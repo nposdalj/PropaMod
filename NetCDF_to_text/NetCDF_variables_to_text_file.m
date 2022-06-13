@@ -42,3 +42,14 @@ for i=vars(1:end)
         end
     end
 end
+
+%% Convert from grid to columns
+%load txt files
+latdir = [txtdir,'\var0.txt'];
+lat = importdata(latdir);
+londir = [txtdir,'\var1.txt'];
+lon = importdata(londir);
+depthdir = [txtdir,'\var2.txt'];
+depth = importdata(depthdir);
+
+[X,Y] = meshgrid (lat, lon);

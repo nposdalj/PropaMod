@@ -28,14 +28,28 @@ for i=vars(1:end)
     varsize=size(var);
     dlmwrite([txtdir,'\varsizes.txt'],varsize,'delimiter',';','-append');
     if numel(varsize)<3
-        dlmwrite(sprintf([txtdir,'\var%d.txt'],i),var);
+        dlmwritetemp = sprintf('var%d.txt',i);
+        dlmwrite([txtdir,'\',dlmwritetemp],var);
     elseif numel(varsize)==3
         for j=1:varsize(3)
-            dlmwrite(sprintf([txtdir,'\var%d.txt'],i),var(:,:,j),'-append');
+            dlmwritetemp = sprintf('var%d.txt',i);
+            dlmwrite([txtdir,'\',dlmwritetemp],var(:,:,j),'-append');
         end
     elseif numel(varsize)==4
         for j=1:(varsize(3)*varsize(4))
-            dlmwrite(sprintf([txtdir,'var%d.txt'],i),var(:,:,j),'-append');
+            dlmwritetemp = sprintf('var%d.txt',i);
+            dlmwrite([txtdir,'\',dlmwritetemp],var(:,:,j),'-append');
         end
     end
 end
+
+%% Convert from grid to columns
+%load txt files
+latdir = [txtdir,'\var0.txt'];
+lat = importdata(latdir);
+londir = [txtdir,'\var1.txt'];
+lon = importdata(londir);
+depthdir = [txtdir,'\var2.txt'];
+depth = importdata(depthdir);
+
+[X,Y] = meshgrid (lat, lon);
