@@ -74,7 +74,7 @@ switch modelType
 end
 
 % Beam angles
-fprintf(fid, '-20.3  20.3 /\n');
+fprintf(fid, '-90  90 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
 fprintf(fid, '50  1500 101.0');

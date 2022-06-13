@@ -63,6 +63,7 @@ SD = 3
 RD = 30
 R = 40000
 RD = 0:1:2000;
+r = 0:rangeStep:dist*1000;
 
 
 fpath = 'D:\Ch.5_ShipMap\PropagationModeling\Bellhop'
@@ -77,9 +78,8 @@ fpath = 'D:\Ch.5_ShipMap\PropagationModeling\Bellhop'
             loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:dist*1000));
             
             [R, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
-            r = 0:rangeStep:dist*1000;
-            R = r
-            makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(R), R, 'C'); % make environment file
+
+            makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
             bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
             
             plotshd 'Radial_1.shd'
