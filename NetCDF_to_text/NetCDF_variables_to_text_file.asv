@@ -28,17 +28,14 @@ for i=vars(1:end)
     varsize=size(var);
     dlmwrite([txtdir,'\varsizes.txt'],varsize,'delimiter',';','-append');
     if numel(varsize)<3
-        dlmwritetemp = sprintf('var%d.txt',i);
-        dlmwrite([txtdir,'\',dlmwritetemp],var);
+        dlmwrite(sprintf([txtdir,'\var%d.txt'],i),var);
     elseif numel(varsize)==3
         for j=1:varsize(3)
-            dlmwritetemp = sprintf('var%d.txt',i);
-            dlmwrite([txtdir,'\',dlmwritetemp],var(:,:,j),'-append');
+            dlmwrite(sprintf([txtdir,'\var%d.txt'],i),var(:,:,j),'-append');
         end
     elseif numel(varsize)==4
         for j=1:(varsize(3)*varsize(4))
-            dlmwritetemp = sprintf('var%d.txt',i);
-            dlmwrite([txtdir,'\',dlmwritetemp],var(:,:,j),'-append');
+            dlmwrite(sprintf([txtdir,'var%d.txt'],i),var(:,:,j),'-append');
         end
     end
 end
