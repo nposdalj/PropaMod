@@ -27,7 +27,7 @@ fprintf(fid, '1\t! NMEDIA\n');
 fprintf(fid, '''SVW''\t! SSPOPT (Analytic or C-linear interpolation)\n');
 
 % line 5: Bottom depth, number of depth values
-fprintf(fid, '%d  0.0  %.3f\t! Depth of bottom (m)\n', length(z), max(z));
+fprintf(fid, '%d  0.0  %.3f\t! Depth of bottom (m)\n', 2, max(z));
 
 % lines 6 to 6 + N: depth and ssp
 fprintf(fid, '%d\t%.6f\t/ \n', z(1), ssp(1));
@@ -77,6 +77,6 @@ end
 fprintf(fid, '-90  90 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
-fprintf(fid, '50  1500 101.0');
+fprintf(fid, '50  2000 101.0');
 
 fclose(fid);

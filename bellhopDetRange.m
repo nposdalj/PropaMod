@@ -55,9 +55,9 @@ hydLoc = [34.2755, -120.0185, 565];
 radials = 1:10:360;                                      % radials in 10 degree intervals
 dist = 40;                                                % distance in km
 distDeg = km2deg(dist);                                  % radial length in degrees
-rangeStep = 50;
+rangeStep = 100;
 
-zssp = [1:1:2000]
+zssp = [1:1:1000]
 ssp = ones(1, length(zssp))*1500
 SD = 3
 RD = 30
@@ -79,7 +79,7 @@ fpath = 'D:\Ch.5_ShipMap\PropagationModeling\Bellhop'
             
             [R, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
 
-            makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+            makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'A'); % make environment file
             bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
             
             plotshd 'Radial_1.shd'
