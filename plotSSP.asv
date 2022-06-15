@@ -23,30 +23,46 @@ ncdisp([NCfilePath,'\',salfile]);
 saldat = ncread([NCfilePath,'\',salfile], "salinity"); %Load salinity data
 ncdisp([NCfilePath,'\',tempfile]);
 tempdat = ncread([NCfilePath,'\',tempfile], "temperature"); %Load potential temperature data
-ncdisp([NCfilePath,'\',depthfile]);
-depthdat = ncread([NCfilePath,'\',depthfile], "salinity"); %Load salinity data
 
-saldat = flip(permute(saldat, [2 1 3 4]),1); % To make map work, swaps lat/long and flips lat
-saldat = flip(permute(saldat, [2 1 3 4]),1); % To make map work, swaps lat/long and flips lat
-
+saldat = flip(permute(saldat, [2 1 3 4]),1); % To make maps work, swaps lat/long and flips lat
+tempdat = flip(permute(tempdat, [2 1 3 4]),1);
 
 lattwelfths = 12*latlims;   % Multiply lat, long values to work w/ HYCOM data (data every 1/12 degree)
 longtwelfths = 12*longlims; 
 
-
-
 layer1 = saldat(longtwelfths(1):longtwelfths(2),lattwelfths(1):lattwelfths(2),1);
 
-figure(1) %map salinity @ 1m
-layer1 = saldat(1:400,2550:3000,1);
-heatmap(layer1, 'Colormap', turbo)
-grid off
-axis off
-
-figure(2)
-layer1 = saldat(1:400,2550:3000,10);
+%% Map salinity and temperature at surface
+figure(1) % Map salinity @ 1m
+layersal = saldat(1:400,2550:3000,1);
 heatmap(layer1, 'Colormap', turbo)
 grid off
 
+%NOTE: temperature data provides potential temperature which may not be
+%what we want
+figure(2) % Map potential temperature @ 1m
+layertemp = tempdat(1:400,2550:3000,1);
+heatmap(layer1, 'Colormap', turbo)
+grid off
 
-ncdisp([NCfilePath,'\','rarchv.2018_331_00_2d.nc']);
+%% Merge data to sound speed
+% Development goal: Get 3D grid of sound speeds
+
+maxdepth = 11;
+dataset_size = (lattwelfths(2) - lattwelfths(1))*(longtwelfths(2) - longtwelfths(1))*maxdepth;
+
+%format of saldat is lat, long, depth
+%format of tempdat is lat, long, depth
+
+%generate salinity and temperature matrices for region
+saldat_reg = saldat(1:400,2550:3000,1:11);
+tempdat_reg = tempdat(1:400,2550:3000,1:11);
+% create analogous "depthdat"
+depthdat_reg = zeros(400, 451, 11);
+for i=1:maxdepth
+    depthdat_reg(1:400,1:451,i) = i;
+end
+
+cdat = salt_water_c(tempdat_reg, depthdat_reg, saldat_reg);
+
+%% Map sound speed
