@@ -89,22 +89,29 @@ reducedYtix(mod(Ytix,500) ~= 0) = "";
 
 %MAKE FIGURE
 long = 190; % User-selected parameter! Longitude line along which to cut
-Longitu = D.Longitude(long);
 sspslicefig = figure(5000 + long);
 longcut_table = cdat_slice(:,:,long);
 longcut_table(longcut_table(:,:)==0) = NaN;
 [latq, depthq] = meshgrid(1:1:301,1:1:5000);
 longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
 longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1380 1560]);
-%longcut = heatmap(cdat_cut(1:5000,1:301,long), 'Colormap', turbo);
 grid off
 longcut.XDisplayLabels = reducedXtix;
 longcut.YDisplayLabels = reducedYtix;
 xlabel("Latitude (*N)")
 ylabel("Depth (m)")
+titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
+titletext = strjoin([string(titledate),"| Longitude", string(D.Longitude(long))]);
+title(titletext)
 title("FALL [11/1/16] | Longitude *293.2")
+asDate
 
+%SAVE FIGURE
 plotDate = extractBetween(fileName, 6,13);
 Longitu = D.Longitude(long);
 set(gcf,'Position',[500 200 700 400]);
-saveas(gcf,[saveDirectory,'\',siteabrev,'\',plotDate,'_',Longitu,'_SSPslice'],'png');
+saveas(gcf,[saveDirectory,'\',siteabrev,'\',char(plotDate),'_',...
+    char(string(round(10*Longitu))),'_SSPslice'],'png');
+
+%saveas(gcf,[saveDirectory,'\',siteabrev,'\',char(plotDate),'_',...   More complicated workaround
+    %char(string(round(Longitu))),char(string(round(10*mod(Longitu, round(Longitu))))),'_SSPslice'],'png');
