@@ -103,8 +103,6 @@ ylabel("Depth (m)")
 titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
 titletext = strjoin([string(titledate),"| Longitude", string(D.Longitude(long))]);
 title(titletext)
-title("FALL [11/1/16] | Longitude *293.2")
-asDate
 
 %SAVE FIGURE
 plotDate = extractBetween(fileName, 6,13);
