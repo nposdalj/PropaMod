@@ -14,9 +14,10 @@ close all
 %% Parameters defined by user
 % Before running, make sure desired data has been downloaded from HYCOM
 % using ext_hycom_gofs_3_1.m.
-fileName = '0001_20160201T120000'; % File name to match.
+fileName = '0001_20161101T120000'; % File name to match.
 siteabrev = 'WAT';
 FilePath = 'C:\Users\HARP\Documents\MATLAB\Propagation_Modelling';
+saveDirectory = 'C:\Users\HARP\Documents\MATLAB\Propagation_Modelling';
 
 %% load data
 load([FilePath,'\', siteabrev, '\', fileName]);
@@ -88,16 +89,22 @@ reducedYtix(mod(Ytix,500) ~= 0) = "";
 
 %MAKE FIGURE
 long = 190; % User-selected parameter! Longitude line along which to cut
-figure(5000 + long)
+Longitu = D.Longitude(long);
+sspslicefig = figure(5000 + long);
 longcut_table = cdat_slice(:,:,long);
 longcut_table(longcut_table(:,:)==0) = NaN;
 [latq, depthq] = meshgrid(1:1:301,1:1:5000);
 longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
-longcut = heatmap(longcut_table, 'Colormap', turbo);
+longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1380 1560]);
 %longcut = heatmap(cdat_cut(1:5000,1:301,long), 'Colormap', turbo);
 grid off
 longcut.XDisplayLabels = reducedXtix;
 longcut.YDisplayLabels = reducedYtix;
-xlabel("Latitude (degrees N)")
+xlabel("Latitude (*N)")
 ylabel("Depth (m)")
-title("Longitude Line 190(?)")
+title("FALL [11/1/16] | Longitude *293.2")
+
+plotDate = extractBetween(fileName, 6,13);
+Longitu = D.Longitude(long);
+set(gcf,'Position',[500 200 700 400]);
+saveas(gcf,[saveDirectory,'\',siteabrev,'\',plotDate,'_',Longitu,'_SSPslice'],'png');
