@@ -33,9 +33,19 @@ for i=1:301
     end
 end
 
+cdat = nan(301,238,40);
+
+for i=1:(301*238(
+if temp_frame(i) ~= 0 & sal_frame(i) ~= 0
+    cdat(i) = salt_water_c(temp_frame,depth_frame,sal_frame); % Sound Speed data
+end
+
+clear cdat
 cdat = salt_water_c(temp_frame,depth_frame,sal_frame); % Sound Speed data
 %lattwelfths = 12*latlims;   % Multiply lat, long values to work w/ HYCOM data (data every 1/12 degree)
 %longtwelfths = 12*longlims; 
+
+cdat(200,200,:)
 
 %% Plot sound speed by depth
 
@@ -113,7 +123,8 @@ depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's
 Xtix = flip(D.Latitude); % Adjust plot tick marks (found this code somewhere on google, as always)
 reducedXtix = string(Xtix);
 reducedXtix(mod(Xtix,1) ~= 0) = "";
-reducedYtix = string(1:5000);
+Ytix = 1:5000;
+reducedYtix = string(Ytix);
 reducedYtix(mod(Ytix,500) ~= 0) = "";
 
 %MAKE FIGURE

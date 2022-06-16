@@ -33,9 +33,20 @@ for i=1:301
     end
 end
 
-cdat = salt_water_c(temp_frame,depth_frame,sal_frame); % Sound Speed data
+cdat = nan(301,238,40);
+
+for i=1:(301*238*40)
+    if temp_frame(i) ~= 0 & sal_frame(i) ~= 0
+        cdat(i) = salt_water_c(temp_frame(i),depth_frame(i),sal_frame(i)); % Sound Speed data
+    end
+end
+
+%cdat = salt_water_c(temp_frame,depth_frame,sal_frame); % Sound Speed data
+
 %lattwelfths = 12*latlims;   % Multiply lat, long values to work w/ HYCOM data (data every 1/12 degree)
 %longtwelfths = 12*longlims; 
+
+cdat(200,200,:)
 
 %% Plot sound speed by depth
 
@@ -131,4 +142,4 @@ longcut.XDisplayLabels = reducedXtix;
 longcut.YDisplayLabels = reducedYtix;
 xlabel("Latitude (degrees N)")
 ylabel("Depth (m)")
-title("Longitude Line 200(?)")
+title("Longitude Line 190(?)")
