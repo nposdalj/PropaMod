@@ -34,7 +34,6 @@ for i=1:301
 end
 
 cdat = salt_water_c(temp_frame,depth_frame,sal_frame); % Sound Speed data
-
 %lattwelfths = 12*latlims;   % Multiply lat, long values to work w/ HYCOM data (data every 1/12 degree)
 %longtwelfths = 12*longlims; 
 
@@ -74,27 +73,20 @@ title("1000 m")
 depthlevel.XDisplayLabels = reducedXtix;
 depthlevel.YDisplayLabels = reducedYtix;
 
-depth0 = heatmap(cdat(1:301,1:238,1), 'Colormap', turbo);
-grid off
-xlabel("0 m")
+%% Plot sound speed profiles by longitude line slices (!! Old Code !!)
+% Skip to line 112 for the correct version
 
-%% Plot sound speed profiles by longitude line slices
 cdat_slice = permute(cdat, [3 1 2]); % Place depth in first position (y), latitude in second position (x)
 depthlist = abs(transpose(D.Depth));
 depthlist(1) = 1;       % ALERT - Wierd workaround
 cdat_cut((depthlist), 1:301, 1:238) = cdat_slice(1:40, 1:301, 1:238); % Reassign sound speeds to actual depths
-cdat_cut(setdiff(1:5000, depthlist), 1:301, 1:238) = 0; %Fill unused depths with 0 (will change in next line...)
+cdat_cut(setdiff(1:5000, depthlist), 1:301, 1:238) = NaN; %Fill unused depths with 0 (will change in next line...)
 for i=1:5000 % What this does is take the non-level depths and replaces their value with that of the level above them.
     if i ~= depthlist
         cdat_cut(i,1:301,1:238) = cdat_cut(i-1,1:301,1:238);
     end
 end
         
-class(depthlist)
-isnan(cdat_cut(200,1:301,1:238))
-
-isnan(cdat_cut(i,1:301,1:238)) == 1
-
 Xtix = flip(D.Latitude); % Adjust plot tick marks (found this code somewhere on google, as always)
 reducedXtix = string(Xtix);
 reducedXtix(mod(Xtix,1) ~= 0) = "";
@@ -102,6 +94,7 @@ Ytix = 1:5000;
 reducedYtix = string(Ytix);
 reducedYtix(mod(Ytix,500) ~= 0) = "";
 
+%MAKE FIGURE
 figure(6)
 long = 200; % User-selected parameter!
 slice = heatmap(cdat_cut(1:5000,1:301,long), 'Colormap', turbo);
@@ -112,5 +105,30 @@ xlabel("Latitude (degrees N)")
 ylabel("Depth (m)")
 title("Longitude Line 200(?)")
 
+%% Plot sound speed profiles by longitude line slices (!! Correct Version !!)
 
-aaaaa = setdiff(1:5000, abs(depthlist));
+cdat_slice = permute(cdat, [3 1 2]); % Place depth in first position (y), latitude in second position (x)
+depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's in cdat_slice
+
+Xtix = flip(D.Latitude); % Adjust plot tick marks (found this code somewhere on google, as always)
+reducedXtix = string(Xtix);
+reducedXtix(mod(Xtix,1) ~= 0) = "";
+Ytix = 1:5000;
+reducedYtix = string(Ytix);
+reducedYtix(mod(Ytix,500) ~= 0) = "";
+
+%MAKE FIGURE
+long = 190; % User-selected parameter! Longitude line along which to cut
+figure(5000 + long)
+longcut_table = cdat_slice(:,:,long);
+longcut_table(longcut_table(:,:)==0) = NaN;
+[latq, depthq] = meshgrid(1:1:301,1:1:5000);
+longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
+longcut = heatmap(longcut_table, 'Colormap', turbo);
+%longcut = heatmap(cdat_cut(1:5000,1:301,long), 'Colormap', turbo);
+grid off
+longcut.XDisplayLabels = reducedXtix;
+longcut.YDisplayLabels = reducedYtix;
+xlabel("Latitude (degrees N)")
+ylabel("Depth (m)")
+title("Longitude Line 200(?)")
