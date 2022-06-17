@@ -14,13 +14,13 @@ close all
 %% Parameters defined by user
 % Before running, make sure desired data has been downloaded from HYCOM
 % using ext_hycom_gofs_3_1.m.
-fileName = '0001_20161101T120000'; % File name to match.
+fileName = '0012_20170101T000000'; % File name to match.
 siteabrev = 'WAT';
-FilePath = 'C:\Users\HARP\Documents\MATLAB\Propagation_Modelling';
-saveDirectory = 'C:\Users\HARP\Documents\MATLAB\Propagation_Modelling';
+FilePath = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM';
+saveDirectory = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM\Plots';
 
 %% load data
-load([FilePath,'\', siteabrev, '\', fileName]);
+load([FilePath,'\', fileName]);
 temp_frame = D.temperature;
 sal_frame = D.salinity;
 temp_frame = flip(permute(temp_frame, [2 1 3]),1); % To make maps work, swaps lat/long and flips lat
@@ -108,7 +108,7 @@ title(titletext)
 plotDate = extractBetween(fileName, 6,13);
 Longitu = D.Longitude(long);
 set(gcf,'Position',[500 200 700 400]);
-saveas(gcf,[saveDirectory,'\',siteabrev,'\',char(plotDate),'_',...
+saveas(gcf,[saveDirectory,'\',char(plotDate),'_',...
     char(string(round(10*Longitu))),'_SSPslice'],'png');
 
 %saveas(gcf,[saveDirectory,'\',siteabrev,'\',char(plotDate),'_',...   More complicated workaround
