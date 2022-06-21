@@ -103,7 +103,7 @@ longcut_table = cdat_slice(:,:,long);
 longcut_table(longcut_table(:,:)==0) = NaN;
 [latq, depthq] = meshgrid(1:1:301,1:1:5000);
 longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
-longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1380 1560]);
+longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1400 1560]);
 grid off
 longcut.XDisplayLabels = reducedXtix;
 longcut.YDisplayLabels = reducedYtix;
