@@ -103,14 +103,14 @@ longcut_table = cdat_slice(:,:,long);
 longcut_table(longcut_table(:,:)==0) = NaN;
 [latq, depthq] = meshgrid(1:1:301,1:1:5000);
 longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
-longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1380 1560]);
+longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1400 1560]);
 grid off
 longcut.XDisplayLabels = reducedXtix;
 longcut.YDisplayLabels = reducedYtix;
 xlabel("Latitude (*N)")
 ylabel("Depth (m)")
 titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
-titletext = strjoin([string(titledate),"| Longitude", string(D.Longitude(long))]);
+titletext = strjoin([string(titledate),"|", string(D.Longitude(long)), "E"]);
 title(titletext)
 
 %SAVE FIGURE
@@ -147,4 +147,4 @@ for i=1:length(siteabrev)
 end
 SSP_table = array2table(SSP_table);
 SSP_table.Properties.VariableNames = {'Depth' char(siteabrev(1)) char(siteabrev(2)) char(siteabrev(3)) char(siteabrev(4)) char(siteabrev(5))};
-writetable(SSP_table,"SSP_WAT.xlsx")
+writetable(SSP_table,[saveDirectory,'\', 'SSP_', regionabrev, '.xlsx'])

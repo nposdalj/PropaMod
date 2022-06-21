@@ -110,7 +110,7 @@ longcut.YDisplayLabels = reducedYtix;
 xlabel("Latitude (*N)")
 ylabel("Depth (m)")
 titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
-titletext = strjoin([string(titledate),"| Longitude", string(D.Longitude(long))]);
+titletext = strjoin([string(titledate),"|", string(D.Longitude(long)), "E"]);
 title(titletext)
 
 %SAVE FIGURE
