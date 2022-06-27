@@ -1,7 +1,8 @@
 % plotSSP
 % Plot Sound Speed Profile for region of choice.
 % Configured for use with HYCOM's files
-% Latitudes and longitudes are configured for Western Atlantic (WAT)
+% Latitudes and longitudes are configured for Western Atlantic (WAT). To
+% change this, make edits in ext_hycom_gofs_3_1.m.
 
 % AD: HYCOM data provides data points for every 1/12 degree. I believe 
 % that is at most every ~9.25 km. This MIGHT allow us to see significant
@@ -20,7 +21,6 @@ FilePath = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM';
 saveDirectory = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM\Plots';
 
 %For PART B (Longitude Line Plots): Select longitude line along which to cut
-%cut
 long = 150;
 
 %For PART C (Site Plots): Add site data below: siteabrev, lat, long
@@ -28,7 +28,7 @@ siteabrev = ["NC";       "BC";       "GS";       "BP";       "BS"];
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833];
 Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900];
 
-%% load data
+%% Load data
 load([FilePath,'\', fileName]);
 temp_frame = D.temperature;
 sal_frame = D.salinity;
@@ -90,7 +90,7 @@ depthlevel.YDisplayLabels = reducedYtix;
 cdat_slice = permute(cdat, [3 1 2]); % Place depth in first position (y), latitude in second position (x)
 depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's in cdat_slice
 
-Xtix = flip(D.Latitude); % Adjust plot tick marks (found this code somewhere on google, as always)
+Xtix = flip(D.Latitude); % Adjust plot tick marks
 reducedXtix = string(Xtix);
 reducedXtix(mod(Xtix,1) ~= 0) = "";
 Ytix = 1:5000;
@@ -101,8 +101,8 @@ reducedYtix(mod(Ytix,500) ~= 0) = "";
 sspslicefig = figure(5000 + long);
 longcut_table = cdat_slice(:,:,long);
 longcut_table(longcut_table(:,:)==0) = NaN;
-[latq, depthq] = meshgrid(1:1:301,1:1:5000);
-longcut_table = interp2((1:301).', (depthlist).', longcut_table, latq, depthq);
+[latq, depthq] = meshgrid(1:1:length(D.Latitude),1:1:5000);
+longcut_table = interp2((1:length(D.Latitude)).', (depthlist).', longcut_table, latq, depthq);
 longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1400 1560]);
 grid off
 longcut.XDisplayLabels = reducedXtix;
@@ -120,7 +120,7 @@ set(gcf,'Position',[500 200 700 400]);
 saveas(gcf,[saveDirectory,'\',char(plotDate),'_',...
     char(string(round(10*Longitu))),'_SSPslice'],'png');
 
-%saveas(gcf,[saveDirectory,'\',regionabrev,'\',char(plotDate),'_',...     %More complicated workaround for lines 112-113
+%saveas(gcf,[saveDirectory,'\',regionabrev,'\',char(plotDate),'_',... %More complicated workaround for lines 120-21
     %char(string(round(Longitu))),char(string(round(10*mod(Longitu, round(Longitu))))),'_SSPslice'],'png');
     
 %% (C) LOCATION: Plot sound speed profile at each site
