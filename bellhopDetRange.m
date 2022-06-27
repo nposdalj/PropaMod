@@ -48,7 +48,7 @@ hlat = 34.2755
 hlon = -120.0185;
 
 % Center of source cell
-hydLoc = [34.2755, -120.0185, 565];
+hydLoc = [hlat, hlon, 565];
 
 
 % Radial intervals and length
@@ -57,11 +57,15 @@ dist = 40;                                                % distance in km
 distDeg = km2deg(dist);                                  % radial length in degrees
 rangeStep = 100;
 
-
+% source depth
 SD = 3
-RD = 30
+% receiver depth
+%RD = 30
+% range
 R = 40000
+% receiver depth
 RD = 0:1:2000;
+% range with steps
 r = 0:rangeStep:dist*1000;
 
 
@@ -78,6 +82,8 @@ for rad = 1:length(radials)
     
     [Range, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
+   
+
     zssp = [1:1:max(bath)+1];
     ssp = ones(1, length(zssp))*1500;
     makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
@@ -97,10 +103,12 @@ test = pressure(1, 1, :, :);
 freq = 12000
 [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd( 'Radial_10.shd', freq );
 
-test = squeeze(pressure(1, 1,:,:));
-PL = -20*log10(abs(test));
-PL(isinf(PL)) = 2000
-
+PLslice = squeeze(pressure(1, 1,:,:));
+PL = -20*log10(abs(PLslice));
+PL(isinf(PL)) = 0
+    
+    plotshd('Radial_10.shd')
+    plotbty 'Radial_10.bty'
 
 
 figure
@@ -119,5 +127,5 @@ caxis([20 120])
 
 plot(pressure(1, 1, :, :))
 figure
-    plotshd('Radial_50.shd')
-    plotbty 'Radial_50.bty'
+    plotshd('Radial_260.shd')
+    plotbty 'Radial_260.bty'
