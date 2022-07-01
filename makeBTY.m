@@ -51,7 +51,7 @@ Range = ri.';
 bath = abs(bathi).';
 
 [Rsort, I] = sort(Range);
-bathSort = flipud(bath(I));
+bathSort = bath(I);
 
 writebdry( fpn, 'C', ([Rsort, bathSort]) ) % write bty file
 

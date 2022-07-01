@@ -5,14 +5,22 @@
 % bathymetry data (sbc_bathymetry.txt)
 % sound speed profiles
 %
+%
+% Variables to change: 
+% fpath: path to where the bellhop code is.
+%   - makeBTY.m
+%   - makeENV.m
+%   - read_shd.m
+% Bath: Path and file to your bathymetry file.
+% SSP_WAT: Path and file to your sound speed profile data.
 
 
 
 clear variables
 clear all
+fpath = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'
 
 
-global zc
 global rangeStep
 global lat
 global lon
@@ -22,12 +30,17 @@ global loni
 global rad
 
 
-%% Bathymetry along Radials
+outDir = 'D:\Ch.5_ShipMap\PropagationModeling\Bellhop'
+SITE = 'NC'
+
+
+
+%% Bathymetry 
 
 % Reading in bathymetry data
-Bath = load('D:\Ch.5_ShipMap\Bathymetry Data\sbc_bathymetry.txt');
-lon = Bath(:,1);                                        % vector for longitude
-lat = Bath(:,2);                                        % vector for latitude
+Bath = load('C:\Users\HARP\Documents\GitHub\PropagationModeling\bathy.txt');
+lon = Bath(:,2);                                        % vector for longitude
+lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
 %btyz(btyz > 0) = nan;                                   % getting rid of land
 %indNan = find(isnan(btyz));
@@ -35,80 +48,168 @@ z = Bath(:,3);                                       % vector for depth (depth d
 %lon(indNan) = nan;
 z = -z;                                           % making depth down  positive
 
+% 
+% S = ones(1, length(z));
+% C = -z; %making color of depth for plot negative down depths
+% figure
+% geoscatter(lat, lon, S, -z);
+% borders('continental us','FaceColor', 'black')
+% 
+%% Sound Speed Profiles
 
-S = ones(1, length(z));
-C = -z; %making color of depth for plot negative down depths
-%figure
-%geoscatter(lat, lon, S, -btyz);
-%borders('continental us','FaceColor', 'black')
+SSP_WAT = readtable('C:\Users\HARP\Documents\GitHub\PropagationModeling\SSP_WAT.xlsx')
+NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
+idxNan = isnan(NCSSPcourse(:, 2));
+NCSSPcourse(idxNan, :) = [];
+
+vq = interp1(NCSSPcourse(:, 1), NCSSPcourse(:, 2), 1:1:NCSSPcourse(end, 1));
+NCSSP = [1:1:NCSSPcourse(end, 1); vq]';
 
 
+%% Hydrophone location and depth
+hlat = 39.8326;
+hlon = -69.9800;
+hdepth = 960;
 
-hlat = 34.2755
-hlon = -120.0185;
 
 % Center of source cell
-hydLoc = [hlat, hlon, 565];
+hydLoc = [hlat, hlon, hdepth];
 
 
 % Radial intervals and length
-radials = 0:10:350;                                      % radials in 10 degree intervals
-dist = 40;                                                % distance in km
+radials = 0:5:350;                                       % radials in 10 degree intervals
+dist = 20;                                               % distance in km to farthest point you want
 distDeg = km2deg(dist);                                  % radial length in degrees
-rangeStep = 100;
+rangeStep = 10;                                          % in meters
 
 % source depth
-SD = 3
+SD = 800
 % receiver depth
 %RD = 30
 % range
-R = 40000
+%R = 20000                                               % in meters
 % receiver depth
-RD = 0:1:2000;
+RD = 0:1:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 
 
-fpath = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'
 for rad = 1:length(radials)
     
     
     % gives lat lon point 20 km away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
     
-    % RANGE STEP
+    % RANGE STEP, interpolating a line from the center point to the point
+    % at edge of circle
     lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rangeStep:dist*1000));
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:dist*1000));
     
+    % make bathymetry file to be used in belllhop
     [Range, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
    
-
+    % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-    ssp = ones(1, length(zssp))*1500;
+    ssp = NCSSP(1:length(zssp), 2);
+    % make environment file to be used in bellhop
     makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    % running bellhop
     bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
     
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
+
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
+    PLslice = squeeze(pressure(1, 1,:,:));
+    PL = -20*log10(abs(PLslice));
+    
+    save([outDir '\' SITE '_Radial_' num2str(radials(rad)) '.mat'], 'PL')
+    
     clear Range bath
 end
 
-freq = 12000
-[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd( 'Radial_10.shd', freq );
-%    Reads source at the specified frequency.
-test = pressure(1, 1, :, :);
+
+matFiles = ls(fullfile(outDir,'*Radial*.mat'));
 
 
-freq = 12000
-[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd( 'Radial_10.shd', freq );
 
-PLslice = squeeze(pressure(1, 1,:,:));
-PL = -20*log10(abs(PLslice));
-PL(isinf(PL)) = 0
+
+for mf = 1:size(matFiles,1)
     
-    plotshd('Radial_10.shd')
-    plotbty 'Radial_10.bty'
+    
+    iffn = fullfile(outDir,matFiles(mf,:));
+    
+    load(iffn);
+    
+    [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
+    
+    [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
+    
+    zq = interp2(x1,y1, PL,xq1, yq1);
+    
+    PL800(mf, :) = zq(790, :);
+    
+    
+end
+
+
+PL800(isinf(PL800)) = NaN;
+PL800(isinf(PL800)) = NaN;
+PL800 > 125 == NaN; 
+RL800 = 220 - PL800;
+RL800(RL800 < 125) = NaN; 
+
+
+R = 1:1:20100;
+figure; 
+polarPcolor(R, radials, RL800)
+colormap('jet')
+t=colorbar;
+test=flipud(colormap('jet'));
+colormap(test);
+set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
+
+
+
+
+
+test = load('NC_Radial_0.mat')
+test = test.PL
+
+x = meshgrid(1:10:2010);
+y = meshgrid(1:10:810);
+v = test; 
+
+xq = meshgrid(1:1:2000);
+yq = meshgrid(1:1:800);
+
+
+[x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
+
+[xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
+
+zq = interp2(x1,y1, PL,xq1, yq1);
+
+PL800 = zq(790, :)
+PL800(isinf(PL800)) = NaN
+figure
+plot(xq1, 220 - PL800)
+
+
+
+figure
+pcolor(zq);
+xlim([0 20100])
+ylim([0 810])
+axis ij
+shading interp;
+xlabel('Range [m]')
+ylabel('Depth [m]')
+test=flipud(colormap('jet'));
+colormap(zq);
+t=colorbar;
+set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 
 
 figure
@@ -129,3 +230,11 @@ plot(pressure(1, 1, :, :))
 figure
     plotshd('Radial_260.shd')
     plotbty 'Radial_260.bty'
+    
+    
+    
+    
+    
+    
+plotshd('Radial_0.shd')
+plotbty 'Radial_0.bty'
