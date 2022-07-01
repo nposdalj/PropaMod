@@ -36,7 +36,7 @@ global loni
 global rad
 
 
-outDir = 'D:\Ch.5_ShipMap\PropagationModeling\Bellhop'
+outDir = 'C:\Users\HARP\Documents\propmod_bathysaves'
 SITE = 'NC'
 
 
@@ -44,7 +44,7 @@ SITE = 'NC'
 %% Bathymetry 
 
 % Reading in bathymetry data
-Bath = load('C:\Users\HARP\Documents\GitHub\PropagationModeling\bathy.txt');
+Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
@@ -63,7 +63,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable('C:\Users\HARP\Documents\GitHub\PropagationModeling\SSP_WAT.xlsx')
+SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx')
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
@@ -95,7 +95,7 @@ SD = 800
 % range
 %R = 20000                                               % in meters
 % receiver depth
-RD = 0:1:1000;
+RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 
