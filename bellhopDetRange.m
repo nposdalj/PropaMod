@@ -13,7 +13,13 @@
 %   - read_shd.m
 % Bath: Path and file to your bathymetry file.
 % SSP_WAT: Path and file to your sound speed profile data.
-
+%
+%
+%
+%
+% TO DO: 
+% - make radial filenames save so that there's 3 digits so they are in
+% order (example 010, 020, etc)
 
 
 clear variables
@@ -105,7 +111,7 @@ for rad = 1:length(radials)
     lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rangeStep:dist*1000));
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:dist*1000));
     
-    % make bathymetry file to be used in belllhop
+    % make bathymetry file to be used in bellhop
     [Range, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
    
@@ -130,18 +136,23 @@ for rad = 1:length(radials)
 end
 
 
-matFiles = ls(fullfile(outDir,'*Radial*.mat'));
+matFiles = ls(fullfile(outDir,'*Radial*.shd'));
 
 
 
 
-for mf = 1:size(matFiles,1)
+for rad = 1:length(radials)
+   
     
     
     iffn = fullfile(outDir,matFiles(mf,:));
+
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
+    PLslice = squeeze(pressure(1, 1,:,:));
+    PL = -20*log10(abs(PLslice));
     
-    load(iffn);
     
+        
     [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
     
     [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
@@ -150,6 +161,8 @@ for mf = 1:size(matFiles,1)
     
     PL800(mf, :) = zq(790, :);
     
+    clear zq yq1 xq1 x1 y1 
+    disp(['\Radial_' num2str(radials(rad)) '.shd'])
     
 end
 
