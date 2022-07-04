@@ -5,7 +5,7 @@
 % bathymetry data (sbc_bathymetry.txt)
 % sound speed profiles
 %
-%
+%omg
 % Variables to change: 
 % fpath: path to where the bellhop code is.
 %   - makeBTY.m
@@ -24,7 +24,7 @@
 
 clear variables
 clear all
-fpath = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'
+fpath = 'C:\Users\HARP\PropagationModeling'
 
 
 global rangeStep
@@ -36,14 +36,15 @@ global loni
 global rad
 
 
-outDir = 'C:\Users\HARP\Documents\propmod_bathysaves'
-SITE = 'NC'
+outDir = 'C:\Users\HARP\Documents\propmod_bathysaves';
+SITE = 'NC';
 
 
 
 %% Bathymetry 
 
 % Reading in bathymetry data
+disp('Loading bathymetry data...')
 Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
@@ -89,7 +90,8 @@ distDeg = km2deg(dist);                                  % radial length in degr
 rangeStep = 10;                                          % in meters
 
 % source depth
-SD = 800
+SD = 800;
+disp(['Source depth: ', num2str(SD), ' m'])
 % receiver depth
 %RD = 30
 % range
@@ -99,7 +101,7 @@ RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 
-
+disp('General setup complete. Entering Loop of Doom...')
 for rad = 1:length(radials)
     
     
@@ -117,30 +119,32 @@ for rad = 1:length(radials)
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-    ssp = NCSSP(1:length(zssp), 2);
+    ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    disp(['Made environment file for Radial_', num2str(radials(rad)),'. Now running Bellhop...'])   % Status update
     % running bellhop
     bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+    disp(['Ran Bellhop for Radial_', num2str(radials(rad)),'. Moving forward to the next radial.']) % Status update
     
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
-    PLslice = squeeze(pressure(1, 1,:,:));
-    PL = -20*log10(abs(PLslice));
-    
-    save([outDir '\' SITE '_Radial_' num2str(radials(rad)) '.mat'], 'PL')
-    
+    %[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
+   % PLslice = squeeze(pressure(1, 1,:,:));
+   % save([outDir '\' SITE '_Radial_' num2str(radials(rad)) '.mat'], 'PL')
+    % you can take this out!!^^^^ don't need to save matlab
     clear Range bath
 end
+disp('Completed running Bellhop for all radials. Saving...')
 
 
 matFiles = ls(fullfile(outDir,'*Radial*.shd'));
+disp('Save successful.')
 
 
 
-
+% join this to the loop above
 for rad = 1:length(radials)
    
     
