@@ -46,6 +46,7 @@ SITE = 'NC';
 % Reading in bathymetry data
 disp('Loading bathymetry data...')
 Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
+Bath = load('C:\Users\HARP\Documents\propmod_bathysaves\bathy.txt'); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
@@ -64,7 +65,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx')
+SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx');
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
