@@ -24,7 +24,9 @@
 
 clear variables
 clear all
-fpath = 'H:\My Drive\PropagationAnalysis'; %fpath = 'C:\Users\HARP\PropagationModeling'
+
+drive = 'P:';
+fpath = [drive, '\My Drive\PropagationModeling']; %fpath = 'C:\Users\HARP\PropagationModeling'
 
 
 global rangeStep
@@ -37,7 +39,7 @@ global rad
 
 
 SITE = 'NC';
-outDir = ['H:\My Drive\PropagationAnalysis\Radials\' SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
+outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 
 
 
@@ -105,7 +107,7 @@ r = 0:rangeStep:dist*1000;
 
 disp('General setup complete. Beginning radial construction...')
 for rad = 1:length(radials)
-    disp(['Constructing Radial ' num2str(radials(rad))])
+    disp(['Constructing Radial ' num2str(radials(rad)), ':'])
     
     % gives lat lon point 20 km away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
@@ -117,8 +119,10 @@ for rad = 1:length(radials)
     
     % make bathymetry file to be used in bellhop
     disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
-    [Range, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    tic
+    [Range, bath] = makeBTY(outDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
+    toc
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
@@ -127,11 +131,13 @@ for rad = 1:length(radials)
     %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
-    makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(outDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
     disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
-    bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+    tic
+    bellhop(fullfile(outDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
         %NOTE: Swap fpath with outDir here
+    toc
     
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
@@ -143,7 +149,7 @@ for rad = 1:length(radials)
     % you can take this out!!^^^^ don't need to save matlab
     clear Range bath
 end
-disp('Completed running Bellhop for all radials. Saving...')
+disp('Completed constructing all radials.')
 
 
 matFiles = ls(fullfile(outDir,'*Radial*.shd'));
