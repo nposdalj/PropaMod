@@ -36,7 +36,7 @@ global loni
 global rad
 
 
-outDir = 'C:\Users\HARP\Documents\propmod_bathysaves';
+outDir = 'C:\Users\HARP\Documents\propmod_bathysaves'; % EDIT - Set up Google Drive folder - for loading in items and saving
 SITE = 'NC';
 
 
@@ -45,10 +45,12 @@ SITE = 'NC';
 
 % Reading in bathymetry data
 disp('Loading bathymetry data...')
+tic % EDIT - these can help
 Bath = load('C:\Users\HARP\Documents\propmod_bathysaves\bathy.txt'); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
+toc
 %btyz(btyz > 0) = nan;                                   % getting rid of land
 %indNan = find(isnan(btyz));
 %lat(indNan) = nan;
@@ -64,7 +66,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx');
+SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx'); %EDIT -> GDrive
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
@@ -120,16 +122,20 @@ for rad = 1:length(radials)
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-    ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
+    
+    ssp = NCSSP([1:length(zssp)], 2);
+    %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
     makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
     disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
     bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+        %NOTE: Swap fpath with outDir here
     
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
+    
 
     %[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
    % PLslice = squeeze(pressure(1, 1,:,:));
@@ -150,7 +156,7 @@ for rad = 1:length(radials)
    
     
     
-    iffn = fullfile(outDir,matFiles(mf,:));
+    iffn = fullfile(outDir,matFiles(rad,:));
 
     [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
