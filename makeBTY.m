@@ -1,4 +1,4 @@
-function [R, bath] = makeBTY(fpath, fname, slat, slon, hlat, hlon)
+function [Range, bath] = makeBTY(fpath, fname, slat, slon, hlat, hlon)
 % VZ: Modified from Eric Snyder's makeBTY.m code
 % NOTE: I'm using the hydrophone as the source and ship as receiver for now
 global rangeStep
@@ -7,6 +7,9 @@ global lon
 global z
 global lati
 global loni
+global rad
+
+
 
 %% Parameters for testing function
 % slat = 29.2570;
@@ -37,19 +40,18 @@ fpn = fullfile(fpath, [fname, '.bty']);
 % loni = linspace(hlon, slon, length(0:rangeStep:dist*1000));
 
 
-
-[xi, yi] = latlon2xy(lati, loni, hlat, hlon);
+[xi, yi] = latlon2xy(lati(rad, :), loni(rad, :), hlat, hlon);
 
 ri = sqrt(xi.^2 + yi.^2)./1000;
 
 %bathi = interp2(lat.', lon.', z.', lati, loni);
-bathi = griddata(lat, lon, z, lati, loni, 'linear');
+bathi = griddata(lat, lon, z, lati(rad, :), loni(rad, :), 'linear');
 
-R = ri.';
+Range = ri.';
 bath = abs(bathi).';
 
-[Rsort, I] = sort(R);
-bathSort = flipud(bath(I));
+[Rsort, I] = sort(Range);
+bathSort = bath(I);
 
 writebdry( fpn, 'C', ([Rsort, bathSort]) ) % write bty file
 
