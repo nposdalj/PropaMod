@@ -24,7 +24,7 @@
 
 clear variables
 clear all
-fpath = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'; %fpath = 'C:\Users\HARP\PropagationModeling'
+fpath = 'H:\My Drive\PropagationAnalysis'; %fpath = 'C:\Users\HARP\PropagationModeling'
 
 
 global rangeStep
@@ -36,8 +36,8 @@ global loni
 global rad
 
 
-outDir = 'C:\Users\HARP\Documents\propmod_bathysaves'; % EDIT - Set up Google Drive folder - for loading in items and saving
 SITE = 'NC';
+outDir = ['H:\My Drive\PropagationAnalysis\Radials\' SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 
 
 
@@ -46,7 +46,7 @@ SITE = 'NC';
 % Reading in bathymetry data
 disp('Loading bathymetry data...')
 tic % EDIT - these can help
-Bath = load('C:\Users\HARP\Documents\propmod_bathysaves\bathy.txt'); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
+Bath = load([fpath, '\Bathymetry\bathy.txt']); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
@@ -66,7 +66,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx'); %EDIT -> GDrive
+SSP_WAT = readtable([fpath, '\SSPs\SSP_WAT.xlsx']); %EDIT -> GDrive
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
@@ -86,7 +86,7 @@ hydLoc = [hlat, hlon, hdepth];
 
 
 % Radial intervals and length
-radials = 0:5:350;                                       % radials in 10 degree intervals
+radials = 0:5:355;                                       % radials in 10 degree intervals
 dist = 20;                                               % distance in km to farthest point you want
 distDeg = km2deg(dist);                                  % radial length in degrees
 rangeStep = 10;                                          % in meters
@@ -103,9 +103,9 @@ RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 
-disp('General setup complete. Entering Loop of Doom...')
+disp('General setup complete. Beginning radial construction...')
 for rad = 1:length(radials)
-    disp(['Now constructing: Radial ' num2str(radials(rad))])
+    disp(['Constructing Radial ' num2str(radials(rad))])
     
     % gives lat lon point 20 km away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
