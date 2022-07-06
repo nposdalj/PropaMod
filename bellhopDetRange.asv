@@ -39,9 +39,8 @@ global rad
 
 
 SITE = 'NC';
-outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-
-
+%outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
+bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
 
 %% Bathymetry 
 
@@ -68,7 +67,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable([fpath, '\SSPs\SSP_WAT.xlsx']); %EDIT -> GDrive
+SSP_WAT = readtable([fpath, '\SSPs\SSP_WAT_MissingDepthsFilled.xlsx']); %EDIT -> GDrive
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
@@ -120,7 +119,7 @@ for rad = 1:length(radials)
     % make bathymetry file to be used in bellhop
     disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
     tic
-    [Range, bath] = makeBTY(outDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    [Range, bath] = makeBTY(bellhopSaveDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
     toc
    
@@ -131,11 +130,13 @@ for rad = 1:length(radials)
     %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
-    makeEnv(outDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(bellhopSaveDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
     disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
     tic
-    bellhop(fullfile(outDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+    %bellhop(fullfile('C:\Users\HARP\Documents\GitHub\PropagationModeling', ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+
+    bellhop(fullfile(bellhopSaveDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
         %NOTE: Swap fpath with outDir here
     toc
     
@@ -152,49 +153,51 @@ end
 disp('Completed constructing all radials.')
 
 
-matFiles = ls(fullfile(outDir,'*Radial*.shd'));
+matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
 disp('Save successful.')
 
 
-
+size(matFiles,1)
 % join this to the loop above
 for rad = 1:length(radials)
    
     
     
-    iffn = fullfile(outDir,matFiles(rad,:));
+    iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(radials(rad)) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     
     
         
-    [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
+    [x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    % [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
     
-    [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
+    [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    % [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
     
     zq = interp2(x1,y1, PL,xq1, yq1);
     
-    PL800(mf, :) = zq(790, :);
+    PL800(rad, :) = zq(790, :); % PL800(mf, :) = zq(790, :);
     
     clear zq yq1 xq1 x1 y1 
     disp(['\Radial_' num2str(radials(rad)) '.shd'])
     
 end
 
+PL800_backup = PL800;
 
 PL800(isinf(PL800)) = NaN;
 PL800(isinf(PL800)) = NaN;
-PL800 > 125 == NaN; 
+PL800 > 125 == NaN; %AD - what is this line for
 RL800 = 220 - PL800;
 RL800(RL800 < 125) = NaN; 
 
-
-R = 1:1:20100;
+R = 1:1:20010;
 figure; 
-polarPcolor(R, radials, RL800)
-colormap('jet')
+Radiance = polarPcolor(R, radials, RL800);
+colormap winter
 t=colorbar;
 test=flipud(colormap('jet'));
 colormap(test);
@@ -268,3 +271,9 @@ figure
     
 plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
+
+figure
+plotshd('Radial_0.shd')
+plotbty 'Radial_0.bty'
+plotshd('Radial_180.shd')
+plotbty 'Radial_180.bty'
