@@ -21,7 +21,11 @@ FilePath = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM';
 saveDirectory = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM\Plots';
 
 %For PART B (Longitude Line Plots): Select longitude line along which to cut
-long = 150;
+long = 150; %At present this code cannot accept longitude values directly...
+            %After running line 32, open D.Longitude and enter the position
+            %of your desired longitude (e.g. 150 --> 290 deg E)
+            %I (AD) may update this to accept any (actual) longitude and extrapolate
+            %from the data
 
 %For PART C (Site Plots): Add site data below: siteabrev, lat, long
 siteabrev = ["NC";       "BC";       "GS";       "BP";       "BS"];
@@ -110,8 +114,7 @@ longcut.YDisplayLabels = reducedYtix;
 xlabel("Latitude (*N)")
 ylabel("Depth (m)")
 titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
-titletext = strjoin([string(titledate),"|", string(D.Longitude(long)), "E"]);
-title(titletext)
+title([char(titledate), ' | ', num2str(D.Longitude(long)), char(176), 'E'])
 
 %SAVE FIGURE
 plotDate = extractBetween(fileName, 6,13);
@@ -138,8 +141,7 @@ for i=1:length(siteabrev)
     figure(200+i)
     plot(numdepths, -depthlist,'-o')
     xlabel("Sound Speed (m/s)"); ylabel("Depth (m)")
-    titletext = strjoin(["Sound Speed Profile at", siteabrev(i),"|" siteCoords(i,1), "N,", siteCoords(i,2), "E"]);
-    title(titletext)
+    title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
     set(gcf,"Position",[(305*i - 300) 100 300 600])
     saveas(gcf,[saveDirectory,'\',char(plotDate),'_',char(siteabrev(i)),'_SSP'],'png');
     
