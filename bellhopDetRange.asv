@@ -27,6 +27,8 @@ clear all
 
 drive = 'P:';
 fpath = [drive, '\My Drive\PropagationModeling']; %fpath = 'C:\Users\HARP\PropagationModeling'
+fpath_Radials = [fpath, '\Radials\', SITE];
+fpath_Plots = [fpath, '\Plots\', SITE];
 
 
 global rangeStep
@@ -37,8 +39,10 @@ global lati
 global loni
 global rad
 
+%% Parameters defined by user
 
 SITE = 'NC';
+Region = 'WAT';
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
 
@@ -77,7 +81,7 @@ NCSSP = [1:1:NCSSPcourse(end, 1); vq]';
 
 
 %% Hydrophone location and depth
-hlat = 39.8326;
+hlat = 39.8326;     %AD: I'll configure this to call an .xlsx file with all the site coords and depths
 hlon = -69.9800;
 hdepth = 960;
 
@@ -103,6 +107,8 @@ disp(['Source depth: ', num2str(SD), ' m'])
 RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
+
+%% Build Radials
 
 disp('General setup complete. Beginning radial construction...')
 for rad = 1:length(radials)
@@ -152,32 +158,35 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 
-matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
-% Generate new .shd files with 3 digits
-for k = 1:length(matFiles)
-    oldFileName = matFiles(k,:);
+%% Generate new files with 3 digits and move (copy) to save directory
+
+%matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
+allFiles = ls(fullfile(bellhopSaveDir,'*Radial*'));
+for k = 1:length(allFiles)
+    oldFileName = allFiles(k,:);
     firsthalf = oldFileName(1:strfind(oldFileName,'_'));
-    if matFiles(k,13) == ' '
-        secondhalf = oldFileName(strfind(oldFileName,'.shd')-1:end);
+    if allFiles(k,13) == ' '
+        secondhalf = oldFileName(strfind(oldFileName,'.')-1:end);
         newFileName = strcat(firsthalf, '00', secondhalf);
-    elseif matFiles(k,14) == ' '
-        secondhalf = oldFileName(strfind(oldFileName,'.shd')-2:end);
+    elseif allFiles(k,14) == ' '
+        secondhalf = oldFileName(strfind(oldFileName,'.')-2:end);
         newFileName = strcat(firsthalf, '0', secondhalf);
     else
         newFileName = oldFileName;
     end
     copyfile(fullfile(bellhopSaveDir,oldFileName),fullfile(fpath, 'Radials',SITE,newFileName));
+    disp([oldFileName, ' copied to save directory as ', newFileName])
 end
-matFiles = ls(fullfile(fpath, 'Radials', SITE, '*Radial*.shd'));
+%matFiles = ls(fullfile(fpath, 'Radials', SITE, '*Radial*.shd'));
+allFiles = ls(fullfile(fpath, 'Radials', SITE, '*Radial*.shd'));
 
-shellcmd = ['move Radial_' num2str(f(findex)) 'Hz_' num
-
-disp('Save successful.')
+%shellcmd = ['move Radial_' num2str(f(findex)) 'Hz_' num
 
 %% Generate plots
+makeDepthPlots = [150, 50, 450]; % USER: edit with [min depth, step size, max depth]
 
 % join this to the loop above
-for plotdepth = 150:50:450;
+for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
@@ -207,19 +216,17 @@ R = 1:1:20010;
 figure(10000 + plotdepth); 
 [Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,20010)], 'Colormap', jet, 'Nspokes', 7);
 set(calbar,'location','EastOutside')
-calbar.Limits = [125 155];
-Radiance.ColorLimits = [125 155];
-size(Radiance.ZData)
-Radiance.CData = 'flat';
+caxis([125 155]);
 yticks(0:60:300)
 %colormap('jet')
 %t=colorbar('Limits', [125 155]);
 %test=flipud(colormap('jet'));
 %colormap(test);
 set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
+set(gcf, 'Position', [100 100 800 600])
 title(['\fontsize{15}', SITE, ' - ', num2str(plotdepth), ' m'],'Position',[0 -1.2])
 saveas(Radiance,[fpath,'\Plots\',SITE,'\',SITE,'_',num2str(plotdepth),'_RadMap.png'])
-disp(['Radial Map saved: Site ', SITE, ', Depth ', num2str(plotdepth), ' m'])
+disp(['Radial Map saved: ', SITE, ', ', num2str(plotdepth), ' m'])
 
 end
 
