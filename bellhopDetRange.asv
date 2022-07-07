@@ -24,7 +24,9 @@
 
 clear variables
 clear all
-fpath = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'; %fpath = 'C:\Users\HARP\PropagationModeling'
+
+drive = 'P:';
+fpath = [drive, '\My Drive\PropagationModeling']; %fpath = 'C:\Users\HARP\PropagationModeling'
 
 
 global rangeStep
@@ -36,19 +38,20 @@ global loni
 global rad
 
 
-outDir = 'C:\Users\HARP\Documents\propmod_bathysaves';
 SITE = 'NC';
-
-
+%outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
+bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
 
 %% Bathymetry 
 
 % Reading in bathymetry data
 disp('Loading bathymetry data...')
-Bath = load('C:\Users\HARP\Documents\propmod_bathysaves\bathy.txt'); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
+tic % EDIT - these can help
+Bath = load([fpath, '\Bathymetry\bathy.txt']); %Bath = load('C:\Users\HARP\PropagationModeling\bathy.txt');
 lon = Bath(:,2);                                        % vector for longitude
 lat = Bath(:,1);                                        % vector for latitude
 z = Bath(:,3);                                       % vector for depth (depth down is negative)
+toc
 %btyz(btyz > 0) = nan;                                   % getting rid of land
 %indNan = find(isnan(btyz));
 %lat(indNan) = nan;
@@ -64,7 +67,7 @@ z = -z;                                           % making depth down  positive
 % 
 %% Sound Speed Profiles
 
-SSP_WAT = readtable('C:\Users\HARP\Documents\propmod_bathysaves\SSP_WAT.xlsx');
+SSP_WAT = readtable([fpath, '\SSPs\SSP_WAT_MissingDepthsFilled.xlsx']); %EDIT -> GDrive
 NCSSPcourse = [SSP_WAT.Depth SSP_WAT.NC];
 idxNan = isnan(NCSSPcourse(:, 2));
 NCSSPcourse(idxNan, :) = [];
@@ -84,7 +87,7 @@ hydLoc = [hlat, hlon, hdepth];
 
 
 % Radial intervals and length
-radials = 0:5:350;                                       % radials in 10 degree intervals
+radials = 0:5:355;                                       % radials in 10 degree intervals
 dist = 20;                                               % distance in km to farthest point you want
 distDeg = km2deg(dist);                                  % radial length in degrees
 rangeStep = 10;                                          % in meters
@@ -101,9 +104,9 @@ RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 
-disp('General setup complete. Entering Loop of Doom...')
+disp('General setup complete. Beginning radial construction...')
 for rad = 1:length(radials)
-    
+    disp(['Constructing Radial ' num2str(radials(rad)), ':'])
     
     % gives lat lon point 20 km away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
@@ -114,22 +117,32 @@ for rad = 1:length(radials)
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:dist*1000));
     
     % make bathymetry file to be used in bellhop
-    disp(['Making bathymetry file for Radial_' num2str(radials(rad)) '...'])
-    [Range, bath] = makeBTY(fpath, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
+    tic
+    [Range, bath] = makeBTY(bellhopSaveDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
+    toc
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-    ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
+    
+    ssp = NCSSP([1:length(zssp)], 2);
+    %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
-    disp(['Making environment file for Radial_', num2str(radials(rad)),'...'])   % Status update
-    makeEnv(fpath, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
+    makeEnv(bellhopSaveDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
-    bellhop(fullfile(fpath, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
-    disp(['Ran Bellhop for Radial_', num2str(radials(rad)),'. Moving forward to the next radial.']) % Status update
+    disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
+    tic
+    %bellhop(fullfile('C:\Users\HARP\Documents\GitHub\PropagationModeling', ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+
+    bellhop(fullfile(bellhopSaveDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+        %NOTE: Swap fpath with outDir here
+    toc
     
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
+    
 
     %[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
    % PLslice = squeeze(pressure(1, 1,:,:));
@@ -137,52 +150,54 @@ for rad = 1:length(radials)
     % you can take this out!!^^^^ don't need to save matlab
     clear Range bath
 end
-disp('Completed running Bellhop for all radials. Saving...')
+disp('Completed constructing all radials.')
 
 
-matFiles = ls(fullfile(outDir,'*Radial*.shd'));
+matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
 disp('Save successful.')
 
 
-
+size(matFiles,1)
 % join this to the loop above
 for rad = 1:length(radials)
    
     
     
-    iffn = fullfile(outDir,matFiles(mf,:));
+    iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(radials(rad)) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     
     
         
-    [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
+    [x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    % [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
     
-    [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
+    [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    % [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
     
     zq = interp2(x1,y1, PL,xq1, yq1);
     
-    PL800(mf, :) = zq(790, :);
+    PL800(rad, :) = zq(790, :); % PL800(mf, :) = zq(790, :);
     
     clear zq yq1 xq1 x1 y1 
     disp(['\Radial_' num2str(radials(rad)) '.shd'])
     
 end
 
+PL800_backup = PL800;
 
 PL800(isinf(PL800)) = NaN;
 PL800(isinf(PL800)) = NaN;
-PL800 > 125 == NaN; 
+PL800 > 125 == NaN; %AD - what is this line for
 RL800 = 220 - PL800;
 RL800(RL800 < 125) = NaN; 
 
-
-R = 1:1:20100;
+R = 1:1:20010;
 figure; 
-polarPcolor(R, radials, RL800)
-colormap('jet')
+Radiance = polarPcolor(R, radials, RL800);
+colormap winter
 t=colorbar;
 test=flipud(colormap('jet'));
 colormap(test);
@@ -256,3 +271,9 @@ figure
     
 plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
+
+figure
+plotshd('Radial_0.shd')
+plotbty 'Radial_0.bty'
+plotshd('Radial_180.shd')
+plotbty 'Radial_180.bty'
