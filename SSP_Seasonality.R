@@ -4,7 +4,7 @@
 #### Parameters defined by user ####
 siteabrev <- "GS"
 region <- "WAT"
-depthlist_range = 20:40 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
+depthlist_range = 20:33 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
 
 setwd("H:/My Drive/PropagationModeling/SSPs") # Working directory
 
@@ -31,9 +31,14 @@ SSP_M11 <- rowMeans(SSP_All[12*(0:3)+6], na.rm=TRUE)  # Nov
 SSP_M12 <- rowMeans(SSP_All[12*(0:3)+7], na.rm=TRUE)  # Dec
 
 #### Analysis ####
+
+# Plot mean SSP of the first day of each month
+x_min <- min(SSP_All[2:49, depthlist_range], na.rm=TRUE)-5
+x_max <- max(SSP_All[2:49, depthlist_range], na.rm=TRUE)+5
 plot(SSP_M01[depthlist_range],-depthlist[depthlist_range], 'l', col="#0080FF",   # Jan - blue
-     xlim=c(1480,1530), ylim=c(-1000,-200), 
-     xlab="c (m/s)", ylab="Depth (m)", title=paste('SSP at', siteabrev))
+     xlim=c(x_min,x_max),
+     ylim=c(-depthlist[max(depthlist_range)],-depthlist[min(depthlist_range)]), 
+     xlab="c (m/s)", ylab="Depth (m)", main=paste('SSP at', siteabrev))
 points(SSP_M02[depthlist_range],-depthlist[depthlist_range], 'l', col="#0000FF") 
 points(SSP_M03[depthlist_range],-depthlist[depthlist_range], 'l', col="#8000FF")
 points(SSP_M04[depthlist_range],-depthlist[depthlist_range], 'l', col="#FF00FF") # April - Pink
