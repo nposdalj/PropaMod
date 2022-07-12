@@ -169,3 +169,50 @@ writetable(SSP_table,[saveDirectory,'\', 'SSP_', regionabrev, '_', fileName(strf
 disp([fileName, ' - Completed Part C'])
 
 end
+
+% REORDER TIME-WISE TABLES TO SITE-WISE TABLES
+timeFileNames = ls(fullfile(saveDirectory,'*SSP_WAT_2*'));
+SSP_NC = array2table([depthlist].');    SSP_NC.Properties.VariableNames(1) = {'Depth'};
+SSP_BC = array2table([depthlist].');    SSP_BC.Properties.VariableNames(1) = {'Depth'};
+SSP_GS = array2table([depthlist].');    SSP_GS.Properties.VariableNames(1) = {'Depth'};
+SSP_BP = array2table([depthlist].');    SSP_BP.Properties.VariableNames(1) = {'Depth'};
+SSP_BS = array2table([depthlist].');    SSP_BS.Properties.VariableNames(1) = {'Depth'};
+SSP_WC = array2table([depthlist].');    SSP_WC.Properties.VariableNames(1) = {'Depth'};
+SSP_OC = array2table([depthlist].');    SSP_OC.Properties.VariableNames(1) = {'Depth'};
+SSP_HZ = array2table([depthlist].');    SSP_HZ.Properties.VariableNames(1) = {'Depth'};
+SSP_JAX = array2table([depthlist].');   SSP_JAX.Properties.VariableNames(1) = {'Depth'};
+
+for n = 1:length(timeFileNames)
+    SSPbyTime = readtable(fullfile(saveDirectory,timeFileNames(n,:)));
+    
+    SSP_NC(:,n+1) = SSPbyTime(:,2);
+    SSP_NC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_BC(:,n+1) = SSPbyTime(:,3);
+    SSP_BC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_GS(:,n+1) = SSPbyTime(:,4);
+    SSP_GS.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_BP(:,n+1) = SSPbyTime(:,5);
+    SSP_BP.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_BS(:,n+1) = SSPbyTime(:,6);
+    SSP_BS.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_WC(:,n+1) = SSPbyTime(:,7);
+    SSP_WC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_OC(:,n+1) = SSPbyTime(:,8);
+    SSP_OC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_HZ(:,n+1) = SSPbyTime(:,9);
+    SSP_HZ.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    SSP_JAX(:,n+1) = SSPbyTime(:,10);
+    SSP_JAX.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
+    
+    disp(['Added date ' timeFileNames(n,9:16) ' to all site-wise tables'])
+end
+
+writetable(SSP_NC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(1)), '.xlsx'])
+writetable(SSP_BC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(2)), '.xlsx'])
+writetable(SSP_GS,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(3)), '.xlsx'])
+writetable(SSP_BP,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(4)), '.xlsx'])
+writetable(SSP_BS,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(5)), '.xlsx'])
+writetable(SSP_WC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(6)), '.xlsx'])
+writetable(SSP_OC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(7)), '.xlsx'])
+writetable(SSP_HZ,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(8)), '.xlsx'])
+writetable(SSP_JAX,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(9)), '.xlsx'])
