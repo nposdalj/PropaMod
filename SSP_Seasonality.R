@@ -16,7 +16,7 @@ colnames(SSP_All)[44:49] <- c('X20160501','X20170201','X20170601','X20171001','X
 SSP_All <- SSP_All[order(colnames(SSP_All))] # Order columns by month
 # Now all columns 12n+2 are July, all columns 12n+3 are August, etc.
 
-depthlist <- drop(t(SSP_All[1]))
+depthlist <- drop(t(SSP_All[1]))                      # Average SSPs for the first day of each month
 SSP_M01 <- rowMeans(SSP_All[12*(0:3)+8], na.rm=TRUE)  # Jan
 SSP_M02 <- rowMeans(SSP_All[12*(0:3)+9], na.rm=TRUE)  # Feb
 SSP_M03 <- rowMeans(SSP_All[12*(0:3)+10], na.rm=TRUE) # Mar
@@ -30,10 +30,10 @@ SSP_M10 <- rowMeans(SSP_All[12*(0:3)+5], na.rm=TRUE)  # Oct
 SSP_M11 <- rowMeans(SSP_All[12*(0:3)+6], na.rm=TRUE)  # Nov
 SSP_M12 <- rowMeans(SSP_All[12*(0:3)+7], na.rm=TRUE)  # Dec
 
-#### Analysis ####
+#### Graphical Analysis ####
 
 # Plot mean SSP of the first day of each month
-x_min <- min(SSP_All[2:49, depthlist_range], na.rm=TRUE)-5
+x_min <- min(SSP_All[2:49, depthlist_range], na.rm=TRUE)-5 # Graph x-limits
 x_max <- max(SSP_All[2:49, depthlist_range], na.rm=TRUE)+5
 plot(SSP_M01[depthlist_range],-depthlist[depthlist_range], 'l', col="#0080FF",   # Jan - blue
      xlim=c(x_min,x_max),
@@ -48,5 +48,8 @@ points(SSP_M07[depthlist_range],-depthlist[depthlist_range], 'l', col="#FF8000")
 points(SSP_M08[depthlist_range],-depthlist[depthlist_range], 'l', col="#FFFF00") # July - Orange
 points(SSP_M09[depthlist_range],-depthlist[depthlist_range], 'l', col="#80FF00")
 points(SSP_M10[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF00")
-points(SSP_M11[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF80") # October - Green
-points(SSP_M12[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FFFF")
+points(SSP_M11[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF80")
+points(SSP_M12[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FFFF") # October - Green
+
+#### Statistical Analysis ####
+#Region of interest for Pm: 200m+
