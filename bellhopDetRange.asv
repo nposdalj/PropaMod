@@ -65,9 +65,6 @@ radStep = 5; % Angular resolution (i.e. angle between radials)
 
 % CONFIGURE PLOT OUTPUT
 
-total_range = 20000; % Desired radial range, in meters
-rangeStep = 10; % Range step size, in meters
-
 %% Bathymetry 
 disp('Loading bathymetry data...') % Reading in bathymetry data
 tic
@@ -143,7 +140,7 @@ for rad = 1:length(radials)
     % make bathymetry file to be used in bellhop
     disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
     tic
-    [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    [Range, bath] = makeBTY(intermedDir, [Site '_Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
     toc
    
@@ -154,13 +151,13 @@ for rad = 1:length(radials)
     %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
-    makeEnv(intermedDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(bellhopSaveDir, [Site 'Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
     disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
     tic
     %bellhop(fullfile('C:\Users\HARP\Documents\GitHub\PropagationModeling', ['Radial_' num2str(radials(rad))])); % run bellhop on env file
 
-    bellhop(fullfile(intermedDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
+    bellhop(fullfile(interme, [Site 'Radial_' num2str(radials(rad))])); % run bellhop on env file
         %NOTE: Swap fpath with outDir here
     toc
     
