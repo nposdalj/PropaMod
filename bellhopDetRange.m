@@ -302,6 +302,9 @@ t=colorbar;
 set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 caxis([20 120])
 
+presur = squeeze(pressure(1,1,:,:));
+plot(presur)
+
 plot(pressure(1, 1, :, :))
 figure
     plotshd('Radial_260.shd')
@@ -315,6 +318,13 @@ figure
 plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
 
+for o=0:10:350
+    figure((o+1))
+    plotshd(['Radial_',num2str(o),'.shd'])
+    plotbty(['Radial_',num2str(o),'.bty'])
+    saveas(gcf,[fpath_Plots,'\',Site,'_Radial_',num2str(o)],'png')
+end
+
 figure(5)
 radiant = 120;
 plotshd(['Radial_', num2str(radiant), '.shd'])
@@ -323,3 +333,31 @@ plotbty(['Radial_', num2str(radiant), '.bty'])
 hold on
 plot(0:2000:20000, 790, 'or')
 hold off
+
+read_shd([bellhopSaveDir, '\Radial_50.shd'])
+plottld('Radial_0.shd')
+
+plotssp('Radial_0.env')
+
+[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(5) '.shd']]);
+
+RL_rad0_bty = nan(1010,20010);
+RL_rad0_bty(zq==inf) = inf;
+bruh = pcolor(RL_rad0_bty);
+set(bruh, 'EdgeColor','none')
+axis ij
+colormap(gray(1))
+
+%rough code - works for plotting radials!
+% Will need to take smth out of Vanessa's loop that sets up the radial
+% correctly
+
+
+RL_rad0 = 220 - zq;
+RL_rad0(RL_rad0 < 125) = NaN;
+distress = pcolor(RL_rad0(:,:)); 
+axis ij
+set(distress, 'EdgeColor','none')
+colormap(jet)
+plotbty('Radial_0.bty')
+title([Site,' Radial 0'])

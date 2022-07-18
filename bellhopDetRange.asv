@@ -65,6 +65,9 @@ radStep = 5; % Angular resolution (i.e. angle between radials)
 
 % CONFIGURE PLOT OUTPUT
 
+total_range = 20000; % Desired radial range, in meters
+rangeStep = 10; % Range step size, in meters
+
 %% Bathymetry 
 disp('Loading bathymetry data...') % Reading in bathymetry data
 tic
@@ -140,7 +143,7 @@ for rad = 1:length(radials)
     % make bathymetry file to be used in bellhop
     disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
     tic
-    [Range, bath] = makeBTY(intermedDir, [Site '_Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(radials(rad))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
     toc
    
@@ -151,13 +154,13 @@ for rad = 1:length(radials)
     %ssp = [NCSSP(:,2); NaN(length(zssp)-length(NCSSP),1)];%ssp = NCSSP([1:length(zssp), 2); %AD - I changed this as a workaround
     % make environment file to be used in bellhop
     disp(['Making environment file for Radial ', num2str(radials(rad)),'...'])   % Status update
-    makeEnv(bellhopSaveDir, [Site 'Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(intermedDir, ['Radial_' num2str(radials(rad))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     % running bellhop
     disp(['Running Bellhop for Radial ', num2str(radials(rad)),'...']) % Status update
     tic
     %bellhop(fullfile('C:\Users\HARP\Documents\GitHub\PropagationModeling', ['Radial_' num2str(radials(rad))])); % run bellhop on env file
 
-    bellhop(fullfile(interme, [Site 'Radial_' num2str(radials(rad))])); % run bellhop on env file
+    bellhop(fullfile(intermedDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
         %NOTE: Swap fpath with outDir here
     toc
     
@@ -299,6 +302,9 @@ t=colorbar;
 set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 caxis([20 120])
 
+presur = squeeze(pressure(1,1,:,:));
+plot(presur)
+
 plot(pressure(1, 1, :, :))
 figure
     plotshd('Radial_260.shd')
@@ -312,6 +318,13 @@ figure
 plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
 
+for o=0:10:350
+    figure((o+1))
+    plotshd(['Radial_',num2str(o),'.shd'])
+    plotbty(['Radial_',num2str(o),'.bty'])
+    saveas(gcf,[fpath_Plots,'\',Site,'_Radial_',num2str(o)],'png')
+end
+
 figure(5)
 radiant = 120;
 plotshd(['Radial_', num2str(radiant), '.shd'])
@@ -320,3 +333,21 @@ plotbty(['Radial_', num2str(radiant), '.bty'])
 hold on
 plot(0:2000:20000, 790, 'or')
 hold off
+
+read_shd([bellhopSaveDir, '\Radial_50.shd'])
+plottld('Radial_0.shd')
+
+plotssp('Radial_0.env')
+
+[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(5) '.shd']]);
+
+HeatMap(zq)
+
+Pcolor(zq)
+
+RL_rad0 = 220 - zq;
+RL_rad0(RL_rad0 < 125) = NaN;
+RL_rad0;
+distress = pcolor(RL_rad0(:,:)); 
+set(distress, 'EdgeColor','none')
+colormap(jet)
