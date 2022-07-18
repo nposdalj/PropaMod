@@ -186,7 +186,7 @@ allFiles = ls(fullfile(fpath, 'Radials', SITE, '*Radial*.shd'));
 %shellcmd = ['move Radial_' num2str(f(findex)) 'Hz_' num
 
 %% Generate plots
-makeDepthPlots = [150, 50, 450]; % USER: edit with [min depth, step size, max depth]
+makeDepthPlots = [150, 50, 800]; % USER: edit with [min depth, step size, max depth]
 
 % join this to the loop above
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
@@ -300,7 +300,7 @@ plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
 
 figure(5)
-radiant = 145;
+radiant = 120;
 plotshd(['Radial_', num2str(radiant), '.shd'])
 ylim([0 2500])
 plotbty(['Radial_', num2str(radiant), '.bty'])
