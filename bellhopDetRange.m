@@ -334,13 +334,6 @@ hold on
 plot(0:2000:20000, 790, 'or')
 hold off
 
-read_shd([bellhopSaveDir, '\Radial_50.shd'])
-plottld('Radial_0.shd')
-
-plotssp('Radial_0.env')
-
-[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(5) '.shd']]);
-
 RL_rad0_bty = nan(1010,20010);
 RL_rad0_bty(zq==inf) = inf;
 bruh = pcolor(RL_rad0_bty);
@@ -349,15 +342,25 @@ axis ij
 colormap(gray(1))
 
 %rough code - works for plotting radials!
-% Will need to take smth out of Vanessa's loop that sets up the radial
-% correctly
+for o = 0:60:300
 
-
+[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(o) '.shd']]);
+PLslice = squeeze(pressure(1, 1,:,:));
+PL = -20*log10(abs(PLslice));
+    
+[x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+[xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+zq = interp2(x1,y1, PL,xq1, yq1);
+    
+figure(o+1)
 RL_rad0 = 220 - zq;
 RL_rad0(RL_rad0 < 125) = NaN;
 distress = pcolor(RL_rad0(:,:)); 
 axis ij
 set(distress, 'EdgeColor','none')
 colormap(jet)
-plotbty('Radial_0.bty')
-title([Site,' Radial 0'])
+plotbty(['Radial_',num2str(o),'.bty'])
+title([Site,' Radial', num2str(o)])
+colorbar
+
+end
