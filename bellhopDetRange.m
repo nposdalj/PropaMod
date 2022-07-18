@@ -46,6 +46,9 @@ Region = 'WAT';
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
 
+total_range = 20000; % Desired radial range, in meters
+rangeStep = 10; % Range step size, in meters
+
 %% Bathymetry 
 
 % Reading in bathymetry data
