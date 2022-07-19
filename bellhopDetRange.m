@@ -24,7 +24,6 @@
 
 clear variables
 clear all
-
 %% Define global vars
 global rangeStep
 global lat
@@ -97,7 +96,6 @@ NCSSPcoarse(idxNan, :) = [];
 
 vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
 NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
-
 %% Hydrophone location and depth
 hlat = 39.8326;     %AD: I'll configure this to call an .xlsx file with all the site coords and depths
 hlon = -69.9800;
@@ -123,7 +121,6 @@ RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
 rr = r'; %output to be saved for pDetSim
-
 %% Build Radials
 
 disp('General setup complete. Beginning radial construction...')
