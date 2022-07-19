@@ -47,4 +47,4 @@ for idsk = 1 : length(concatFiles)
     rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
 end
 %% Save and export workspace for pDetSim_v3Pm.m
-save([exportDir,['\',site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','-v7.3')
+save([exportDir,['\',site,'_',convertCharsToStrings(freqSave),'_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth')

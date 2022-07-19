@@ -6,7 +6,7 @@ siteabrev <- "GS"
 region <- "WAT"
 depthlist_range = 20:33 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
 
-setwd("H:/My Drive/PropagationModeling/SSPs") # Working directory
+setwd("I:/My Drive/PropagationModeling/SSPs") # Working directory
 
 #### Import and set up data ####
 SSP_All <- read.csv(paste('SSP_',region, '_',siteabrev,'.csv', sep=""))
@@ -50,6 +50,12 @@ points(SSP_M09[depthlist_range],-depthlist[depthlist_range], 'l', col="#80FF00")
 points(SSP_M10[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF00")
 points(SSP_M11[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF80")
 points(SSP_M12[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FFFF") # October - Green
+
+# Plot mean SSP across all months with standard deviation
+
+# Save text file with output
+# At 800m, save the mean sound speed, the range (min/max), and standard deviation
+# What two months were the extremes (we might use this for propagation modeling sensitivity test)
 
 #### Statistical Analysis ####
 #Region of interest for Pm: 200m+
