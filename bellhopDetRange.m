@@ -103,10 +103,8 @@ hlat = 39.8326;     %AD: I'll configure this to call an .xlsx file with all the 
 hlon = -69.9800;
 hdepth = 960;
 
-
 % Center of source cell
 hydLoc = [hlat, hlon, hdepth];
-
 
 % Radial intervals and length
 radials = 0:radStep:(360-radStep);                                       % radials in 10 degree intervals
@@ -168,7 +166,6 @@ for rad = 1:length(radials)
     %plotshd('Radial_1.shd')
     %plotbty 'Radial_1.bty'
     
-
     %[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([fpath, ['\Radial_' num2str(radials(rad)) '.shd']]);
    % PLslice = squeeze(pressure(1, 1,:,:));
    % save([outDir '\' SITE '_Radial_' num2str(radials(rad)) '.mat'], 'PL')
@@ -177,7 +174,6 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 toc
-
 %% Generate new files with 3 digits and move (copy) to save directory
 
 %matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
@@ -201,12 +197,11 @@ end
 allFiles = ls(fullfile(fpath, 'Radials', Site, '*Radial*.shd'));
 
 %shellcmd = ['move Radial_' num2str(f(findex)) 'Hz_' num
-
 %% Generate plots
 makeDepthPlots = [150, 50, 800]; % USER: edit with [min depth, step size, max depth]
 
-rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
-sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
+% rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
+% sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
 
 % join this to the loop above
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
@@ -222,11 +217,11 @@ for rad = 1:length(radials)
     [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
     % [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
     zq = interp2(x1,y1, PL,xq1, yq1);
-    sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
+%     sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
     
     %save radial depth
     rd_inter = Pos.r.z;
-    rd_all(rad) = rd_inter; %depth array to be used in pDetSim
+%     rd_all(rad) = rd_inter; %depth array to be used in pDetSim
     
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
@@ -258,7 +253,6 @@ disp(['Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 
 end
 
-
 test = load('NC_Radial_0.mat')
 test = test.PL
 
@@ -268,7 +262,6 @@ v = test;
 
 xq = meshgrid(1:1:2000);
 yq = meshgrid(1:1:800);
-
 
 [x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
 
@@ -280,8 +273,6 @@ PL800 = zq(790, :)
 PL800(isinf(PL800)) = NaN
 figure
 plot(xq1, 220 - PL800)
-
-
 
 figure
 pcolor(zq);
@@ -295,7 +286,6 @@ test=flipud(colormap('jet'));
 colormap(zq);
 t=colorbar;
 set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
-
 
 figure
 pcolor(220 - PL);
@@ -316,14 +306,9 @@ plot(presur)
 
 plot(pressure(1, 1, :, :))
 figure
-    plotshd('Radial_260.shd')
-    plotbty 'Radial_260.bty'
-    
-    
-    
-    
-    
-    
+plotshd('Radial_260.shd')
+plotbty 'Radial_260.bty'
+
 plotshd('Radial_0.shd')
 plotbty 'Radial_0.bty'
 
@@ -375,4 +360,4 @@ colorbar
 end
 %% Save variables for pDetSim
 freqSave = freqVec/1000;
-save([region,'_',site,'_',hdepth,'_',freqSave,'_3DTL.mat'],'rr','nrr','rd_all','sortedTLvec');
+save([region,'_',site,'_',hdepth,'_',freqSave,'_3DTL.mat'],'rr','nrr');
