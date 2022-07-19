@@ -62,6 +62,7 @@ intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Nat
 total_range = 20000; % Radial range around your site, in meters
 rangeStep = 10; % Range resolution
 radStep = 5; % Angular resolution (i.e. angle between radials)
+source
 
 % CONFIGURE PLOT OUTPUT
 total_range = 20000; % Desired radial range, in meters
@@ -171,9 +172,10 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 toc
-%% Generate new files with 3 digits and move (copy) to save directory
-% AD Note to self - files should be correctly named automatically in the
-% main loop, can remove that function from here
+%% Copy files to final export directory
+% Edit this code to copy the files to the export directory, and then run a
+% check that ensures the files in the export directory aren't screwed up...
+% Since the process did take a while to run
 
 %matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
 allFiles = ls(fullfile(bellhopSaveDir,'*Radial*'));
@@ -207,7 +209,7 @@ for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(radials(rad)) '.shd']]);
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     
@@ -225,13 +227,13 @@ for rad = 1:length(radials)
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
     clear zq yq1 xq1 x1 y1 
-    disp(['\Radial_' num2str(radials(rad)) '.shd'])
+    disp(['\Radial_' num2str(sprintf('%03d', radials(rad))) '.shd'])
 end
 
 PL800(isinf(PL800)) = NaN;
 %PL800(isinf(PL800)) = NaN;
 PL800(PL800 > 125) = NaN; %PL800 > 125 == NaN; %AD - what is this line for
-RL800 = 220 - PL800;
+RL800 = 220 - PL800;    % NOTE: This treats SL as constant 220, but it shouldn't be hard-coded
 RL800(RL800 < 125) = NaN; 
 
 R = 1:1:20010;
@@ -326,13 +328,6 @@ plotbty(['Radial_', num2str(radiant), '.bty'])
 hold on
 plot(0:2000:20000, 790, 'or')
 hold off
-
-RL_rad0_bty = nan(1010,20010);
-RL_rad0_bty(zq==inf) = inf;
-bruh = pcolor(RL_rad0_bty);
-set(bruh, 'EdgeColor','none')
-axis ij
-colormap(gray(1))
 
 %rough code - works for plotting radials!
 for o = 0:60:300
