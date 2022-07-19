@@ -42,7 +42,7 @@ Site = 'NC';
 Region = 'WAT';
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
-Gdrive = 'P';
+Gdrive = 'I';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
     % fpath must contain:
         % bathymetry file: \Bathymetry\bathy.txt
@@ -124,6 +124,7 @@ disp(['Source depth: ', num2str(SD), ' m'])
 RD = 0:rangeStep:1000;
 % range with steps
 r = 0:rangeStep:dist*1000;
+rr = r'; %output to be saved for pDetSim
 
 %% Build Radials
 
