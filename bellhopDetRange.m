@@ -205,7 +205,8 @@ allFiles = ls(fullfile(fpath, 'Radials', Site, '*Radial*.shd'));
 %% Generate plots
 makeDepthPlots = [150, 50, 800]; % USER: edit with [min depth, step size, max depth]
 
-rd_all = zeros(1,length(radials)); %create empty array for depthArray to be used later with pDetSim
+rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
+sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
 
 % join this to the loop above
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
@@ -221,6 +222,9 @@ for rad = 1:length(radials)
     [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
     % [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
     zq = interp2(x1,y1, PL,xq1, yq1);
+    sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
+    
+    %save radial depth
     rd_inter = Pos.r.z;
     rd_all(rad) = rd_inter; %depth array to be used in pDetSim
     
@@ -369,3 +373,6 @@ title([Site,' Radial', num2str(o)])
 colorbar
 
 end
+%% Save variables for pDetSim
+freqSave = freqVec/1000;
+save([region,'_',site,'_',hdepth,'_',freqSave,'_3DTL.mat'],'rr','nrr','rd_all','sortedTLvec');
