@@ -137,7 +137,6 @@ for rad = 1:length(radials)
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-
     ssp = NCSSP([1:length(zssp)], 2);
 
     % Make environment file (to be used in BELLHOP)
@@ -235,59 +234,8 @@ colorbar
 
 end
 
-test = load('NC_Radial_0.shd');
-test = test.PL;
-
-x = meshgrid(1:10:2010);
-y = meshgrid(1:10:810);
-v = test; 
-
-xq = meshgrid(1:1:2000);
-yq = meshgrid(1:1:800);
-
-[x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
-
-[xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
-
-zq = interp2(x1,y1, PL,xq1, yq1);
-
-PL800 = zq(790, :)
-PL800(isinf(PL800)) = NaN
-figure
-plot(xq1, 220 - PL800)
-
-figure
-pcolor(zq);
-xlim([0 20100])
-ylim([0 810])
-axis ij
-shading interp;
-xlabel('Range [m]')
-ylabel('Depth [m]')
-test=flipud(colormap('jet'));
-colormap(zq);
-t=colorbar;
-set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
-
-figure
-pcolor(220 - PL);
-xlim([0 401])
-ylim([0 800])
-axis ij
-shading interp;
-xlabel('Range [m]')
-ylabel('Depth [m]')
-test=flipud(colormap('jet'));
-colormap(test);
-t=colorbar;
-set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
-caxis([20 120])
-
-plot(pressure(1, 1, :, :))
-figure
-plotshd('Radial_260.shd')
-plotbty 'Radial_260.bty'
-
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
 save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
+
+% Whale? Yes
