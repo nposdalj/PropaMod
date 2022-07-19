@@ -43,14 +43,13 @@ Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
-Gdrive = 'I';
+Gdrive = 'P';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
     % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
-
-%intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
+intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
+%intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
@@ -79,6 +78,14 @@ makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to
 total_range = 20000; % Desired radial range, in meters
 rangeStep = 10; % Range step size, in meters
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
+
+%% Make new folder w/in intermedDir for this run's files
+timestamp_currentrun = datestr(datetime('now'), 'yyyymmdd_HHMMSS');
+intermedDir_sub = [intermedDir, '\Run_Start_' timestamp_currentrun];
+mkdir(intermedDir_sub);
+% This prevents file overwriting, if you are running bellhopDetRange.m multiple
+% times in parallel on the same computer.
+
 %% Bathymetry 
 disp('Loading bathymetry data...') % Read in bathymetry data
 tic
@@ -114,6 +121,7 @@ r = 0:rangeStep:total_range;  % range with steps
 rr = r'; %output to be saved for pDetSim
 
 %% Build Radials
+% DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
 
 disp('General setup complete. Beginning radial construction...')
 tic
@@ -131,7 +139,7 @@ for rad = 1:length(radials)
     % Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     tic
-    [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    [Range, bath] = makeBTY(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
     toc
    
@@ -141,27 +149,29 @@ for rad = 1:length(radials)
 
     % Make environment file (to be used in BELLHOP)
     disp(['Making environment file for Radial ', num2str(sprintf('%03d', radials(rad))),'...'])   % Status update
-    makeEnv(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     
     % Run BELLHOP
     disp(['Running Bellhop for Radial ', num2str(sprintf('%03d', radials(rad))),'...']) % Status update
     tic
-    bellhop(fullfile(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
+    bellhop(fullfile(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
     toc
     clear Range bath
 end
 disp('Completed constructing all radials.')
 toc
+
 %% Copy files to final export directory
 % Include a check that ensures the files in the export directory aren't screwed up...
 % Since the process did take a while to run
-allFiles = ls(fullfile(intermedDir,'*Radial*'));
+allFiles = ls(fullfile(intermedDir_sub,'*Radial*'));
 for k = 1:length(allFiles)
-    copyfile(fullfile(intermedDir,allFiles(k,:)),fullfile(fpath, 'Radials',Site,allFiles(k,:)));
+    copyfile(fullfile(intermedDir_sub,allFiles(k,:)),fullfile(fpath, 'Radials',Site,allFiles(k,:)));
     disp([allFiles(k,:), ' copied to GDrive export directory'])
 end
 
 %% Generate plots
+if generate_plots == 1
 
 % rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
 % sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
@@ -172,7 +182,7 @@ for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
+    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir_sub, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     
@@ -212,7 +222,6 @@ end
 
 % RADIAL PLOTS
 for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-
 [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(o) '.shd']]);
 PLslice = squeeze(pressure(1, 1,:,:));
 PL = -20*log10(abs(PLslice));
@@ -231,7 +240,9 @@ colormap(jet)
 plotbty(['Radial_',num2str(o),'.bty'])
 title([Site,' Radial', num2str(o)])
 colorbar
+end
 
+else
 end
 
 %% Save variables for pDetSim

@@ -43,14 +43,17 @@ Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
-Gdrive = 'I';
+Gdrive = 'P';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
     % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
+intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
+%intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
 
-%intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
+%This makes a new folder in intermedDir where the files from this run will
+%get dropped, in case you are running this program more than once in
+%parallel.
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
@@ -79,6 +82,8 @@ makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to
 total_range = 20000; % Desired radial range, in meters
 rangeStep = 10; % Range step size, in meters
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
+
+%
 %% Bathymetry 
 disp('Loading bathymetry data...') % Read in bathymetry data
 tic
@@ -131,13 +136,12 @@ for rad = 1:length(radials)
     % Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     tic
-    [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
+    [Range, bath] = makeBTY(intermedDir, [Site '_Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
     toc
    
     % make sound speed profile the same depth as the bathymetry
     zssp = [1:1:max(bath)+1];
-
     ssp = NCSSP([1:length(zssp)], 2);
 
     % Make environment file (to be used in BELLHOP)
@@ -153,6 +157,7 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 toc
+
 %% Copy files to final export directory
 % Include a check that ensures the files in the export directory aren't screwed up...
 % Since the process did take a while to run
@@ -163,6 +168,7 @@ for k = 1:length(allFiles)
 end
 
 %% Generate plots
+if generate_plots == 1
 
 % rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
 % sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
@@ -207,13 +213,12 @@ set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 set(gcf, 'Position', [100 100 800 600])
 title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m'],'Position',[0 -1.2])
 saveas(Radiance,[fpath,'\Plots\',Site,'\',Site,'_',num2str(plotdepth),'_RadMap.png'])
-disp(['Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
+disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 
 end
 
 % RADIAL PLOTS
 for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-
 [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([bellhopSaveDir, ['\Radial_' num2str(o) '.shd']]);
 PLslice = squeeze(pressure(1, 1,:,:));
 PL = -20*log10(abs(PLslice));
@@ -225,69 +230,20 @@ zq = interp2(x1,y1, PL,xq1, yq1);
 figure(o+1)
 RL_rad0 = SL - zq;
 RL_rad0(RL_rad0 < RL_threshold) = NaN;
-distress = pcolor(RL_rad0(:,:)); 
+ye_olde_whale = pcolor(RL_rad0(:,:)); 
 axis ij
-set(distress, 'EdgeColor','none')
+set(ye_olde_whale, 'EdgeColor','none')
 colormap(jet)
 plotbty(['Radial_',num2str(o),'.bty'])
 title([Site,' Radial', num2str(o)])
 colorbar
-
 end
 
-test = load('NC_Radial_0.shd');
-test = test.PL;
-
-x = meshgrid(1:10:2010);
-y = meshgrid(1:10:810);
-v = test; 
-
-xq = meshgrid(1:1:2000);
-yq = meshgrid(1:1:800);
-
-[x1,y1] = meshgrid(1:100:(100*size(PL,2)),1:10:(10*size(PL,1)));
-
-[xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
-
-zq = interp2(x1,y1, PL,xq1, yq1);
-
-PL800 = zq(790, :)
-PL800(isinf(PL800)) = NaN
-figure
-plot(xq1, 220 - PL800)
-
-figure
-pcolor(zq);
-xlim([0 20100])
-ylim([0 810])
-axis ij
-shading interp;
-xlabel('Range [m]')
-ylabel('Depth [m]')
-test=flipud(colormap('jet'));
-colormap(zq);
-t=colorbar;
-set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
-
-figure
-pcolor(220 - PL);
-xlim([0 401])
-ylim([0 800])
-axis ij
-shading interp;
-xlabel('Range [m]')
-ylabel('Depth [m]')
-test=flipud(colormap('jet'));
-colormap(test);
-t=colorbar;
-set(get(t,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
-caxis([20 120])
-
-plot(pressure(1, 1, :, :))
-figure
-plotshd('Radial_260.shd')
-plotbty 'Radial_260.bty'
+else
+end
 
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
 save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
+
+% Whale? Yes
