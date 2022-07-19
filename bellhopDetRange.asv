@@ -129,7 +129,7 @@ rr = r'; %output to be saved for pDetSim
 disp('General setup complete. Beginning radial construction...')
 tic
 for rad = 1:length(radials)
-    disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
+    disp(['Constructing Radial ' num2str(radials(rad)), ':'])
     
     % gives lat lon point 20 km away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
@@ -140,7 +140,7 @@ for rad = 1:length(radials)
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:dist*1000));
     
     % make bathymetry file to be used in bellhop
-    disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
+    disp(['Making bathymetry file for Radial ' num2str(radials(rad)) '...'])
     tic
     [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
@@ -159,7 +159,7 @@ for rad = 1:length(radials)
     tic
     %bellhop(fullfile('C:\Users\HARP\Documents\GitHub\PropagationModeling', ['Radial_' num2str(radials(rad))])); % run bellhop on env file
 
-    bellhop(fullfile(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
+    bellhop(fullfile(intermedDir, ['Radial_' num2str(radials(rad))])); % run bellhop on env file
         %NOTE: Swap fpath with outDir here
     toc
     
@@ -175,8 +175,6 @@ end
 disp('Completed constructing all radials.')
 toc
 %% Generate new files with 3 digits and move (copy) to save directory
-% AD Note to self - files should be correctly named automatically in the
-% main loop, can remove that function from here
 
 %matFiles = ls(fullfile(bellhopSaveDir,'*Radial*.shd'));
 allFiles = ls(fullfile(bellhopSaveDir,'*Radial*'));
