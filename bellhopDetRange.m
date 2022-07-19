@@ -359,5 +359,5 @@ colorbar
 
 end
 %% Save variables for pDetSim
-freqSave = freqVec/1000;
-save([region,'_',site,'_',hdepth,'_',freqSave,'_3DTL.mat'],'rr','nrr');
+freqSave = char(freqVec/1000);
+save([[fpath,'\',site,'\',site,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');

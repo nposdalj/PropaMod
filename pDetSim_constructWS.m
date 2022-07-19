@@ -17,7 +17,9 @@ sp = 'Pm';
 GDrive = 'I';
 inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site]; % Where your data is coming from
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
-%% Loop through .shd files
+%% Load workspace from bellhopDetRange to extract nrr and rr
+load(fullfile(inputDir, [site,'_bellhopDetRangeWS.mat']))
+%% Loop through .shd files and extract depth and transmission loss
 detfn = ['Radial_','.*','.shd']; %.shd file names
 fileList = cellstr(ls(inputDir)); %all file names in folder
 fileMatchIdx = find(~cellfun(@isempty,regexp(fileList,detfn))>0); % Find the file name that matches the filePrefix
@@ -44,25 +46,5 @@ for idsk = 1 : length(concatFiles)
     rd_inter = Pos.r.z;
     rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
 end
-
-load(fullfile(inputDir, 'package_for_constructWS.mat'))
-load(fullfile(inputDir, '.shd files'))
-%% Construct rr and nrr
-% rr - Vector w/ range of hydrophone stepping by # m
-% nrr - Total # of range steps in data
-rr = rangeStep; % re-save rangeStep from bellhopDetRange.m as rr
-nrr             % re-save range variable from bellhopDetRange.m as nrr
-%% Construct rd_all
-% rd_all - Cell array w/ each cell containing the depths for 1 radial
-rd_all
-% Now that I think about it did John load this in separately? In which case
-% this intermediate file might have to be switched up accordingly
-%% Construct sortedTLVec
-% sortedTLVec - Cell array w/ each cell containing the TL for 1 radial
-sortedTLvec % this is the thing we need to extract from BELLHOP's .shd's but we dk how
-
-% Step 1: Extract TL from .shd's
-% Step 2: Organize data
 %% Save and export workspace for pDetSim_v3Pm.m
-
-save('filename.mat','rr','nrr','rd_all','sortedTLvec')
+save(site,'_',freqSave,'_3DTL.mat','rr','nrr','rd_all','sortedTLvec','hdepth')
