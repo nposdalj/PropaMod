@@ -33,7 +33,6 @@ for idsk = 1 : length(concatFiles)
     [x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
     [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
     zq = interp2(x1,y1, PL,xq1, yq1);
-
 end
 
 load(fullfile(inputDir, 'package_for_constructWS.mat'))

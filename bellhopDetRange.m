@@ -50,8 +50,9 @@ fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 fpath_Radials = [fpath, '\Radials\', Site]; %UNUSED
 fpath_Plots = [fpath, '\Plots\', Site];     %UNUSED
 saveDir = [fpath, '\Radials\', Site]; % Export directory
-intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-    % This script will:
+%intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
+intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
+% This script will:
         % Construct sound propagation radials around your site with your
         % specified range, depth, and angle resolutions
         % Save .bty, .env, .shd, and .prt files to intermediate directory
@@ -64,10 +65,9 @@ rangeStep = 10; % Range resolution
 radStep = 5; % Angular resolution (i.e. angle between radials)
 
 % CONFIGURE PLOT OUTPUT
-
 total_range = 20000; % Desired radial range, in meters
 rangeStep = 10; % Range step size, in meters
-
+nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 %% Bathymetry 
 disp('Loading bathymetry data...') % Reading in bathymetry data
 tic
@@ -205,6 +205,8 @@ allFiles = ls(fullfile(fpath, 'Radials', Site, '*Radial*.shd'));
 %% Generate plots
 makeDepthPlots = [150, 50, 800]; % USER: edit with [min depth, step size, max depth]
 
+rd_all = zeros(1,length(radials)); %create empty array for depthArray to be used later with pDetSim
+
 % join this to the loop above
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
@@ -219,6 +221,8 @@ for rad = 1:length(radials)
     [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
     % [xq1,yq1] = meshgrid(1:(100*size(PL,2)),1:(10*size(PL,1)));
     zq = interp2(x1,y1, PL,xq1, yq1);
+    rd_inter = Pos.r.z;
+    rd_all(rad) = rd_inter; %depth array to be used in pDetSim
     
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
