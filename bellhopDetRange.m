@@ -59,9 +59,9 @@ hlon = -69.9800;
 hdepth = 960;       % Unused value?
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
-total_range = 20000;    % Radial range around your site, in meters
+total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
-radStep = 5;            % Angular resolution (i.e. angle between radials)
+radStep = 10;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
 
 % CONFIGURE PLOT OUTPUT
@@ -80,8 +80,8 @@ rangeStep = 10; % Range step size, in meters
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 %% Make new folder w/in intermedDir for this run's files
-timestamp_currentrun = datestr(datetime('now'), 'yyyymmdd_HHMMSS');
-intermedDir_sub = [intermedDir, '\Run_Start_' timestamp_currentrun];
+timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
+intermedDir_sub = [intermedDir, '\' timestamp_currentrun];
 mkdir(intermedDir_sub);
 % This prevents file overwriting, if you are running bellhopDetRange.m multiple
 % times in parallel on the same computer.
