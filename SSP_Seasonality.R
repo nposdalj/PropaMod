@@ -2,11 +2,12 @@
 # Based on data from HYCOM
 
 #### Parameters defined by user ####
-siteabrev <- "GS"
+siteabrev <- "NC"
 region <- "WAT"
-depthlist_range = 20:33 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
+depthlist_range = 1:33 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
 
-setwd("I:/My Drive/PropagationModeling/SSPs") # Working directory
+setwd("H:/My Drive/PropagationModeling/SSPs") # Working directory
+saveDir <- "H:/My Drive/PropagationModeling/SSPs" #export directory
 
 #### Import and set up data ####
 SSP_All <- read.csv(paste('SSP_',region, '_',siteabrev,'.csv', sep=""))
@@ -33,8 +34,8 @@ SSP_M12 <- rowMeans(SSP_All[12*(0:3)+7], na.rm=TRUE)  # Dec
 #### Graphical Analysis ####
 
 # Plot mean SSP of the first day of each month
-x_min <- min(SSP_All[2:49, depthlist_range], na.rm=TRUE)-5 # Graph x-limits
-x_max <- max(SSP_All[2:49, depthlist_range], na.rm=TRUE)+5
+x_min <- min(SSP_All[depthlist_range,2:49], na.rm=TRUE)-5 # Graph x-limits
+x_max <- max(SSP_All[depthlist_range,2:49], na.rm=TRUE)+5
 plot(SSP_M01[depthlist_range],-depthlist[depthlist_range], 'l', col="#0080FF",   # Jan - blue
      xlim=c(x_min,x_max),
      ylim=c(-depthlist[max(depthlist_range)],-depthlist[min(depthlist_range)]), 
@@ -52,8 +53,29 @@ points(SSP_M11[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF80")
 points(SSP_M12[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FFFF") # October - Green
 
 # Plot mean SSP across all months with standard deviation
+SSP_MAnnual <- rowMeans(SSP_All[2:49], na.rm=TRUE)
+plot(SSP_MAnnual[depthlist_range], -depthlist[depthlist_range], 'l', col="#000000",
+     xlim=c(x_min,x_max),
+     ylim=c(-depthlist[max(depthlist_range)],-depthlist[min(depthlist_range)]), 
+     xlab="c (m/s)", ylab="Depth (m)", main=paste('SSP at', siteabrev))
+#calculate and plot stdevs on top
+SSP_stdev <- matrix(NA,40,1)
+for(j in 1:40) {
+  SSP_stdev[j] <- sd(SSP_All[j,2:49], na.rm=TRUE)
+}
+arrows(SSP_MAnnual-SSP_stdev,-depthlist,SSP_MAnnual+SSP_stdev,-depthlist,
+       code=3, angle=90, length=.05)
+
+sumtab <- cbind(depthlist,SSP_MAnnual,SSP_stdev)
+colnames(sumtab) <- c("Depth","c_mean","c_stdev")
 
 # Save text file with output
+filename = paste(saveDir,'/',siteabrev,'_SSP_SeasonalStats.txt',sep="")
+sink(filename)
+sumtab
+summary(sumtab)
+sink(file = NULL)
+
 # At 800m, save the mean sound speed, the range (min/max), and standard deviation
 # What two months were the extremes (we might use this for propagation modeling sensitivity test)
 
