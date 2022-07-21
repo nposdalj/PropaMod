@@ -69,11 +69,24 @@ arrows(SSP_MAnnual-SSP_stdev,-depthlist,SSP_MAnnual+SSP_stdev,-depthlist,
 sumtab <- cbind(depthlist,SSP_MAnnual,SSP_stdev)
 colnames(sumtab) <- c("Depth","c_mean","c_stdev")
 
+#Calculate params at 800m
+M800 <- c(SSP_M01[31],SSP_M02[31],SSP_M03[31],SSP_M04[31],SSP_M05[31],SSP_M06[31],
+          SSP_M07[31],SSP_M08[31],SSP_M09[31],SSP_M10[31],SSP_M11[31],SSP_M12[31])
+range800 <- range(M800)
+min_month <- which(M800 == range800[1])
+max_month <- which(M800 == range800[2])
+
+sumtab800 <- cbind(depthlist[31],SSP_MAnnual[31],SSP_stdev[31],range800[1],min_month,range800[2],max_month)
+colnames(sumtab800) <- c("Depth","c_mean","c_stdev","c_min","min_mo","c_max","max_mo")
+
+#Calculate month with min and month with max
+
 # Save text file with output
 filename = paste(saveDir,'/',siteabrev,'_SSP_SeasonalStats.txt',sep="")
 sink(filename)
 sumtab
 summary(sumtab)
+sumtab800
 sink(file = NULL)
 
 # At 800m, save the mean sound speed, the range (min/max), and standard deviation
