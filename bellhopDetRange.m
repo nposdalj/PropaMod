@@ -141,6 +141,7 @@ for rad = 1:length(radials)
     tic
     [Range, bath] = makeBTY(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
     bathTest(rad, :) = bath;
+    RD = 0:rangeStep:max(bath); % Receiver depth (check this!!)
     toc
    
     % make sound speed profile the same depth as the bathymetry
@@ -189,11 +190,11 @@ for rad = 1:length(radials)
     [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
     [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
     zq = interp2(x1,y1, PL,xq1, yq1);
-%     sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
+    %sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
     
     %save radial depth
     rd_inter = Pos.r.z;
-%     rd_all(rad) = rd_inter; %depth array to be used in pDetSim
+    %rd_all(rad) = rd_inter; %depth array to be used in pDetSim
     
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
