@@ -42,14 +42,15 @@ Site = 'NC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling';
-Gdrive = 'P';
+% bellhopSaveDir = 'C:\Users\HARP\Documents\GitHub\PropagationModeling'; %Aaron's Computer
+bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer
+Gdrive = 'I';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
     % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
-intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-%intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
+% intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
+intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
