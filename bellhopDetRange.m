@@ -61,7 +61,7 @@ hdepth = 960;       % Unused value?
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
-radStep = 10;            % Angular resolution (i.e. angle between radials)
+radStep = 5;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
 
 % CONFIGURE PLOT OUTPUT
@@ -73,10 +73,10 @@ RL_threshold = 125; % Threshold below which you want to ignore data; will be plo
 makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth]
 
 % Radial Plots
-makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot
+makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot]
 
-total_range = 20000; % Desired radial range, in meters
-rangeStep = 10; % Range step size, in meters
+total_range; % Desired radial range, in meters
+rangeStep; % Range step size, in meters
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 %% Make new folder w/in intermedDir for this run's files
@@ -198,7 +198,7 @@ for rad = 1:length(radials)
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
     clear zq yq1 xq1 x1 y1 
-    disp(['Working on Polar plot w/ Depth ' plotdepth ': Radial ' num2str(sprintf('%03d', radials(rad)))])
+    disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' num2str(sprintf('%03d', radials(rad)))])
 end
 
 PL800(isinf(PL800)) = NaN;
@@ -208,7 +208,7 @@ RL800(RL800 < RL_threshold) = NaN;
 
 R = 1:1:length(zq(1,:));
 figure(1000 + plotdepth); 
-[Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,length(zq(1,:)))], 'Colormap', jet, 'Nspokes', 7);
+[Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,length(RL800(1,:)))], 'Colormap', jet, 'Nspokes', 7);
 set(calbar,'location','EastOutside')
 caxis([RL_threshold 200]); % Should remove hard coding of 200, which is the upper limit of the color bar
 yticks(0:60:300)
