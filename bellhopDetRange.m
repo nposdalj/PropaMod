@@ -129,7 +129,7 @@ tic
 for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
-    % gives lat lon point 20 km away in the direction of radials from source center
+    % gives lat lon point total range (km) away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
     
     % RANGE STEP, interpolating a line from the center point to the point
