@@ -18,7 +18,7 @@ GDrive = 'I';
 inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site]; % Where your data is coming from
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
 %% Load workspace from bellhopDetRange to extract nrr and rr
-load(fullfile(exportDir, [site,'_bellhopDetRange.mat']))
+load(fullfile(exportDir, [Site,'_bellhopDetRange.mat']))
 %% Loop through .shd files and extract depth and transmission loss
 detfn = ['Radial_','.*','.shd']; %.shd file names
 fileList = cellstr(ls(inputDir)); %all file names in folder
