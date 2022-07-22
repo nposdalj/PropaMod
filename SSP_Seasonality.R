@@ -2,7 +2,7 @@
 # Based on data from HYCOM
 
 #### Parameters defined by user ####
-siteabrev <- "GS"
+siteabrev <- "BC"
 region <- "WAT"
 depthlist_range = 1:33 # Depth levels you would like to analyze (NOT the same as the actual depths!!)
 
@@ -56,7 +56,7 @@ points(SSP_M11[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FF80")
 points(SSP_M12[depthlist_range],-depthlist[depthlist_range], 'l', col="#00FFFF")
 
 # Plot mean SSP across all months with standard deviation
-SSP_MAnnual <- rowMeans(SSP_All[2:49], na.rm=TRUE)
+SSP_MAnnual <- rowMeans(SSP_MoAvgs, na.rm=TRUE)
 plot(SSP_MAnnual[depthlist_range], -depthlist[depthlist_range], 'l', col="#000000",
      xlim=c(x_min,x_max),
      ylim=c(-depthlist[max(depthlist_range)],-depthlist[min(depthlist_range)]), 
@@ -64,7 +64,7 @@ plot(SSP_MAnnual[depthlist_range], -depthlist[depthlist_range], 'l', col="#00000
 #calculate and plot stdevs on top
 SSP_stdev <- matrix(NA,40,1)
 for(j in 1:40) {
-  SSP_stdev[j] <- sd(SSP_All[j,2:49], na.rm=TRUE)
+  SSP_stdev[j] <- sd(SSP_MoAvgs[j,], na.rm=TRUE)
 }
 arrows(SSP_MAnnual-SSP_stdev,-depthlist,SSP_MAnnual+SSP_stdev,-depthlist,
        code=3, angle=90, length=.05)
@@ -92,9 +92,14 @@ sumtab_extremes <- cbind(min_mo,max_mo)
 rownames(sumtab_extremes) <- "Month"
 
 # Save text file with output
-filename = paste(saveDir,'/',siteabrev,'_SSP_SeasonalStats.txt',sep="")
+filename = paste(saveDir,'/',siteabrev,'_SSP_SeasonalVar.txt',sep="")
 sink(filename)
 sumtab
+sink(file = NULL)
+
+filename = paste(saveDir,'/',siteabrev,'_SSP_extrememos.txt',sep="")
+sink(filename)
+sumtab_extremes
 sink(file = NULL)
 
 summary(sumtab)
