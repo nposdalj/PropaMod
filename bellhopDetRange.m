@@ -87,6 +87,16 @@ mkdir(intermedDir_sub);
 % This prevents file overwriting, if you are running bellhopDetRange.m multiple
 % times in parallel on the same computer.
 
+%% Save User-input params to a text file
+paramfile = fullfile(intermedDir_sub, [timestamp_currentrun,'_Input_Parameters.txt']);
+fileid = fopen(paramfile, 'at');
+fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
+    '\n\nSite\t' Site '\nRegion\t' Region ...
+    '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth)...
+    '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
+    '\n\nPLOT GENERATION\nGenerate Plots\t' num2str(generate_plots) '\nRL Threshold\t' num2str(RL_threshold) '\nDepth Levels\t' num2str(makeDepthPlots) '\nRadial Plots\t' num2str(makeRadialPlots)]);
+fclose(fileid);
+
 %% Bathymetry 
 disp('Loading bathymetry data...') % Read in bathymetry data
 tic
@@ -111,15 +121,15 @@ NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
 hydLoc = [hlat, hlon, hdepth];
 
 % Radial intervals and length
-radials = 0:radStep:(360-radStep);                       % radials in #-degree intervals (# is in radStep)
-dist = (total_range/1000);                               % distance in km to farthest point in range
-distDeg = km2deg(dist);                                  % radial length in degrees
+radials = 0:radStep:(360-radStep);  % radials in #-degree intervals (# is in radStep)
+dist = (total_range/1000);          % distance in km to farthest point in range
+distDeg = km2deg(dist);             % radial length in degrees
 
 % Source Depth
 disp(['Source depth: ', num2str(SD), ' m'])
-RD = 0:rangeStep:1000; % Receiver depth
-r = 0:rangeStep:total_range;  % range with steps
-rr = r'; %output to be saved for pDetSim
+RD = 0:rangeStep:1000;              % Receiver depth
+r = 0:rangeStep:total_range;        % range with steps
+rr = r';                            %output to be saved for pDetSim
 
 %% Build Radials
 % DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
@@ -167,10 +177,13 @@ toc
 % Include a check that ensures the files in the export directory aren't screwed up...
 % Since the process did take a while to run
 allFiles = ls(fullfile(intermedDir_sub,'*Radial*'));
+saveDir_sub = [saveDir, '\' timestamp_currentrun];
+mkdir(saveDir_sub);
 for k = 1:length(allFiles)
-    copyfile(fullfile(intermedDir_sub,allFiles(k,:)),fullfile(fpath, 'Radials',Site,allFiles(k,:)));
-    disp([allFiles(k,:), ' copied to GDrive export directory'])
+    copyfile(fullfile(intermedDir_sub,allFiles(k,:)),fullfile(saveDir_sub, allFiles(k,:)));
+    disp([allFiles(k,:), ' copied to new subfolder in GDrive export directory'])
 end
+copyfile(paramfile,fullfile(saveDir_sub, [timestamp_currentrun,'_Input_Parameters.txt']))
 
 %% Generate plots
 if generate_plots == 1
@@ -180,6 +193,9 @@ if generate_plots == 1
 
 % POLAR PLOTS
 % join this to the loop above
+disp(['Now generating polar plots between depths ' num2str(makeDepthPlots(1)) 'm and ' ...
+    num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
+pause(1)
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
@@ -208,8 +224,8 @@ PL800(PL800 > RL_threshold) = NaN; %PL800 > 125 == NaN; %AD - what is this line 
 RL800 = SL - PL800;
 RL800(RL800 < RL_threshold) = NaN; 
 
-R = 1:1:length(zq(1,:));
-figure(1000 + plotdepth); 
+R = 1:1:length(RL800(1,:));
+figure(1000 + plotdepth)
 [Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,length(RL800(1,:)))], 'Colormap', jet, 'Nspokes', 7);
 set(calbar,'location','EastOutside')
 caxis([RL_threshold 200]); % Should remove hard coding of 200, which is the upper limit of the color bar
@@ -217,7 +233,7 @@ yticks(0:60:300)
 set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 set(gcf, 'Position', [100 100 800 600])
 title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m'],'Position',[0 -1.2])
-saveas(Radiance,[fpath,'\Plots\',Site,'\',Site,'_',num2str(plotdepth),'_RadMap.png'])
+%saveas(Radiance,[fpath,'\Plots\',Site,'\',Site,'_',num2str(plotdepth),'_RadMap.png'])
 disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 
 end
@@ -232,7 +248,7 @@ PL = -20*log10(abs(PLslice));
 [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
 zq = interp2(x1,y1, PL,xq1, yq1);
     
-figure(o+1)
+figure(2000+o)
 RL_rad0 = SL - zq;
 RL_rad0(RL_rad0 < RL_threshold) = NaN;
 ye_olde_whale = pcolor(RL_rad0(:,:)); 
@@ -242,6 +258,7 @@ colormap(jet)
 plotbty(['Radial_',num2str(o),'.bty'])
 title([Site,' Radial', num2str(o)])
 colorbar
+%saveas(ye_olde_whale,[fpath,'\Plots\',Site,'\',Site,'_',num2str(o),'_RadMap.png'])
 end
 
 else
