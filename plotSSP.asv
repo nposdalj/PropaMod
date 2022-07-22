@@ -66,8 +66,7 @@ for deplev=1:40
 end
 [xq yq zq] = meshgrid(1:1:301,1:1:5,1:1:5001);
 [xi yi zi] = meshgrid(1:1:301,1:1:5,(-D.Depth+1));
-cdat_xtra_int = interp3(xi,yi,zi,cdat(:,100:104,:),xq,yq,zq);
-size(xq)
+cdat_xtra_int = interp3(xi,yi,zi,cdat_xtra,xq,yq,zq);
 tic
 cdat_xtra_inpaint = inpaint_nans(cdat_xtra);
 toc
