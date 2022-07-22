@@ -32,6 +32,7 @@ long = 150;
 siteabrev = ["NC";       "BC";       "GS";       "BP";       "BS";      "WC";       "OC";       "HZ";       "JAX"];
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833;   38.3738;    40.2550;    41.0618;    30.1523]; %jax avg is for D_13, 14, 15 only
 Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37;     -67.99;     -66.35;     -79.77];
+HydDepth  = [950;        950;        950;        950;        950;       950;        950;        950;        950];
 
 %% Overarching loop runs through all timepoints requested
 for k = 1:length(fileNames(:,1))
@@ -149,15 +150,33 @@ siteCoords = [Latitude, LongitudeE];
 SSP_table = [depthlist.'];
 for i=1:length(siteabrev)
     numdepths = nan(1,length(depthlist));
-    for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
-        numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat(:,:,j),siteCoords(i,2),siteCoords(i,1).');
+    
+    % NEW ADDITION: Make cdat_sel, modified version of cdat that only
+    % includes interpolates using grid points where the data goes deeper
+    % than the site depth
+    site_HydDepth = HydDepth(i);
+    depthlist_req = find(depthlist > site_HydDepth, 1); % Want to only look at gridpoints where the data goes to this depthlist depth or deeper
+    site_depthreq = depthlist(depthlist_req);
+    cdat_sel = cdat;
+    for o=1:301
+        for p=1:238
+            if isnan(cdat_sel(o,p,depthlist_req))
+                cdat_sel(o,p,:) = NaN;
+            end
+        end
     end
-    %figure(200+i)
-    %plot(numdepths, -depthlist,'-o')
-    %xlabel("Sound Speed (m/s)"); ylabel("Depth (m)")
-    %%title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
-    %title(['SSP at ', char(siteabrev(i)),' | ', timestamp])
-    %set(gcf,"Position",[(155*i - 150) 100 300 600])
+    
+    
+    
+    for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
+        numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat_sel(:,:,j),siteCoords(i,2),siteCoords(i,1).');
+    end
+    figure(200+i)
+    plot(numdepths, -depthlist,'-o')
+    xlabel("Sound Speed (m/s)"); ylabel("Depth (m)")
+    %title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
+    title(['SSP at ', char(siteabrev(i)),' | ', timestamp])
+    set(gcf,"Position",[(155*i - 150) 100 300 600])
     %saveas(gcf,[saveDirectory,'\',char(plotDate),'_',char(siteabrev(i)),'_SSP'],'png');
     
     SSP_table(:,i+1) = numdepths;
@@ -216,3 +235,17 @@ writetable(SSP_WC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(6
 writetable(SSP_OC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(7)), '.csv'])
 writetable(SSP_HZ,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(8)), '.csv'])
 writetable(SSP_JAX,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(9)), '.csv'])
+
+%HZ
+% 41.0618; -66.35 (293.6500)
+% nearby lats: 227: 41.0400 and 228: 41.0800
+% nearby longs: 195: 293.6000 and 196: 293.6800
+% long is 238 in length, lat is 301 in length
+squeeze(D.temperature(195,227,:)) % goes down to 500
+squeeze(D.temperature(195,228,:)) % goes down to 350
+squeeze(D.temperature(196,227,:)) % goes down to 1000
+squeeze(D.temperature(196,228,:)) % goes down to 800
+
+depthlist(40-9)
+
+squeeze(cdat_sel(200,64,:))

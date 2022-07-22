@@ -45,6 +45,10 @@ fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
 %0 = no density contrast or RMS roughness?
 %5000 max depth
 
+%Format of the above (added by AD for clarification)
+%fprintf(fid, 'max depth, %.3f, density contrast, likely density,
+%attenuation, /\n', sound speed profile in the mud)
+
 % Number of source depths (hydrophone location)
 fprintf(fid, '%d\t! No. of SD\n', length(SD));
 
