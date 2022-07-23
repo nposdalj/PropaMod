@@ -1,6 +1,6 @@
 %VZ: Modified from Eric Snyder's makeEnv.m code
 
-function makeEnv(filepath, filename, z, ssp, SD, RD, NR, RR, modelType)
+function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, modelType)
 
 
 
@@ -18,7 +18,8 @@ fprintf(fid, ['''', filename, '''']);
 fprintf(fid, '\t!TITLE\n');
 
 % line 2: freq
-fprintf(fid, '12000\t!Freq (Hz)\n');
+% fprintf(fid, '12000\t!Freq (Hz)\n');
+fprintf(fid, [num2str(freq),'\t!Freq (Hz)\n']);
 
 % line 3: No. of media
 fprintf(fid, '1\t! NMEDIA\n');

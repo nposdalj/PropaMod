@@ -50,7 +50,7 @@ fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
 % intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-intermedDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate'; %For Natalie's computer
+intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
@@ -58,6 +58,7 @@ SD = 800; % Source depth
 hlat = 39.8326;     % Hydrophone location params
 hlon = -69.9800;
 hdepth = 960;       % Unused value?
+freq = 12000; %frequency of source
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -161,7 +162,7 @@ for rad = 1:length(radials)
 
     % Make environment file (to be used in BELLHOP)
     disp(['Making environment file for Radial ', num2str(sprintf('%03d', radials(rad))),'...'])   % Status update
-    makeEnv(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))], zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+    makeEnv(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))], freq, zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     
     % Run BELLHOP
     disp(['Running Bellhop for Radial ', num2str(sprintf('%03d', radials(rad))),'...']) % Status update
@@ -243,7 +244,7 @@ end
 
 % RADIAL PLOTS
 for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-[ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir_sub, ['\Radial_' num2str(sprintf('%03d', radials(rad)) '.shd']]);
+[PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir_sub, ['\Radial_' num2str(sprintf('%03d', radials(rad)) '.shd']]);
 PLslice = squeeze(pressure(1, 1,:,:));
 PL = -20*log10(abs(PLslice));
     
