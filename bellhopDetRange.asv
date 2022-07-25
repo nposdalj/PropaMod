@@ -62,9 +62,10 @@ freq = 12000; % frequency of source
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
-rangeStep = 10;         % Range resolution
+rangeStep = 10;         % Range step size (m)
 radStep = 5;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
+nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % CONFIGURE PLOT OUTPUT
 generate_plots = 1; % 1 = Yes, generate plots;  0 = No, do not generate plots
@@ -76,10 +77,6 @@ makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth]
 
 % Radial Plots
 makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot]
-
-total_range; % Desired radial range, in meters
-rangeStep; % Range step size, in meters
-nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 %% Make new folder w/in intermedDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir_sub = [intermedDir, '\' timestamp_currentrun];
@@ -123,9 +120,9 @@ distDeg = km2deg(dist);             % radial length in degrees
 
 % Source Depth
 disp(['Source depth: ', num2str(SD), ' m'])
-RD = 0:rangeStep:1000;              % Receiver depth
+RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
-rr = r';                            %output to be saved for pDetSim
+rr = r';                            % output to be saved for pDetSim
 %% Build Radials
 % DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
 
@@ -146,8 +143,8 @@ for rad = 1:length(radials)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     tic
     [Range, bath] = makeBTY(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
-    bathTest(rad, :) = bath;
-    RD = 0:rangeStep:max(bath); % Receiver depth (check this!!)
+    bathTest(rad, :) = bath; %this is only used to plot the bathymetry if needed 
+    RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
     toc
    
     % make sound speed profile the same depth as the bathymetry
@@ -164,6 +161,8 @@ for rad = 1:length(radials)
     bellhop(fullfile(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
     toc
     clear Range bath
+    
+    %
 end
 disp('Completed constructing all radials.')
 toc
@@ -198,7 +197,7 @@ for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir_sub, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
+    [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDir_sub, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     

@@ -143,8 +143,8 @@ for rad = 1:length(radials)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     tic
     [Range, bath] = makeBTY(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
-    bathTest(rad, :) = bath;
-    RD = 0:rangeStep:max(bath); % Receiver depth (check this!!)
+    bathTest(rad, :) = bath; %this is only used to plot the bathymetry if needed 
+    RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
     toc
    
     % make sound speed profile the same depth as the bathymetry
@@ -161,6 +161,8 @@ for rad = 1:length(radials)
     bellhop(fullfile(intermedDir_sub, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
     toc
     clear Range bath
+    
+    %Why aren't we saving the PL here as a .mat file like Vanessa was?
 end
 disp('Completed constructing all radials.')
 toc
@@ -195,7 +197,7 @@ for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
     %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
 
-    [ PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir_sub, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
+    [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDir_sub, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
     
