@@ -96,24 +96,41 @@ disp([fileName, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,6:11)]
 
 end
 
+MoMeans.M01 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   M01.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
+MoMeans.M02 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   M02.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
+MoMeans.M03 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   M03.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
+MoMeans.M04 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+10]),3);  M04.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+10]),0,3);
+MoMeans.M05 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+11]),3);  M05.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+11]),0,3);
+MoMeans.M06 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+12]),3);  M06.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+12]),0,3);
+MoMeans.M07 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+1]),3);   M07.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+1]),0,3);
+MoMeans.M08 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   M08.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+2]),0,3);
+MoMeans.M09 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   M09.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
+MoMeans.M10 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   M10.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
+MoMeans.M11 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   M11.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
+MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
 
-M01.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   M01.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
-M02.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   M02.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
-M03.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   M03.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
-M04.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+10]),3);  M04.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+10]),0,3);
-M05.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+11]),3);  M05.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+11]),0,3);
-M06.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+12]),3);  M06.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+12]),0,3);
-M07.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+1]),3);   M07.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+1]),0,3);
-M08.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   M08.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+2]),0,3);
-M09.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   M09.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
-M10.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   M10.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
-M11.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   M11.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
-M12.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
+% NOTE: Before applying inpaint_nans, must
+    % Expand SSPM to entire depth
+    % Use interp to figure out values in between known values
 
-SSPM_export = [[depthlist].',inpaint_nans(M04.mean(:,2))];
-SSPM = array2table(SSPM01_NC);
-SSPM01_NC.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM01_NC, [saveDirectory,'\', 'NC_SSPM04.xlsx'])
+% configure user input: Tell user to take run an output of this script
+% through R and get the min and max mo's, then come back and input them
+% here
+minMo = 4;
+maxMo = 8;
+
+MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]);
+
+MoMeanfd = [(0:5000).' nan(1,5001).'];
+M0Meanfd((depthlist+1),2) = MeanSSP_minMo(:,2);
+firstNan = find(isnan(MeanSSP_minMo(:,2)),1);
+M0Meanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', M0Meanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(M0Meanfd),'linear', 'extrap');
+
+SSPM = [(0:5000).',inpaint_nans(M0Mean4fd(:,2))];
+SSPM = array2table(SSPM);
+SSPM.Properties.VariableNames = {'Depth' 'SS'};
+writetable(SSPM, [saveDirectory,'\', Site, '_SSPM',num2str(sprintf('%02d', minMo)),'.xlsx'])
+
 
 %%
 %HZ
