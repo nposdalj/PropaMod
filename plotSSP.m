@@ -25,9 +25,6 @@ fileNames_all = ls(fullfile(FilePath, '*0*')); % File name to match.
 saveDirectory = [GDrive ':\My Drive\PropagationModeling\SSPs'];
 %saveDirectory = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM\Plots';
 
-%For PART B (Longitude Line Plots): Select longitude line along which to cut
-long = 150;
-
 %For PART C (Site Plots): Add site data below: siteabrev, lat, long
 siteabrev = ['NC';       'BC';       'GS';       'BP';       'BS';      'WC';       'OC';       'HZ';       'JX'];
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833;   38.3738;    40.2550;    41.0618;    30.1523]; %jax avg is for D_13, 14, 15 only
@@ -140,84 +137,6 @@ end
 timestamp = [fileName(6:9), '/', fileName(10:11), '/', fileName(12:13), ' ',...
     fileName(15:16), ':', fileName(17:18), ':', fileName(19:20)];
 
-% %% (A) REGION: Plot sound speed by depth across region
-% 
-% Xtix = D.Longitude; % Adjust plot tick marks (found this code somewhere on google, as always)
-% reducedXtix = string(Xtix);
-% reducedXtix(mod(Xtix,1) ~= 0) = "";
-% Ytix = flip(D.Latitude);
-% reducedYtix = string(Ytix);
-% reducedYtix(mod(Ytix,1) ~= 0) = "";
-% 
-% % MAKE FIGURE
-% figure(5) % Sound Speed at various depths
-% set(gcf,"Position",[100 200 1300 400])
-% subplot(1,4,1)                                      % 0M, SURFACE
-% depthlevel = heatmap(cdat(:,:,1), 'Colormap', turbo, 'ColorLimits', [1400 1560]);
-% grid off; colorbar off
-% title("0 m")
-% depthlevel.XDisplayLabels = reducedXtix;
-% depthlevel.YDisplayLabels = reducedYtix;
-% subplot(1,4,2)                                      % -300M
-% depthlevel = heatmap(cdat(:,:,25), 'Colormap', turbo, 'ColorLimits', [1400 1560]);
-% grid off; colorbar off
-% title("300 m")
-% depthlevel.XDisplayLabels = reducedXtix;
-% depthlevel.YDisplayLabels = reducedYtix;
-% subplot(1,4,3)                                      % -600M
-% depthlevel = heatmap(cdat(:,:,29), 'Colormap', turbo, 'ColorLimits', [1400 1560]);
-% grid off; colorbar off
-% title("600 m")
-% depthlevel.XDisplayLabels = reducedXtix;
-% depthlevel.YDisplayLabels = reducedYtix;
-% subplot(1,4,4)                                      % -1000M
-% depthlevel = heatmap(cdat(:,:,33), 'Colormap', turbo, 'ColorLimits', [1400 1560]);
-% grid off
-% title("1000 m")
-% depthlevel.XDisplayLabels = reducedXtix;
-% depthlevel.YDisplayLabels = reducedYtix;
-% 
-% disp([fileName, ' - Completed Part A'])
-%     
-% %% (B) LONGITUDE: Plot sound speed profiles by longitude line slices
-% 
-% cdat_slice = permute(cdat, [3 1 2]); % Place depth in first position (y), latitude in second position (x)
-% depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's in cdat_slice
-% 
-% Xtix = flip(D.Latitude); % Adjust plot tick marks
-% reducedXtix = string(Xtix);
-% reducedXtix(mod(Xtix,1) ~= 0) = "";
-% Ytix = 1:5000;
-% reducedYtix = string(Ytix);
-% reducedYtix(mod(Ytix,500) ~= 0) = "";
-% 
-% %MAKE FIGURE
-% sspslicefig = figure(5000 + long);
-% longcut_table = cdat_slice(:,:,long);
-% longcut_table(longcut_table(:,:)==0) = NaN;
-% [latq, depthq] = meshgrid(1:1:length(D.Latitude),1:1:5000);
-% longcut_table = interp2((1:length(D.Latitude)).', (depthlist).', longcut_table, latq, depthq);
-% longcut = heatmap(longcut_table, 'Colormap', turbo, 'ColorLimits', [1400 1560]);
-% grid off
-% longcut.XDisplayLabels = reducedXtix;
-% longcut.YDisplayLabels = reducedYtix;
-% xlabel("Latitude (*N)")
-% ylabel("Depth (m)")
-% titledate = datetime(str2num(string(extractBetween(fileName, 6,13))), 'ConvertFrom', 'yyyymmdd', 'Format', 'MM/dd/yyyy');
-% title([char(titledate), ' | ', num2str(D.Longitude(long)), char(176), 'E'])
-% 
-% %SAVE FIGURE
-% plotDate = extractBetween(fileName, 6,13);
-% Longitu = D.Longitude(long);
-% set(gcf,'Position',[500 200 700 400]);
-% saveas(gcf,[saveDirectory,'\',char(plotDate),'_',...
-%     char(string(round(10*Longitu))),'_SSPslice'],'png');
-% 
-% disp([fileName, ' - Completed Part B'])
-% 
-% %saveas(gcf,[saveDirectory,'\',regionabrev,'\',char(plotDate),'_',... %More complicated workaround for lines 120-21
-%     %char(string(round(Longitu))),char(string(round(10*mod(Longitu, round(Longitu))))),'_SSPslice'],'png');
-    
 %% (C) LOCATION: Plot sound speed profile at each site
 
 depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's
@@ -274,13 +193,6 @@ disp([fileName, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,6:11)]
 
 end
 
-ALL_SSParray(ALL_SSParray == 0) = NaN; % After building ALL_SSParray, change months with no data from 0s to NaNs
-
-firstCalMo = str2double(MonthStart(5:6)); % Get the calendar month ALL_SSParray starts on (in its third dimension)
-calOffset = 12-firstCalMo;
-firstCalMo = 2;
-YearNums = 1:(length(ALL_SSParray(1,1,:))/12);
-
 M01.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   M01.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
 M02.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   M02.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
 M03.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   M03.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
@@ -294,23 +206,6 @@ M10.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   M10.std = nanstd(
 M11.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   M11.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
 M12.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
 
-% Sitenum = 2 % (2 is NC)
-% plot(M01.mean(:,2), -depthlist)
-% hold on
-% plot(M02.mean(:,2), -depthlist)
-% plot(M03.mean(:,2), -depthlist)
-% plot(M04.mean(:,2), -depthlist)
-% plot(M05.mean(:,2), -depthlist)
-% plot(M06.mean(:,2), -depthlist)
-% plot(M07.mean(:,2), -depthlist)
-% plot(M08.mean(:,2), -depthlist)
-% plot(M09.mean(:,2), -depthlist)
-% plot(M10.mean(:,2), -depthlist)
-% plot(M11.mean(:,2), -depthlist)
-% plot(M12.mean(:,2), -depthlist)
-% hold off
-
-
 SSPM_export = [[depthlist].',inpaint_nans(M01.mean(:,2))];
 SSPM = array2table(SSPM01_NC);
 SSPM01_NC.Properties.VariableNames = {'Depth' 'SS'};
@@ -318,55 +213,7 @@ writetable(SSPM01_NC, [saveDirectory,'\', 'NC_SSPM01.xlsx'])
 
 plot(SSPM01_NC.SS, -SSPM01_NC.Depth)
 
-%% Data Export Assembly
-
-% REORDER TIME-WISE TABLES TO SITE-WISE TABLES
-timeFileNames = ls(fullfile(saveDirectory,'*SSP_WAT_2*'));
-SSP_NC = array2table([depthlist].');    SSP_NC.Properties.VariableNames(1) = {'Depth'};
-SSP_BC = array2table([depthlist].');    SSP_BC.Properties.VariableNames(1) = {'Depth'};
-SSP_GS = array2table([depthlist].');    SSP_GS.Properties.VariableNames(1) = {'Depth'};
-SSP_BP = array2table([depthlist].');    SSP_BP.Properties.VariableNames(1) = {'Depth'};
-SSP_BS = array2table([depthlist].');    SSP_BS.Properties.VariableNames(1) = {'Depth'};
-SSP_WC = array2table([depthlist].');    SSP_WC.Properties.VariableNames(1) = {'Depth'};
-SSP_OC = array2table([depthlist].');    SSP_OC.Properties.VariableNames(1) = {'Depth'};
-SSP_HZ = array2table([depthlist].');    SSP_HZ.Properties.VariableNames(1) = {'Depth'};
-SSP_JAX = array2table([depthlist].');   SSP_JAX.Properties.VariableNames(1) = {'Depth'};
-
-for n = 1:length(timeFileNames)
-    SSPbyTime = readtable(fullfile(saveDirectory,timeFileNames(n,:)));
-    
-    SSP_NC(:,n+1) = SSPbyTime(:,2);
-    SSP_NC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_BC(:,n+1) = SSPbyTime(:,3);
-    SSP_BC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_GS(:,n+1) = SSPbyTime(:,4);
-    SSP_GS.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_BP(:,n+1) = SSPbyTime(:,5);
-    SSP_BP.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_BS(:,n+1) = SSPbyTime(:,6);
-    SSP_BS.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_WC(:,n+1) = SSPbyTime(:,7);
-    SSP_WC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_OC(:,n+1) = SSPbyTime(:,8);
-    SSP_OC.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_HZ(:,n+1) = SSPbyTime(:,9);
-    SSP_HZ.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    SSP_JAX(:,n+1) = SSPbyTime(:,10);
-    SSP_JAX.Properties.VariableNames(n+1) = {timeFileNames(n,9:16)};
-    
-    disp(['Added date ' timeFileNames(n,9:16) ' to all site-wise tables'])
-end
-
-writetable(SSP_NC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(1)), '.csv'])
-writetable(SSP_BC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(2)), '.csv'])
-writetable(SSP_GS,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(3)), '.csv'])
-writetable(SSP_BP,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(4)), '.csv'])
-writetable(SSP_BS,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(5)), '.csv'])
-writetable(SSP_WC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(6)), '.csv'])
-writetable(SSP_OC,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(7)), '.csv'])
-writetable(SSP_HZ,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(8)), '.csv'])
-writetable(SSP_JAX,[saveDirectory,'\', 'SSP_', regionabrev, '_', char(siteabrev(9)), '.csv'])
-
+%%
 %HZ
 % 41.0618; -66.35 (293.6500)
 % nearby lats: 227: 41.0400 and 228: 41.0800
