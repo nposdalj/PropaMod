@@ -76,7 +76,7 @@ RL_threshold = 125; % Threshold below which you want to ignore data; will be plo
 makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 
 % Radial Plots
-makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot]
+makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
 %% Make new folder w/in intermedDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir_sub = [intermedDir, '\' timestamp_currentrun];
