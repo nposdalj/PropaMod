@@ -166,7 +166,6 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 toc
-
 %% Copy files to final export directory
 % Include a check that ensures the files in the export directory aren't screwed up...
 % Since the process did take a while to run
@@ -178,15 +177,11 @@ for k = 1:length(allFiles)
     disp([allFiles(k,:), ' copied to new subfolder in GDrive export directory'])
 end
 copyfile(paramfile,fullfile(saveDir_sub, [timestamp_currentrun,'_Input_Parameters.txt']))
-
 %% Generate plots
 if generate_plots == 1
     
 fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
 mkdir(fpath_plotSub);
-
-% rd_all = zeros(1,length(radials)); %create empty array for radial depth to be used later with pDetSim
-% sortedTLVec = zeros(1,length(radials)); %create empty array for transmission loss to be used later with pDetSim
 
 % POLAR PLOTS
 % join this to the loop above
@@ -204,11 +199,9 @@ for rad = 1:length(radials)
     [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
     [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
     zq = interp2(x1,y1, PL,xq1, yq1);
-    %sortedTLVec(rad) = zq; %transmission loss vector to be used in pDetSim
     
     %save radial depth
     rd_inter = Pos.r.z;
-    %rd_all(rad) = rd_inter; %depth array to be used in pDetSim
     
     PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
     
@@ -257,10 +250,8 @@ title([Site,' Radial', num2str(o)])
 colorbar
 saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RadMap.png'])
 end
-
 else
 end
-
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
 save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
