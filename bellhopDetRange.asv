@@ -62,10 +62,9 @@ freq = 12000; % frequency of source
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
-rangeStep = 10;         % Range step size (m)
+rangeStep = 10;         % Range resolution
 radStep = 5;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
-nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % CONFIGURE PLOT OUTPUT
 generate_plots = 1; % 1 = Yes, generate plots;  0 = No, do not generate plots
@@ -77,6 +76,10 @@ makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth]
 
 % Radial Plots
 makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot]
+
+total_range; % Desired radial range, in meters
+rangeStep; % Range step size, in meters
+nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 %% Make new folder w/in intermedDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir_sub = [intermedDir, '\' timestamp_currentrun];
@@ -120,9 +123,9 @@ distDeg = km2deg(dist);             % radial length in degrees
 
 % Source Depth
 disp(['Source depth: ', num2str(SD), ' m'])
-RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
+RD = 0:rangeStep:1000;              % Receiver depth
 r = 0:rangeStep:total_range;        % range with steps
-rr = r';                            % output to be saved for pDetSim
+rr = r';                            %output to be saved for pDetSim
 %% Build Radials
 % DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
 
