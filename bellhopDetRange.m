@@ -73,7 +73,7 @@ generate_plots = 1; % 1 = Yes, generate plots;  0 = No, do not generate plots
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 
 % Polar Plots
-makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth]
+makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 
 % Radial Plots
 makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot]
