@@ -9,23 +9,20 @@
 % differences in sound speed across a 20-km range, but given such a low
 % resolution, I think those differences will be somewhat imprecise.
 
-% Different parts of the code should be commented out as appropriate when
-% analyzing large amounts of data for speed
-
 clearvars
 close all
     
 %% Parameters defined by user
 % Before running, make sure desired data has been downloaded from HYCOM
 % using ext_hycom_gofs_3_1.m.
+Site = 'NC';
 regionabrev = 'WAT';
+
 GDrive = 'H'; FilePath = [GDrive ':\My Drive\PropagationModeling\HYCOM_data'];
 fileNames_all = ls(fullfile(FilePath, '*0*')); % File name to match.
-%FilePath = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM';
 saveDirectory = [GDrive ':\My Drive\PropagationModeling\SSPs'];
-%saveDirectory = 'H:\My Drive\WAT_TPWS_metadataReduced\HYCOM\Plots';
 
-%For PART C (Site Plots): Add site data below: siteabrev, lat, long
+% Add site data below: siteabrev, lat, long
 siteabrev = ['NC';       'BC';       'GS';       'BP';       'BS';      'WC';       'OC';       'HZ';       'JX'];
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833;   38.3738;    40.2550;    41.0618;    30.1523]; %jax avg is for D_13, 14, 15 only
 Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37;     -67.99;     -66.35;     -79.77];
@@ -41,7 +38,7 @@ fileName = fileNames(k,:);
 
 %% Load data
 load([FilePath,'\', fileName]);
-%load('P:\My Drive\PropagationModeling\HYCOM_data\0002_20140801T000000')
+
 temp_frame = D.temperature;
 sal_frame = D.salinity;
 temp_frame = flip(permute(temp_frame, [2 1 3]),1); % To make maps work, swaps lat/long and flips lat
@@ -60,84 +57,7 @@ for i=1:(length(D.Latitude)*length(D.Longitude)*length(D.Depth)) % Only adds sou
     end
 end
 
-% %% Temp code - exploring inpaint_nans
-% cdat_xtra = nan(301,5,3001);
-% for deplev=1:40
-%     cdat_xtra(:,:,(-D.Depth(deplev)+1)) = cdat(:,100:104,deplev);
-% end
-% [xq yq zq] = meshgrid(1:1:301,1:1:5,1:1:5001);
-% [xi yi zi] = meshgrid(1:1:301,1:1:5,(-D.Depth+1));
-% cdat_xtra_int = interp3(xi,yi,zi,cdat(:,100:104,:),xq,yq,zq);
-% size(xq)
-% tic
-% cdat_xtra_inpaint = inpaint_nans(cdat_xtra);
-% toc
-% cdat_xtra_inpaint_2 = reshape(cdat_xtra_inpaint, [301 5 5001]);
-% 
-% figure(766)
-% test3 = pcolor(squeeze(cdat_xtra_inpaint_2(:,3,:)));
-% set(test3, 'EdgeColor', 'none')
-% colormap(jet)
-% caxis([1490 1550])
-% colorbar
-% hold on
-% plot(-D.Depth, 150, '.w')
-% hold off
-% squeeze(cdat_xtra_inpaint_2(:,3,:))
-% 
-% figure(767)
-% plot(squeeze(cdat(300,102,:)),D.Depth)
-% plot(squeeze(cdat(300,102,:)),D.Depth,'.')
-% 
-% 
-% figure(722)
-% test1 = pcolor(cdat_xtra(:,(238*39+1):(238*39+238)));
-% set(test1, 'EdgeColor', 'none')
-% axis ij
-% colormap(jet)
-% caxis([1490 1550]);
-% colorbar
-% 
-% figure(723)
-% test2 = pcolor(cdat(:,1:238,39));
-% set(test2, 'EdgeColor', 'none')
-% axis ij
-% colormap(jet)
-% caxis([1490 1550]);
-% colorbar
-% 
-% %% Code to be integrated into plotSSP - create site-specific grids of points
-% nearlats = knnsearch(D.Latitude,Latitude(1),'K',4); %find closest 4 latitude values
-% nearlats = sort(nearlats);
-% nearlons = knnsearch(D.Longitude.',[360+Longitude(1)],'K',4); %find closest 4 latitude values
-% nearlons = sort(nearlons);
-% cdat_site = cdat(nearlats, nearlons, :); % Create the site-specific subset of cdat
-% 
-% cdat_full = nan(4,4,5001);
-% for deplev=1:40
-%     cdat_full(:,:,(-D.Depth(deplev)+1)) = cdat_site(:,:,deplev);
-% end
-% cdat_site_inpaint = inpaint_nans(cdat_full);
-% cdat_site_inpaint = reshape(cdat_site_inpaint, [4 4 5001]); % I have no clue if this actually reshapes it correctly
-% doggo = pcolor(squeeze(cdat_site_inpaint(:,4,:)));
-% set(doggo, 'EdgeColor', 'none')
-% hold on
-% plot(-D.Depth,1,'.w')
-% ylim([0 5])
-% hold off
-% axis ij
-% 
-% cat = [1 2 3 4; 5 6 7 8];
-% cat
-% reshape(cat, [2 2 2])
-
-%%
-
-% Make timestamp for plot labels
-timestamp = [fileName(6:9), '/', fileName(10:11), '/', fileName(12:13), ' ',...
-    fileName(15:16), ':', fileName(17:18), ':', fileName(19:20)];
-
-%% (C) LOCATION: Plot sound speed profile at each site
+%% Generate SSPs
 
 depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's
 LongitudeE = Longitude + 360;
@@ -147,23 +67,6 @@ siteCoords = [Latitude, LongitudeE];
 SSP_table = [depthlist.'];
 for i=1:length(siteabrev)
     numdepths = nan(1,length(depthlist));
-    
-    % NEW ADDITION: Make cdat_sel, modified version of cdat that only
-    % includes interpolates using grid points where the data goes deeper
-    % than the site depth
-%     site_HydDepth = HydDepth(i);
-%     depthlist_req = find(depthlist > site_HydDepth, 1); % Want to only look at gridpoints where the data goes to this depthlist depth or deeper
-%     site_depthreq = depthlist(depthlist_req);
-%     cdat_sel = cdat;
-%     for o=1:301
-%         for p=1:238
-%             if isnan(cdat_sel(o,p,depthlist_req))
-%                 cdat_sel(o,p,:) = NaN;
-%             end
-%         end
-%     end
-    
-    
     
     for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
         %numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat_sel(:,:,j),siteCoords(i,2),siteCoords(i,1).');
@@ -193,6 +96,7 @@ disp([fileName, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,6:11)]
 
 end
 
+
 M01.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   M01.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
 M02.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   M02.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
 M03.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   M03.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
@@ -206,12 +110,10 @@ M10.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   M10.std = nanstd(
 M11.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   M11.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
 M12.mean = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
 
-SSPM_export = [[depthlist].',inpaint_nans(M01.mean(:,2))];
+SSPM_export = [[depthlist].',inpaint_nans(M04.mean(:,2))];
 SSPM = array2table(SSPM01_NC);
 SSPM01_NC.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM01_NC, [saveDirectory,'\', 'NC_SSPM01.xlsx'])
-
-plot(SSPM01_NC.SS, -SSPM01_NC.Depth)
+writetable(SSPM01_NC, [saveDirectory,'\', 'NC_SSPM04.xlsx'])
 
 %%
 %HZ
