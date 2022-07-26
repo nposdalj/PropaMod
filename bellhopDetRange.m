@@ -100,10 +100,10 @@ z = Bath(:,3);      % vector for depth (depth down is negative)
 z = -z;             % Make depth down positive
 toc
 %% Sound Speed Profiles
-SSP_TABLE = readtable([fpath, '\SSPs\SSP_WAT_MissingDepthsFilled.xlsx']);
-NCSSPcoarse = [SSP_TABLE.Depth SSP_TABLE.(Site)];
-idxNan = isnan(NCSSPcoarse(:, 2));
-NCSSPcoarse(idxNan, :) = [];
+SSP_TABLE = readtable([fpath, '\SSPs\SSP_WAT_MissingDepthsFilled.xlsx']); % read the SSP file
+NCSSPcoarse = [SSP_TABLE.Depth SSP_TABLE.(Site)]; % pull out the SSP for the specific site of interest 
+idxNan = isnan(NCSSPcoarse(:, 2)); %identify any NANs
+NCSSPcoarse(idxNan, :) = []; %remove NANs
 
 vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
 NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
@@ -123,6 +123,8 @@ r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
 %% Build Radials
 % DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
+% ^^ can we remove this comment now that you're automatically making the
+% subfolders?
 
 disp('General setup complete. Beginning radial construction...')
 tic
