@@ -145,7 +145,7 @@ for rad = 1:length(radials)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     tic
     [Range, bath] = makeBTY(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file
-    bathTest(rad, :) = bath; %this is only used to plot the bathymetry if needed 
+    bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed 
     RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
     toc
    
@@ -186,14 +186,13 @@ fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
 mkdir(fpath_plotSub);
 
 % POLAR PLOTS
-% join this to the loop above
+% join this to the loop above -- is this something that we still need to
+% do?
 disp(['Now generating polar plots between depths ' num2str(makeDepthPlots(1)) 'm and ' ...
     num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
 pause(1)
 for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
 for rad = 1:length(radials)
-    %iffn = fullfile(bellhopSaveDir,matFiles(rad,:));
-
     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDir, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
@@ -205,7 +204,7 @@ for rad = 1:length(radials)
     %save radial depth
     rd_inter = Pos.r.z;
     
-    PL800(rad, :) = zq(plotdepth, :); % PL800(mf, :) = zq(790, :); %SELECT DEPTH TO PLOT
+    PL800(rad, :) = zq(plotdepth, :); %SELECT DEPTH TO PLOT
     
     clear zq yq1 xq1 x1 y1 
     disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' num2str(sprintf('%03d', radials(rad)))])
