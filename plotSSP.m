@@ -265,11 +265,12 @@ end
 % nearby lats: 227: 41.0400 and 228: 41.0800
 % nearby longs: 195: 293.6000 and 196: 293.6800
 % long is 238 in length, lat is 301 in length
-squeeze(D.temperature(195,227,:)) % goes down to 500
-squeeze(D.temperature(195,228,:)) % goes down to 350
-squeeze(D.temperature(196,227,:)) % goes down to 1000
-squeeze(D.temperature(196,228,:)) % goes down to 800
 
-depthlist(40-9)
-
-squeeze(cdat_sel(200,64,:))
+% squeeze(D.temperature(195,227,:)) % goes down to 500
+% squeeze(D.temperature(195,228,:)) % goes down to 350
+% squeeze(D.temperature(196,227,:)) % goes down to 1000
+% squeeze(D.temperature(196,228,:)) % goes down to 800
+% 
+% depthlist(40-9)
+% 
+% squeeze(cdat_sel(200,64,:))
