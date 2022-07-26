@@ -9,6 +9,8 @@
 % differences in sound speed across a 20-km range, but given such a low
 % resolution, I think those differences will be somewhat imprecise.
 
+%ADD SOMETHING HERE ABOUT WHAT IT DOES AT THE END WITH MIN/MAX SSPs
+
 clearvars
 close all
     
@@ -169,7 +171,7 @@ plot(SSPT.SS,-SSPT.Depth)
 
 end
 
-%%
+%% Have this script calculate the min and max months within this script and produce the SSPs to save accordingly
 minMo = 4;
 maxMo = 8;
 

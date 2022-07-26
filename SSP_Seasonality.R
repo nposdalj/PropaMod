@@ -1,6 +1,9 @@
 # Analyze seasonality of sound speed at a give site
 # Based on data from HYCOM
 
+# This script isn't required to run for bellhopDetRange; rather, a helpful script
+# for plotting and statistics 
+
 #### Parameters defined by user ####
 siteabrev <- "BC"
 region <- "WAT"
