@@ -38,7 +38,7 @@ saveDirectory = [GDrive ':\My Drive\PropagationModeling\SSPs'];
 
 % Add site data below: siteabrev, lat, long
 siteabrev = ['NC';       'BC';       'GS';       'BP';       'BS';      'WC';       'OC';       'HZ';       'JX'];
-siteID    = [2;          3;          4;          5;          6;         7;          8;          9;          10];    % Make this list start at 2, and be the same length as siteabrev
+siteID    = [1;          2;          3;          4;          5;         6;          7;          8;          9];    % Currently trying to phase this out
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833;   38.3738;    40.2550;    41.0618;    30.1523]; %jax avg is for D_13, 14, 15 only
 Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37;     -67.99;     -66.35;     -79.77];
 % HydDepth  = [950;        950;        950;        950;        950;       950;        950;        950;        950];
@@ -81,18 +81,6 @@ for lev=1:40
     cdat(:,:,lev) = lev_extracted;
 end
 
-% for siteid = 1:9
-%     nearlats = knnsearch(D.Latitude,Latitude(siteid),'K',4); %find closest 4 latitude values
-%     nearLats.(['Site' num2str(siteid)]) = sort(nearlats);
-%     nearlons = knnsearch(D.Longitude.',[360+Longitude(siteid)],'K',4); %find closest 4 latitude values
-%     nearLons.(['Site' num2str(siteid)]) = sort(nearlons);
-%     cdat_site.(['Site' num2str(siteid)]) = cdat(nearlats, nearlons, :); % Create the site-specific subset of cdat
-%     for site_depthlevel = 1:40
-%         cdat_site.(['Site' num2str(siteid)])(:,:,site_depthlevel) = inpaint_nans(cdat_site.(['Site' num2str(siteid)])(:,:,site_depthlevel));
-%     end
-% end
-% 
-% cdat_site.(['Site' num2str(8)])(:,:,33)
 %% Generate SSPs
 
 depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's
@@ -173,20 +161,14 @@ MoMeans.M08 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   MoStd.M08 = na
 MoMeans.M09 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   MoStd.M09 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
 MoMeans.M10 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   MoStd.M10 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
 MoMeans.M11 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   MoStd.M11 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
-MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   MoStd.M12 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
+MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   MoStd.M12 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,
 
-% NOTE: Before applying inpaint_nans, must
-    % Expand SSPM to entire depth
-    % Use interp to figure out values in between known values
-
-% configure user input: Tell user to take run an output of this script
-% through R and get the min and max mo's, then come back and input them
-% here
 %% Export Data for each site
 
 for b = 1:length(siteabrev)
     Site = siteabrev(b,:);
-    siteIDi = siteID(contains(siteabrev,Site));
+    siteIDa = siteID+1;
+    siteIDi = siteIDa(contains(siteabrev,Site));
 
 TotMean = mean(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05,MoMeans.M06,...
     MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 3); % Average all 12 calendar months
@@ -196,9 +178,7 @@ TotStd = std(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05
     MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 0, 3); % SD of the 12 calendar months
 
 TotMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-TotMeanfd((depthlist+1),2) = TotMean(:,siteIDi); % Bring in site-specific data
-%firstNan = find(isnan(TotMean(:,2)),1); % Prevent interp1 from taking in NaNs as input values
-%TotMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', TotMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(TotMeanfd));
+TotMeanfd((depthlist+1),2) = TotMean(:,(siteIDi)); % Bring in site-specific data
 TotMeanfd(:,2) = interp1((depthlist+1).', TotMeanfd((depthlist.'+1),2),1:length(TotMeanfd));
 
 SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
@@ -215,7 +195,7 @@ set(gcf,'Position',[170*(b-1) 50 170 700])
 
 end
 
-%% Have this script calculate the min and max months within this script and produce the SSPs to save accordingly
+%% Calculate the min and max months and produce the SSPs to save accordingly
 
 for mon = 1:12
     testmean(mon,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', mon))])([23 25 27:33],2:10)); %2:10 issue
@@ -227,38 +207,31 @@ for sitenum = 1:length(siteabrev(:,1))
     extreme_mos(sitenum,2) = find(testmean == max(testmean(:,sitenum))) - 12*(sitenum-1); % Max months stored in second column
 end
 
-
 for i = 1:length(siteabrev(:,1))
     minMo = extreme_mos(i,1);
     maxMo = extreme_mos(i,2);
     
 MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
-
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
 MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
 MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
-
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
 writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
 
-
 MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
-
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
 MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
 MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
-
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
 writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\',siteabrev(i,:), '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
 
 end
-
 %%
 %HZ
 % 41.0618; -66.35 (293.6500)

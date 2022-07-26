@@ -186,7 +186,7 @@ MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   MoStd.M12 = na
 
 for b = 1:length(siteabrev)
     Site = siteabrev(b,:);
-    siteIDi = siteID(contains(siteabrev,Site));
+    siteIDi = (siteID+1)(contains(siteabrev,Site));
 
 TotMean = mean(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05,MoMeans.M06,...
     MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 3); % Average all 12 calendar months
@@ -196,15 +196,13 @@ TotStd = std(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05
     MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 0, 3); % SD of the 12 calendar months
 
 TotMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-TotMeanfd((depthlist+1),2) = TotMean(:,siteIDi); % Bring in site-specific data
-%firstNan = find(isnan(TotMean(:,2)),1); % Prevent interp1 from taking in NaNs as input values
-%TotMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', TotMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(TotMeanfd));
+TotMeanfd((depthlist+1),2) = TotMean(:,(siteIDi)); % Bring in site-specific data
 TotMeanfd(:,2) = interp1((depthlist+1).', TotMeanfd((depthlist.'+1),2),1:length(TotMeanfd));
 
 SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
 SSPT = array2table(SSPT);
 SSPT.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPT, [saveDirectory,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
+writetable(SSPT, [saveDirectory,'\', Site,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
 disp(['Average annual SSP saved for ' Site])
 
 figure(b)
@@ -228,34 +226,34 @@ for sitenum = 1:length(siteabrev(:,1))
 end
 
 
-for i = 1:length(siteabrev(1,:))
+for i = 1:length(siteabrev(:,1))
     minMo = extreme_mos(i,1);
     maxMo = extreme_mos(i,2);
-
+    
 MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
 
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,siteIDi); % Drop the site-specific data into this array
+MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
 MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
 
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM, [saveDirectory,'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
+writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
 
 
 MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
 
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,siteIDi); % Drop the site-specific data into this array
+MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
 MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
 
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM, [saveDirectory,'\', Site, '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
+writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\',siteabrev(i,:), '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
 
 end
 
@@ -265,11 +263,12 @@ end
 % nearby lats: 227: 41.0400 and 228: 41.0800
 % nearby longs: 195: 293.6000 and 196: 293.6800
 % long is 238 in length, lat is 301 in length
-squeeze(D.temperature(195,227,:)) % goes down to 500
-squeeze(D.temperature(195,228,:)) % goes down to 350
-squeeze(D.temperature(196,227,:)) % goes down to 1000
-squeeze(D.temperature(196,228,:)) % goes down to 800
 
-depthlist(40-9)
-
-squeeze(cdat_sel(200,64,:))
+% squeeze(D.temperature(195,227,:)) % goes down to 500
+% squeeze(D.temperature(195,228,:)) % goes down to 350
+% squeeze(D.temperature(196,227,:)) % goes down to 1000
+% squeeze(D.temperature(196,228,:)) % goes down to 800
+% 
+% depthlist(40-9)
+% 
+% squeeze(cdat_sel(200,64,:))
