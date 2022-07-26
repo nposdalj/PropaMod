@@ -84,7 +84,7 @@ intermedDir = [bellhopSaveDir, '\' timestamp_currentrun];
 mkdir(intermedDir);
 % This prevents file overwriting, if you are running bellhopDetRange.m multiple
 % times in parallel on the same computer.
-%% Save User-input params to a text file
+%% Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
 paramfile = fullfile(intermedDir, [timestamp_currentrun,'_Input_Parameters.txt']);
 fileid = fopen(paramfile, 'at');
 fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
