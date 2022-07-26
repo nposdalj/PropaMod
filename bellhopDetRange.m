@@ -66,7 +66,8 @@ depthStep = 10;         % Depth resolution
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % CONFIGURE PLOT OUTPUT
-generate_plots = 1; % 1 = Yes, generate plots;  0 = No, do not generate plots
+generate_PolarPlots = 1; % 1 = Yes, generate polar plots;  0 = No, do not generate polar plots
+generate_RadialPlots = 1;
 
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 
@@ -74,6 +75,8 @@ RL_threshold = 125; % Threshold below which you want to ignore data; will be plo
 makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 
 % Radial Plots
+numRadial_Plot = 4; % make it so the user only has to choose the number of radial plots they want
+% vvvv move this to the radial plot section and don't hard code it
 makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
 %% Make new folder w/in bellhopSaveDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
@@ -124,9 +127,8 @@ RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, b
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
 %% Build Radials
-% DO NOT RUN THIS LOOP WITHOUT GENERATING A NEW SUBFOLDER (see above).
-% ^^ can we remove this comment now that you're automatically making the
-% subfolders?
+% Note: this loop will re-write the existing files in the folder if you do not
+% create a subfolder using the above section of the code
 
 disp('General setup complete. Beginning radial construction...')
 tic
@@ -164,7 +166,8 @@ for rad = 1:length(radials)
     toc
     clear Range bath
     
-    %Why aren't we saving the PL here as a .mat file like Vanessa was?
+    
+
 end
 disp('Completed constructing all radials.')
 toc
@@ -186,8 +189,7 @@ fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
 mkdir(fpath_plotSub);
 
 % POLAR PLOTS
-% join this to the loop above -- is this something that we still need to
-% do?
+% join this to the loop above keep the if generate plot check
 disp(['Now generating polar plots between depths ' num2str(makeDepthPlots(1)) 'm and ' ...
     num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
 pause(1)
@@ -204,7 +206,7 @@ for rad = 1:length(radials)
     %save radial depth
     rd_inter = Pos.r.z;
     
-    PL800(rad, :) = zq(plotdepth, :); %SELECT DEPTH TO PLOT
+    PL800(rad, :) = zq(plotdepth, :);
     
     clear zq yq1 xq1 x1 y1 
     disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' num2str(sprintf('%03d', radials(rad)))])
@@ -219,7 +221,7 @@ R = 1:1:length(RL800(1,:));
 figure(1000 + plotdepth)
 [Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,length(RL800(1,:)))], 'Colormap', jet, 'Nspokes', 7);
 set(calbar,'location','EastOutside')
-caxis([RL_threshold 200]); % Should remove hard coding of 200, which is the upper limit of the color bar
+caxis([RL_threshold 200]); % Should remove hard coding of 200, which is the upper limit of the color bar change variable to indicate that this is the max expected RL
 yticks(0:60:300)
 set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 set(gcf, 'Position', [100 100 800 600])
