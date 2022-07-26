@@ -9,6 +9,17 @@
 % differences in sound speed across a 20-km range, but given such a low
 % resolution, I think those differences will be somewhat imprecise.
 
+% HOW THE CODE EXTRAPOLATES DATA WHERE HYCOM HAS NONE
+% The gigantic, regional 3D grid of sound speed data has 40 depth levels.
+% At each time point, this grid is regenerated for that time point. A
+% secondary process that takes out each of these levels one by one, applies
+% inpaint_nans to that level, then puts it back in the giant grid (like 
+% taking a book out of a stack of books, writing on it, then sliding it 
+% back in). The reason we apply inpaint_nans to each depth level
+% individually is because that if we just apply it to the 3D grid all at 
+% once, we have to worry about the fact that the depth levels aren't evenly
+% spaced.
+
 %ADD SOMETHING HERE ABOUT WHAT IT DOES AT THE END WITH MIN/MAX SSPs
 
 clearvars
@@ -64,7 +75,24 @@ for i=1:(length(D.Latitude)*length(D.Longitude)*length(D.Depth)) % Only adds sou
         cdat(i) = salt_water_c(temp_frame(i),(-depth_frame(i)),sal_frame(i)); % Sound Speed data
     end
 end
+for lev=1:40
+    lev_extracted = cdat(:,:,lev);
+    lev_extracted = inpaint_nans(lev_extracted);
+    cdat(:,:,lev) = lev_extracted;
+end
 
+% for siteid = 1:9
+%     nearlats = knnsearch(D.Latitude,Latitude(siteid),'K',4); %find closest 4 latitude values
+%     nearLats.(['Site' num2str(siteid)]) = sort(nearlats);
+%     nearlons = knnsearch(D.Longitude.',[360+Longitude(siteid)],'K',4); %find closest 4 latitude values
+%     nearLons.(['Site' num2str(siteid)]) = sort(nearlons);
+%     cdat_site.(['Site' num2str(siteid)]) = cdat(nearlats, nearlons, :); % Create the site-specific subset of cdat
+%     for site_depthlevel = 1:40
+%         cdat_site.(['Site' num2str(siteid)])(:,:,site_depthlevel) = inpaint_nans(cdat_site.(['Site' num2str(siteid)])(:,:,site_depthlevel));
+%     end
+% end
+% 
+% cdat_site.(['Site' num2str(8)])(:,:,33)
 %% Generate SSPs
 
 depthlist = abs(transpose(D.Depth)); % List of depth values to assign to the y's
@@ -79,10 +107,16 @@ plottimept_sup = uipanel('Parent',plottimept);
 timestamp = [fileName(6:9), '/', fileName(10:11), '/', fileName(12:13), ' ',...
     fileName(15:16), ':', fileName(17:18), ':', fileName(19:20)];
 plottimept_sup.Title = ['Site SSPs | ' timestamp];
-set(gcf,'Position',[50 100 1400 600])
+set(gcf,'Position',[50 50 1500 700])
 
 for i=1:length(siteabrev)
     numdepths = nan(1,length(depthlist));
+    
+    nearlats = knnsearch(D.Latitude,Latitude(1),'K',4); %find closest 4 latitude values
+    nearlats = sort(nearlats);
+    nearlons = knnsearch(D.Longitude.',[360+Longitude(1)],'K',4); %find closest 4 latitude values
+    nearlons = sort(nearlons);
+    cdat_site = cdat(nearlats, nearlons, :); % Create the site-specific subset of cdat
     
     for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
         %numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat_sel(:,:,j),siteCoords(i,2),siteCoords(i,1).');
@@ -90,7 +124,7 @@ for i=1:length(siteabrev)
     end
     subplot(1,length(siteabrev),i, 'Parent',plottimept_sup)
     plot(numdepths, -depthlist,'-.')
-    ylim([-1100 0])
+    ylim([-3200 0])
     %title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
     title(char(siteabrev(i,:)))
     if i == 1
@@ -122,19 +156,24 @@ disp([fileName, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,6:11)]
 
 end
 
+%There are 0's in ALL_SSParray for months w/ no data. I don't know how
+%those come into being but here's a line to change em to nan's so they
+%don't screw with the monthly means...
+ALL_SSParray(ALL_SSParray==0) = NaN;
+
 YearNums = 1:(length(ALL_SSParray(1,1,:))/12);
-MoMeans.M01 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   M01.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
-MoMeans.M02 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   M02.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
-MoMeans.M03 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   M03.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
-MoMeans.M04 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+10]),3);  M04.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+10]),0,3);
-MoMeans.M05 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+11]),3);  M05.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+11]),0,3);
-MoMeans.M06 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+12]),3);  M06.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+12]),0,3);
-MoMeans.M07 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+1]),3);   M07.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+1]),0,3);
-MoMeans.M08 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   M08.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+2]),0,3);
-MoMeans.M09 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   M09.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
-MoMeans.M10 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   M10.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
-MoMeans.M11 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   M11.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
-MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
+MoMeans.M01 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   MoStd.M01 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
+MoMeans.M02 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   MoStd.M02 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
+MoMeans.M03 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   MoStd.M03 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
+MoMeans.M04 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+10]),3);  MoStd.M04 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+10]),0,3);
+MoMeans.M05 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+11]),3);  MoStd.M05 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+11]),0,3);
+MoMeans.M06 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+12]),3);  MoStd.M06 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+12]),0,3);
+MoMeans.M07 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+1]),3);   MoStd.M07 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+1]),0,3);
+MoMeans.M08 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   MoStd.M08 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+2]),0,3);
+MoMeans.M09 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   MoStd.M09 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
+MoMeans.M10 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   MoStd.M10 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
+MoMeans.M11 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   MoStd.M11 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
+MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   MoStd.M12 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,3);
 
 % NOTE: Before applying inpaint_nans, must
     % Expand SSPM to entire depth
@@ -158,8 +197,9 @@ TotStd = std(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05
 
 TotMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
 TotMeanfd((depthlist+1),2) = TotMean(:,siteIDi); % Bring in site-specific data
-firstNan = find(isnan(TotMean(:,2)),1); % Prevent interp1 from taking in NaNs as input values
-TotMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', TotMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(TotMeanfd),'linear', 'extrap');
+%firstNan = find(isnan(TotMean(:,2)),1); % Prevent interp1 from taking in NaNs as input values
+%TotMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', TotMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(TotMeanfd));
+TotMeanfd(:,2) = interp1((depthlist+1).', TotMeanfd((depthlist.'+1),2),1:length(TotMeanfd));
 
 SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
 SSPT = array2table(SSPT);
@@ -167,7 +207,11 @@ SSPT.Properties.VariableNames = {'Depth' 'SS'};
 writetable(SSPT, [saveDirectory,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
 disp(['Average annual SSP saved for ' Site])
 
+figure(b)
 plot(SSPT.SS,-SSPT.Depth)
+title(siteabrev(b,:))
+xlim([1450,1560])
+set(gcf,'Position',[170*(b-1) 50 170 700])
 
 end
 
