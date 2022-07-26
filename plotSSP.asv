@@ -11,9 +11,14 @@
 
 % HOW THE CODE EXTRAPOLATES DATA WHERE HYCOM HAS NONE
 % The gigantic, regional 3D grid of sound speed data has 40 depth levels.
-% At each time point, this grid is regenerated for that time point. I've 
-% added a secondary process that takes out each of these levels one by one, 
-% applies inpaint_nans to that level, then puts it back in the giant grid (like taking a book out of a stack of books, writing on it, then sliding it back in). The reason I apply inpaint_nans to each depth level individually is because that if I just apply it to the 3D grid all at once, we have to worry about the depth levels not being evenly spaced
+% At each time point, this grid is regenerated for that time point. A
+% secondary process that takes out each of these levels one by one, applies
+% inpaint_nans to that level, then puts it back in the giant grid (like 
+% taking a book out of a stack of books, writing on it, then sliding it 
+% back in). The reason we apply inpaint_nans to each depth level
+% individually is because that if we just apply it to the 3D grid all at 
+% once, we have to worry about the fact that the depth levels aren't evenly
+% spaced.
 
 %ADD SOMETHING HERE ABOUT WHAT IT DOES AT THE END WITH MIN/MAX SSPs
 
@@ -211,21 +216,48 @@ set(gcf,'Position',[170*(b-1) 50 170 700])
 end
 
 %% Have this script calculate the min and max months within this script and produce the SSPs to save accordingly
-minMo = 4;
-maxMo = 8;
+
+for mon = 1:12
+    testmean(mon,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', mon))])([23 25 27:33],2:10)); %2:10 issue
+end
+
+extreme_mos = nan(length(siteabrev(1,:)),2);
+for sitenum = 1:length(siteabrev(:,1))
+    extreme_mos(sitenum,1) = find(testmean == min(testmean(:,sitenum))) - 12*(sitenum-1); % Min months stored in first column
+    extreme_mos(sitenum,2) = find(testmean == max(testmean(:,sitenum))) - 12*(sitenum-1); % Max months stored in second column
+end
+
+
+for i = 1:length(siteabrev(1,:))
+    minMo = extreme_mos(i,1);
+    maxMo = extreme_mos(i,2);
 
 MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
 
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
 MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,siteIDi); % Drop the site-specific data into this array
-firstNan = find(isnan(MeanSSP_minMo(:,2)),1); % Prevent interp1 from taking in NaNs as input values
-MoMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', MoMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(MoMeanfd),'linear', 'extrap');
+MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
 
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM, [saveDirectory,'\', Site, '_SSPM',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
+writetable(SSPM, [saveDirectory,'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
+
+
+MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
+
+MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
+MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,siteIDi); % Drop the site-specific data into this array
+MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
+    % Interpolate to get missing depths in between and extrapolate to get deeper depths
+
+SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
+SSPM = array2table(SSPM);
+SSPM.Properties.VariableNames = {'Depth' 'SS'};
+writetable(SSPM, [saveDirectory,'\', Site, '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
+
+end
 
 %%
 %HZ

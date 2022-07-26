@@ -204,7 +204,7 @@ TotMeanfd(:,2) = interp1((depthlist+1).', TotMeanfd((depthlist.'+1),2),1:length(
 SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
 SSPT = array2table(SSPT);
 SSPT.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPT, [saveDirectory,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
+writetable(SSPT, [saveDirectory,'\', Site,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
 disp(['Average annual SSP saved for ' Site])
 
 figure(b)
@@ -216,21 +216,48 @@ set(gcf,'Position',[170*(b-1) 50 170 700])
 end
 
 %% Have this script calculate the min and max months within this script and produce the SSPs to save accordingly
-minMo = 4;
-maxMo = 8;
 
+for mon = 1:12
+    testmean(mon,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', mon))])([23 25 27:33],2:10)); %2:10 issue
+end
+
+extreme_mos = nan(length(siteabrev(1,:)),2);
+for sitenum = 1:length(siteabrev(:,1))
+    extreme_mos(sitenum,1) = find(testmean == min(testmean(:,sitenum))) - 12*(sitenum-1); % Min months stored in first column
+    extreme_mos(sitenum,2) = find(testmean == max(testmean(:,sitenum))) - 12*(sitenum-1); % Max months stored in second column
+end
+
+
+for i = 1:length(siteabrev(:,1))
+    minMo = extreme_mos(i,1);
+    maxMo = extreme_mos(i,2);
+    
 MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
 
 MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,siteIDi); % Drop the site-specific data into this array
-firstNan = find(isnan(MeanSSP_minMo(:,2)),1); % Prevent interp1 from taking in NaNs as input values
-MoMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', MoMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(MoMeanfd),'linear', 'extrap');
+MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
+MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
 
 SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM, [saveDirectory,'\', Site, '_SSPM',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
+writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
+
+
+MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
+
+MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
+MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
+MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
+    % Interpolate to get missing depths in between and extrapolate to get deeper depths
+
+SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
+SSPM = array2table(SSPM);
+SSPM.Properties.VariableNames = {'Depth' 'SS'};
+writetable(SSPM, [saveDirectory,'\', siteabrev(i,:),'\',siteabrev(i,:), '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
+
+end
 
 %%
 %HZ
