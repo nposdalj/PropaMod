@@ -113,6 +113,8 @@ hydLoc = [hlat, hlon, hdepth];
 
 % Radial intervals and length
 radials = 0:radStep:(360-radStep);  % radials in #-degree intervals (# is in radStep)
+% ^ we should do this in a way where you can specify the number of radials
+% you want and then it does this calculation for the range steps after that
 dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
