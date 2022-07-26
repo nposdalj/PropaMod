@@ -24,15 +24,17 @@ saveDirectory = [GDrive ':\My Drive\PropagationModeling\SSPs'];
 
 % Add site data below: siteabrev, lat, long
 siteabrev = ['NC';       'BC';       'GS';       'BP';       'BS';      'WC';       'OC';       'HZ';       'JX'];
+siteID    = [2;          3;          4;          5;          6;         7;          8;          9;          10];
 Latitude  = [39.8326;    39.1912;    33.6675;    32.1061;    30.5833;   38.3738;    40.2550;    41.0618;    30.1523]; %jax avg is for D_13, 14, 15 only
 Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37;     -67.99;     -66.35;     -79.77];
 HydDepth  = [950;        950;        950;        950;        950;       950;        950;        950;        950];
 
 MonthStart = '201507';  % First month of study period (yyyymm)
 MonthEnd = '201906';    % Last month of study period (yyyymm)
-fileNames = fileNames_all(find(contains(fileNames_all,MonthStart)):find(contains(fileNames_all,MonthEnd)),:);
 
 %% Overarching loop runs through all timepoints requested
+fileNames = fileNames_all(find(contains(fileNames_all,MonthStart)):find(contains(fileNames_all,MonthEnd)),:); % Only use months corresponding to study period
+
 for k = 1:length(fileNames(:,1))
 fileName = fileNames(k,:);
 
@@ -65,30 +67,47 @@ siteCoords = [Latitude, LongitudeE];
 
 %MAKE FIGURES, and GENERATE TABLE OF SITE SSP VALUES
 SSP_table = [depthlist.'];
+
+plottimept = figure(200);
+plottimept_sup = uipanel('Parent',plottimept);
+plottimept_sup.Title = ['Site SSPs | ' timestamp];
+set(gcf,'Position',[50 100 1400 600])
+
+subplot(1,2,1)
+plot(i,j)
+
 for i=1:length(siteabrev)
     numdepths = nan(1,length(depthlist));
     
     for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
         %numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat_sel(:,:,j),siteCoords(i,2),siteCoords(i,1).');
         numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat(:,:,j),siteCoords(i,2),siteCoords(i,1).');
-
     end
-%     figure(200+i)
-%     plot(numdepths, -depthlist,'-o')
-%     xlabel('Sound Speed (m/s)'); ylabel('Depth (m)')
-%     %title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
-%     title(['SSP at ', char(siteabrev(i)),' | ', timestamp])
-%     set(gcf,'Position',[(155*i - 150) 100 300 600])
-%     %saveas(gcf,[saveDirectory,'\',char(plotDate),'_',char(siteabrev(i)),'_SSP'],'png');
-    
+    subplot(1,length(siteabrev),i, 'Parent',plottimept_sup)
+    plot(numdepths, -depthlist,'-o')
+    ylim([-1100 0])
+    %title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
+    title(char(siteabrev(i,:)))
+    if i == 1
+        ylabel('Depth (m)')
+    else
+        set(gca,'YTickLabel',[])
+    end
+    if i == 5
+        xlabel('Sound Speed (m/s)')
+    end
+    %sgtitle(['Site SSPs | ' timestamp])
+    %saveas(gcf,[saveDirectory,'\',char(plotDate),'_',char(siteabrev(i)),'_SSP'],'png');
     SSP_table(:,i+1) = numdepths;
 end
 
 
-ALL_SSParray(:,:,(12*(str2num(fileNames(k,6:9))-str2num(fileNames(1,6:9)))+str2num(fileNames(k,10:11))-str2num(fileNames(1,10:11))+1)) = SSP_table; % Array version of ALL_SSP - used for actual data assembly below
+ALL_SSParray(:,:,(12*(str2num(fileNames(k,6:9))-str2num(fileNames(1,6:9)))+str2num(fileNames(k,10:11))-str2num(fileNames(1,10:11))+1)) = SSP_table;
+    % Array version of ALL_SSP - used for actual data assembly below
 
 SSP_table = array2table(SSP_table);
-SSP_table.Properties.VariableNames = {'Depth' char(siteabrev(1,:)) char(siteabrev(2,:)) char(siteabrev(3,:)) char(siteabrev(4,:)) char(siteabrev(5,:)) char(siteabrev(6,:)) char(siteabrev(7,:)) char(siteabrev(8,:)) char(siteabrev(9,:))};
+SSP_table.Properties.VariableNames = {'Depth' char(siteabrev(1,:)) char(siteabrev(2,:)) char(siteabrev(3,:)) char(siteabrev(4,:))...
+    char(siteabrev(5,:)) char(siteabrev(6,:)) char(siteabrev(7,:)) char(siteabrev(8,:)) char(siteabrev(9,:))};
 %writetable(SSP_table,[saveDirectory,'\', 'SSP_', regionabrev, '_', fileName(strfind(fileName,'_')+1:end), '.xlsx'])
 
 ALL_SSP.(['M',fileNames(k,6:11)]) = SSP_table; % All the data from all time points and all sites is stored in ALL_SSP
@@ -116,22 +135,46 @@ MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   M12.std = nans
 % configure user input: Tell user to take run an output of this script
 % through R and get the min and max mo's, then come back and input them
 % here
+%% Export Data for each site
+
+for b = 1:length(siteabrev)
+    Site = siteabrev(b,:);
+    siteIDi = siteID(contains(siteabrev,Site));
+
 minMo = 4;
 maxMo = 8;
 
-MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]);
+MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
 
-MoMeanfd = [(0:5000).' nan(1,5001).'];
-M0Meanfd((depthlist+1),2) = M04.mean(:,2);
-firstNan = find(isnan(M04.mean(:,2)),1);
-M0Meanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', M0Mean4fd((depthlist(1:(firstNan-1)).'+1),2),1:length(M0Mean4fd),'linear', 'extrap');
+MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
+MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,siteIDi); % Drop the site-specific data into this array
+firstNan = find(isnan(MeanSSP_minMo(:,2)),1); % Prevent interp1 from taking in NaNs as input values
+MoMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', MoMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(MoMeanfd),'linear', 'extrap');
+    % Interpolate to get missing depths in between and extrapolate to get deeper depths
 
-SSPM = [(0:5000).',inpaint_nans(M0Mean4fd(:,2))];
+SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
 SSPM = array2table(SSPM);
 SSPM.Properties.VariableNames = {'Depth' 'SS'};
-writetable(SSPM, [saveDirectory,'\', 'NC_SSPM04.xlsx'])
+writetable(SSPM, [saveDirectory,'\', Site, '_SSPM',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
 
+TotMean = mean(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05,MoMeans.M06,...
+    MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 3); % Average all 12 calendar months
+    % Averages the 12 month averages instead of averaging all the
+    % individual months, since some of the 12 months are less represented
+TotStd = std(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05,MoMeans.M06,...
+    MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 0, 3); % SD of the 12 calendar months
 
+TotMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
+TotMeanfd((depthlist+1),2) = TotMean(:,siteIDi); % Bring in site-specific data
+firstNan = find(isnan(TotMean(:,2)),1); % Prevent interp1 from taking in NaNs as input values
+TotMeanfd(:,2) = interp1((depthlist(1:(firstNan-1))+1).', TotMeanfd((depthlist(1:(firstNan-1)).'+1),2),1:length(TotMeanfd),'linear', 'extrap');
+
+SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
+SSPT = array2table(SSPT);
+SSPT.Properties.VariableNames = {'Depth' 'SS'};
+writetable(SSPT, [saveDirectory,'\', Site, '_SSP_Mean','.xlsx']) % Save overall average SSP
+
+end
 
 %%
 %HZ
