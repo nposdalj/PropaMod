@@ -87,7 +87,7 @@ makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth] - we should
 % Radial Plots
 numRadial_Plot = 4; % make it so the user only has to choose the number of radial plots they want
 % vvvv move this to the radial plot section and don't hard code it
-makeRadialPlots = [0,60,300]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
+makeRadialPlots = [0,90,270]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
 %% Make new folder w/in bellhopSaveDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir = [bellhopSaveDir, '\' timestamp_currentrun];
@@ -261,7 +261,7 @@ ye_olde_whale = pcolor(RL_rad0(:,:));
 axis ij
 set(ye_olde_whale, 'EdgeColor','none')
 colormap(jet)
-plotbty(['Radial_',num2str(o),'.bty'])
+plotbty([fullfile(fpath, 'Radials', Site, timestamp_currentrun), '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
 title([Site,' Radial', num2str(o)])
 colorbar
 saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RadMap.png'])
