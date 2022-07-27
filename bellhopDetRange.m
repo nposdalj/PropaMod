@@ -288,6 +288,6 @@ fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
 fclose(fileid);
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
-save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
+save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',timestamp_currentrun,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
 
 % Whale? Yes
