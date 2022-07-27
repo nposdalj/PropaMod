@@ -44,7 +44,7 @@ Region = 'WAT';
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
 % bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'P';
+Gdrive = 'G';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
     % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
@@ -108,6 +108,8 @@ toc
 SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Site)), SSPtype)); % Select SSP file based on user input
 SSPfolder = ls(fullfile(fpath,'SSPs',Site));
 SSPfile = SSPfolder(SSPfolderCode,:);
+SSPfile(find(SSPfile==' ')) = [];
+
 if strcmp(SSPtype, 'Mmax')        % Get month being examined to report in the output info file, if applicable
     SSPmoReporting = num2str(SSPfile(12:13));
 elseif strcmp(SSPtype, 'Mmin')
@@ -184,6 +186,25 @@ for rad = 1:length(radials)
 end
 disp('Completed constructing all radials.')
 toc
+
+%% Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
+SSP_Reporting = (table2array(SSP)).';
+
+paramfile = fullfile(intermedDir, [timestamp_currentrun,'_Input_Parameters.txt']);
+fileid = fopen(paramfile, 'w');
+fclose(fileid);
+fileid = fopen(paramfile, 'at');
+fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
+    '\n\nSite\t' Site '\nRegion\t' Region ...
+    '\n\nSSP INPUT\nFile Name\t' [SSPfile], '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
+    '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth)...
+    '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
+    '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
+    '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makeDepthPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
+    '\n\n\nSSP\nDepth\tSound Speed']);
+fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
+fclose(fileid);
+
 %% Copy files to final export directory
 % Include a check that ensures the files in the export directory aren't screwed up...
 % Since the process did take a while to run
@@ -195,8 +216,9 @@ for k = 1:length(allFiles)
     disp([allFiles(k,:), ' copied to new subfolder in GDrive export directory'])
 end
 copyfile(paramfile,fullfile(saveDir_sub, [timestamp_currentrun,'_Input_Parameters.txt']))
+
 %% Generate plots
-if generate_plots == 1
+if generate_PolarPlots == 1
     
 fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
 mkdir(fpath_plotSub);
@@ -239,14 +261,17 @@ yticks(0:60:300)
 set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
 set(gcf, 'Position', [100 100 800 600])
 title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m'],'Position',[0 -1.2])
-saveas(Radiance,[fpath_plotSub,'\',Site,'_',num2str(plotdepth),'_RadMap.png'])
+saveas(Radiance,[fpath_plotSub,'\',Site,'_',num2str(plotdepth),'_RLPolarMap.png'])
 disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 
 end
+end
+
+if generate_RadialPlots == 1
 
 % RADIAL PLOTS
 for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-[PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
+[PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', o)) '.shd']]);
 PLslice = squeeze(pressure(1, 1,:,:));
 PL = -20*log10(abs(PLslice));
     
@@ -261,31 +286,14 @@ ye_olde_whale = pcolor(RL_rad0(:,:));
 axis ij
 set(ye_olde_whale, 'EdgeColor','none')
 colormap(jet)
-plotbty([fullfile(fpath, 'Radials', Site, timestamp_currentrun), '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
+plotbty([intermedDir, '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
 title([Site,' Radial', num2str(o)])
 colorbar
-saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RadMap.png'])
+saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RLRadialMap.png'])
 end
 else
 end
 
-%% Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
-SSP_Reporting = (table2array(SSP)).';
-
-paramfile = fullfile(intermedDir, [timestamp_currentrun,'_Input_Parameters.txt']);
-fileid = fopen(paramfile, 'w');
-fclose(fileid);
-fileid = fopen(paramfile, 'at');
-fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
-    '\n\nSite\t' Site '\nRegion\t' Region ...
-    '\n\nSSP INPUT\nFile Name\t' [SSPfile], '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
-    '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth)...
-    '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
-    '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
-    '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makeDepthPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
-    '\n\n\nSSP\nDepth\tSound Speed']);
-fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
-fclose(fileid);
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
 save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',timestamp_currentrun,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
