@@ -13,11 +13,12 @@ close all
 Site = 'NC';
 Region = 'WAT';
 sp = 'Pm';
+date = '220727092843'; %date you created the transmission loss model
 
 GDrive = 'I';
-inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site]; % Where your data is coming from
+inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date]; % Where your data is coming from
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
-inputDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate\220721151649';
+%inputDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate\220721151649';
 %% Load workspace from bellhopDetRange to extract nrr and rr
 load(fullfile(exportDir, [Site,'_bellhopDetRange.mat']))
 %% Loop through .shd files and extract depth and transmission loss
@@ -45,7 +46,9 @@ for idsk = 1 : length(concatFiles)
     
     %save radial depth
     rd_inter = Pos.r.z;
+    rd_inter = (rd_inter(1):1:(rd_inter(end)+10))'; %go from 10m jumps in depth to 1m jumps to match PL
     rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
 end
 %% Save and export workspace for pDetSim_v3Pm.m
-save([exportDir,['\',site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','-v7.3')
+freqSave = freq0/1000;
+save([exportDir,['\',Site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','-v7.3')
