@@ -46,7 +46,7 @@ runSettings = 1;
 %     the respective timestamp folder.)
 
 %% Params defined by user + Info for user (for runSettings Option 1 ONLY)
-% if runSettings == 1
+if runSettings == 1
     
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'NC';
@@ -100,61 +100,61 @@ numRadial_Plot = 4; % make it so the user only has to choose the number of radia
 % vvvv move this to the radial plot section and don't hard code it
 makeRadialPlots = [0,10,350]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
 
-% end
+end
 
 %% If runSettings Option 2 selected: Prompt folder selection and import settings (may need some mending to generalize for other users besides myself)
-% if runSettings == 2
-% requestFolder = input('What is the path for the GDrive folder with your data?\n', 's');
-% Site = input('What site is this data for? (2-letter abbreviation)\n', 's');
-% 
-% Gdrive = requestFolder(1);
-% fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
-%     % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
-%                             % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
-% saveDir = [fpath, '\Radials\', Site]; % Export directory
-% % intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-% % intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
-% 
-% timestamp_currentrun = requestFolder(end-11:end);
-% userParamsFile = fullfile(requestFolder, [timestamp_currentrun, '_Input_Parameters.txt']);
-% 
-% userParamsFileID = fopen(userParamsFile, 'r');
-% userParams = fscanf(userParamsFileID, '%c');
-% 
-% SSPtype = str2double(userParams(strfind(userParams, 'SSPtype')+7:strfind(userParams, 'HYDROPHONE')-1));
-% 
-% SL = str2double(userParams(strfind(userParams, 'SL')+2:strfind(userParams, 'SD')-1));
-% SD = str2double(userParams(strfind(userParams, 'SD')+2:strfind(userParams, 'hlat')-1));
-% hlat = str2double(userParams(strfind(userParams, 'hlat')+4:strfind(userParams, 'hlon')-1));
-% hlon = str2double(userParams(strfind(userParams, 'hlon')+4:strfind(userParams, 'hdepth')-1));
-% hdepth = str2double(userParams(strfind(userParams, 'hdepth')+6:strfind(userParams, 'freq')-1));
-% freq = str2double(userParams(strfind(userParams, 'freq')+4:strfind(userParams, 'RANGE & RESOLUTION')-1));
-% 
-% totalRange;
-% rangeStep;
-% radStep;
-% depthStep;
-% nrr = total_range/rangeStep;
-% 
-% generate_PolarPlots;
-% generate_RadialPlots;
-% RL_threshold; % Threshold below which you want to ignore data; will be plotted as blank (white space)
-% RL_plotMax; % Colorbar maximum for plots; indicates that this is the max expected RL
-% makeDepthPlots; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
-% numRadial_Plot; % make it so the user only has to choose the number of radial plots they want
-% % vvvv move this to the radial plot section and don't hard code it
-% makeRadialPlots; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
-% 
-% 
-% end
+if runSettings == 2
+requestFolder = input('What is the path for the GDrive folder with your data?\n', 's');
+Site = input('What site is this data for? (2-letter abbreviation)\n', 's');
+
+Gdrive = requestFolder(1);
+fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
+    % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
+                            % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
+saveDir = [fpath, '\Radials\', Site]; % Export directory
+% intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
+% intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
+
+timestamp_currentrun = requestFolder(end-11:end);
+userParamsFile = fullfile(requestFolder, [timestamp_currentrun, '_Input_Parameters.txt']);
+
+userParamsFileID = fopen(userParamsFile, 'r');
+userParams = fscanf(userParamsFileID, '%c');
+
+SSPtype = str2double(userParams(strfind(userParams, 'SSPtype')+7:strfind(userParams, 'HYDROPHONE')-1));
+
+SL = str2double(userParams(strfind(userParams, 'SL')+2:strfind(userParams, 'SD')-1));
+SD = str2double(userParams(strfind(userParams, 'SD')+2:strfind(userParams, 'hlat')-1));
+hlat = str2double(userParams(strfind(userParams, 'hlat')+4:strfind(userParams, 'hlon')-1));
+hlon = str2double(userParams(strfind(userParams, 'hlon')+4:strfind(userParams, 'hdepth')-1));
+hdepth = str2double(userParams(strfind(userParams, 'hdepth')+6:strfind(userParams, 'freq')-1));
+freq = str2double(userParams(strfind(userParams, 'freq')+4:strfind(userParams, 'RANGE & RESOLUTION')-1));
+
+totalRange;
+rangeStep;
+radStep;
+depthStep;
+nrr = total_range/rangeStep;
+
+generate_PolarPlots;
+generate_RadialPlots;
+RL_threshold; % Threshold below which you want to ignore data; will be plotted as blank (white space)
+RL_plotMax; % Colorbar maximum for plots; indicates that this is the max expected RL
+makeDepthPlots; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
+numRadial_Plot; % make it so the user only has to choose the number of radial plots they want
+% vvvv move this to the radial plot section and don't hard code it
+makeRadialPlots; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
+
+
+end
 %% Make new folder w/in bellhopSaveDir for this run's files (for runSettings Option 1)
-% if runSettings == 1
+if runSettings == 1
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir = [bellhopSaveDir, '\' timestamp_currentrun];
 mkdir(intermedDir);
 % This prevents file overwriting, if you are running bellhopDetRange.m multiple
 % times in parallel on the same computer.
-% end
+end
 
 %% Bathymetry 
 disp('Loading bathymetry data...') % Read in bathymetry data
@@ -213,7 +213,7 @@ end
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code
 
-%if runSettings == 1
+if runSettings == 1
     
 disp('General setup complete. Beginning radial construction...')
 tic
@@ -278,7 +278,7 @@ end
 disp('Completed constructing all radials.')
 toc
 
-% end
+end
 
 %% Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
 SSP_Reporting = (table2array(SSP)).';
