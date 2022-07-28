@@ -52,7 +52,7 @@ saveDir = [fpath, '\Radials\', Site]; % Export directory
 % intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
 % intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
 
-SSPtype = 'Mmin'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
+SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
 % Note to self to have smth in plotSSP that exports the examined effort
 % period and other relevant deets so they can be exported in the info file
@@ -70,7 +70,7 @@ freq = 12000; % frequency of source
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
-radStep = 90;            % Angular resolution (i.e. angle between radials)
+radStep = 10;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
@@ -82,12 +82,12 @@ RL_threshold = 125; % Threshold below which you want to ignore data; will be plo
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
 
 % Polar Plots
-makeDepthPlots = [150, 50, 800]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
+makeDepthPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 
 % Radial Plots
 numRadial_Plot = 4; % make it so the user only has to choose the number of radial plots they want
 % vvvv move this to the radial plot section and don't hard code it
-makeRadialPlots = [0,90,270]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
+makeRadialPlots = [0,10,350]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
 %% Make new folder w/in bellhopSaveDir for this run's files
 timestamp_currentrun = datestr(datetime('now'), 'yymmddHHMMSS');
 intermedDir = [bellhopSaveDir, '\' timestamp_currentrun];
@@ -141,13 +141,18 @@ disp(['Source depth: ', num2str(SD), ' m'])
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
+
+%% Before generating radial plots, set up plot save directory here:
+fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
+mkdir(fpath_plotSub);
+
 %% Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code
 
 disp('General setup complete. Beginning radial construction...')
 tic
-for rad = 1:length(radials)
+for rad = 18:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
     % gives lat lon point total range (km) away in the direction of radials from source center
@@ -181,7 +186,28 @@ for rad = 1:length(radials)
     toc
     clear Range bath
     
+    % Plot radial
+    if generate_RadialPlots == 1
+    [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
+    PLslice = squeeze(pressure(1, 1,:,:));
+    PL = -20*log10(abs(PLslice));
     
+    [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
+    [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
+    zq = interp2(x1,y1, PL,xq1, yq1);
+    
+    figure(2000+radials(rad))
+    RL_rad0 = SL - zq;
+    RL_rad0(RL_rad0 < RL_threshold) = NaN;
+    ye_olde_whale = pcolor(RL_rad0(:,:)); 
+    axis ij
+    set(ye_olde_whale, 'EdgeColor','none')
+    colormap(jet)
+    plotbty([intermedDir, '\Radial_',num2str(sprintf('%03d', radials(rad))),'.bty'])
+    title([Site,' Radial', num2str(sprintf('%03d', radials(rad)))])
+    colorbar
+    saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(sprintf('%03d', radials(rad))),'_RLRadialMap.png'])
+    end
 
 end
 disp('Completed constructing all radials.')
@@ -220,8 +246,8 @@ copyfile(paramfile,fullfile(saveDir_sub, [timestamp_currentrun,'_Input_Parameter
 %% Generate plots
 if generate_PolarPlots == 1
     
-fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
-mkdir(fpath_plotSub);
+% fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
+% mkdir(fpath_plotSub);
 
 % POLAR PLOTS
 % join this to the loop above keep the if generate plot check
@@ -267,32 +293,31 @@ disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 end
 end
 
-if generate_RadialPlots == 1
+% if generate_RadialPlots == 1
 
 % RADIAL PLOTS
-for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-[PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', o)) '.shd']]);
-PLslice = squeeze(pressure(1, 1,:,:));
-PL = -20*log10(abs(PLslice));
-    
-[x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-[xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
-zq = interp2(x1,y1, PL,xq1, yq1);
-    
-figure(2000+o)
-RL_rad0 = SL - zq;
-RL_rad0(RL_rad0 < RL_threshold) = NaN;
-ye_olde_whale = pcolor(RL_rad0(:,:)); 
-axis ij
-set(ye_olde_whale, 'EdgeColor','none')
-colormap(jet)
-plotbty([intermedDir, '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
-title([Site,' Radial', num2str(o)])
-colorbar
-saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RLRadialMap.png'])
-end
-else
-end
+% for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
+% [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', o)) '.shd']]);
+% PLslice = squeeze(pressure(1, 1,:,:));
+% PL = -20*log10(abs(PLslice));
+%     
+% [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
+% [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
+% zq = interp2(x1,y1, PL,xq1, yq1);
+%     
+% figure(2000+o)
+% RL_rad0 = SL - zq;
+% RL_rad0(RL_rad0 < RL_threshold) = NaN;
+% ye_olde_whale = pcolor(RL_rad0(:,:)); 
+% axis ij
+% set(ye_olde_whale, 'EdgeColor','none')
+% colormap(jet)
+% plotbty([intermedDir, '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
+% title([Site,' Radial', num2str(o)])
+% colorbar
+% saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RLRadialMap.png'])
+% end
+% end
 
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
