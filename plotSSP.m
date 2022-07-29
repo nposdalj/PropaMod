@@ -10,15 +10,13 @@
 % resolution, I think those differences will be somewhat imprecise.
 
 % HOW THE CODE EXTRAPOLATES DATA WHERE HYCOM HAS NONE
-% The gigantic, regional 3D grid of sound speed data has 40 depth levels.
-% At each time point, this grid is regenerated for that time point. A
-% secondary process that takes out each of these levels one by one, applies
-% inpaint_nans to that level, then puts it back in the giant grid (like 
-% taking a book out of a stack of books, writing on it, then sliding it 
-% back in). The reason we apply inpaint_nans to each depth level
-% individually is because that if we just apply it to the 3D grid all at 
-% once, we have to worry about the fact that the depth levels aren't evenly
-% spaced.
+% The 3D grid of regional SS data (cdat) has 40 depth levels. At each time 
+% point, this grid is regenerated for that time point. A secondary process 
+% takes out each level one by one, applies inpaint_nans to that level, then
+% puts it back in the 3D SS grid. The reason we apply inpaint_nans to each 
+% depth level individually is because the depth levels in the 3D grid aren't
+% evenly spaced, so extrapolating between them as though they are evenly
+% spaced will be erroneous.
 
 %ADD SOMETHING HERE ABOUT WHAT IT DOES AT THE END WITH MIN/MAX SSPs
 
@@ -47,7 +45,7 @@ Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37; 
 MonthStart = '201507';  % First month of study period (yyyymm)
 MonthEnd = '201906';    % Last month of study period (yyyymm)
 
-plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower.
+plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is turned on.
 
 %% Overarching loop runs through all timepoints requested
 fileNames = fileNames_all(find(contains(fileNames_all,MonthStart)):find(contains(fileNames_all,MonthEnd)),:); % Only use months corresponding to study period
@@ -88,7 +86,7 @@ LongitudeE = Longitude + 360;
 siteCoords = [Latitude, LongitudeE];
 
 %MAKE FIGURES, and GENERATE TABLE OF SITE SSP VALUES
-SSP_table = [depthlist.'];
+SSP_table = depthlist.';
 
 plottimept = figure(200);
 plottimept_sup = uipanel('Parent',plottimept);
@@ -150,18 +148,18 @@ end
 ALL_SSParray(ALL_SSParray==0) = NaN;
 
 YearNums = 1:(length(ALL_SSParray(1,1,:))/12);
-MoMeans.M01 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+7]),3);   MoStd.M01 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+7]),0,3);
-MoMeans.M02 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+8]),3);   MoStd.M02 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+8]),0,3);
-MoMeans.M03 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+9]),3);   MoStd.M03 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+9]),0,3);
-MoMeans.M04 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+10]),3);  MoStd.M04 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+10]),0,3);
-MoMeans.M05 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+11]),3);  MoStd.M05 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+11]),0,3);
-MoMeans.M06 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+12]),3);  MoStd.M06 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+12]),0,3);
-MoMeans.M07 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+1]),3);   MoStd.M07 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+1]),0,3);
-MoMeans.M08 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+2]),3);   MoStd.M08 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+2]),0,3);
-MoMeans.M09 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+3]),3);   MoStd.M09 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+3]),0,3);
-MoMeans.M10 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+4]),3);   MoStd.M10 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+4]),0,3);
-MoMeans.M11 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+5]),3);   MoStd.M11 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+5]),0,3);
-MoMeans.M12 = nanmean(ALL_SSParray(:,:,[12*(YearNums-1)+6]),3);   MoStd.M12 = nanstd(ALL_SSParray(:,:,[12*(YearNums-1)+6]),0,
+MoMeans.M01 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+7)),3);   MoStd.M01 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+7)),0,3);
+MoMeans.M02 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+8)),3);   MoStd.M02 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+8)),0,3);
+MoMeans.M03 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+9)),3);   MoStd.M03 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+9)),0,3);
+MoMeans.M04 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+10)),3);  MoStd.M04 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+10)),0,3);
+MoMeans.M05 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+11)),3);  MoStd.M05 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+11)),0,3);
+MoMeans.M06 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+12)),3);  MoStd.M06 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+12)),0,3);
+MoMeans.M07 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+1)),3);   MoStd.M07 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+1)),0,3);
+MoMeans.M08 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+2)),3);   MoStd.M08 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+2)),0,3);
+MoMeans.M09 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+3)),3);   MoStd.M09 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+3)),0,3);
+MoMeans.M10 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+4)),3);   MoStd.M10 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+4)),0,3);
+MoMeans.M11 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+5)),3);   MoStd.M11 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+5)),0,3);
+MoMeans.M12 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+6)),3);   MoStd.M12 = nanstd(ALL_SSParray(:,:,(12*(YearNums-1)+6)),0,3);
 
 %% Export Data for each site
 
