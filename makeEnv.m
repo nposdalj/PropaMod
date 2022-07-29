@@ -36,9 +36,10 @@ for nz = 2:length(z)
     fprintf(fid, '%.3f\t%.6f\t/ \n', z(nz), ssp(nz));
 end
 
-% Bottom half-space properties
+% Acoustic elastic half-space properties
 % Find sediment cores for WAT?
 fprintf(fid, '''A*'' 0.0\n');
+%A = model as Acousto-Elastic half space
 fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
 %1.5 likely density (according to VZ)
 %max(ssp)*1.01 = 1500 = sound speed profile in the mud (but probably off)

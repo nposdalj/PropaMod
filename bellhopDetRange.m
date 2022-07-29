@@ -77,6 +77,7 @@ hlat = 39.8326; % hydrophone lat
 hlon = -69.9800; % hydrophone long
 hdepth = 960; % hydrophone depth
 freq = 12000; % frequency of source
+% freq = {8000 9000 10000}; %adjust the code so that you can loop through multiple peak frequencies
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -240,6 +241,9 @@ for rad = 1:length(radials)
     zssp = [1:1:max(bath)+1];
     ssp = NCSSP([1:length(zssp)], 2);
 
+    %START LOOP FOR PEAK FREQUENCY HERE - be mindful of not saving the env
+    %and bellhop output files over one another (either use a different
+    %folder or change file name)
     % Make environment file (to be used in BELLHOP)
     disp(['Making environment file for Radial ', num2str(sprintf('%03d', radials(rad))),'...'])   % Status update
     makeEnv(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))], freq, zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
