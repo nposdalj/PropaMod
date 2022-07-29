@@ -12,41 +12,41 @@ hold on
 plot(site_coords.Lon, site_coords.Lat, '.r')
 hold off
 
-figure
-plot(geosamples_export.LON, geosamples_export.LAT, '.','Color',[.9 .9 .9])
-xlim([-85 -65]); ylim([25 45])
-hold on
-clear site_sediments
-for Site = 1:9
-selSite_geosamples = nan(height(geosamples_export),2);
-for i=1:height(geosamples_export);
-    if [distance([site_coords.Lat(Site),site_coords.Lon(Site)],[geosamples_export.LAT(i),geosamples_export.LON(i)])] < 40000
-        selSite_geosamples(i,:) = [geosamples_export.LAT(i),geosamples_export.LON(i)];
-    else
-    end
-end
-% plot(site_coords.Lon, site_coords.Lat, '.r')
-plot(selSite_geosamples(:,2),selSite_geosamples(:,1), '.b')
-plot(site_coords.Lon(Site),site_coords.Lat(Site), '.r')
-selSite_geosamples = rmmissing(selSite_geosamples);%site_coords
-
-ptIndices = nan(0,1); %nan(size(selSite_geosamples, 1),1);
-for point = 1:size(selSite_geosamples, 1) %find the geosamples_export indices of the points close to the site
-    pti = find(geosamples_export.LAT == selSite_geosamples(point,1) & ...
-        geosamples_export.LON == selSite_geosamples(point,2));
-    ptIndices = [ptIndices; pti]; %Attached pti to the end of ptIndices instead of preallocating, which would be a problem;
-                                  %This is because some point coords are associated with more than one index, and more 
-                                  %than one sediment type.
-                                  % check that this works...
-end
-site_sediments.(char(site_coords.Site(Site))) = array2table([ptIndices, nan(length(ptIndices),1)]);
-site_sediments.(char(site_coords.Site(Site))).Properties.VariableNames = {'Index' 'Sediment'};
-site_sediments.(char(site_coords.Site(Site))).Sediment = geosamples_export.TEXT1(ptIndices); % Get the sediment types at these points
-
-%site_sediments.(char(site_coords.Site(Site))) = rmmissing(site_sediments.(char(site_coords.Site(Site))));
-disp(['Site completed: ' char(site_coords.Site(Site))])
-end
-hold off
+% figure
+% plot(geosamples_export.LON, geosamples_export.LAT, '.','Color',[.9 .9 .9])
+% xlim([-85 -65]); ylim([25 45])
+% hold on
+% clear site_sediments
+% for Site = 1:9
+% selSite_geosamples = nan(height(geosamples_export),2);
+% for i=1:height(geosamples_export);
+%     if [distance([site_coords.Lat(Site),site_coords.Lon(Site)],[geosamples_export.LAT(i),geosamples_export.LON(i)])] < 40000
+%         selSite_geosamples(i,:) = [geosamples_export.LAT(i),geosamples_export.LON(i)];
+%     else
+%     end
+% end
+% % plot(site_coords.Lon, site_coords.Lat, '.r')
+% plot(selSite_geosamples(:,2),selSite_geosamples(:,1), '.b')
+% plot(site_coords.Lon(Site),site_coords.Lat(Site), '.r')
+% selSite_geosamples = rmmissing(selSite_geosamples);%site_coords
+% 
+% ptIndices = nan(0,1); %nan(size(selSite_geosamples, 1),1);
+% for point = 1:size(selSite_geosamples, 1) %find the geosamples_export indices of the points close to the site
+%     pti = find(geosamples_export.LAT == selSite_geosamples(point,1) & ...
+%         geosamples_export.LON == selSite_geosamples(point,2));
+%     ptIndices = [ptIndices; pti]; %Attached pti to the end of ptIndices instead of preallocating, which would be a problem;
+%                                   %This is because some point coords are associated with more than one index, and more 
+%                                   %than one sediment type.
+%                                   % check that this works...
+% end
+% site_sediments.(char(site_coords.Site(Site))) = array2table([ptIndices, nan(length(ptIndices),1)]);
+% site_sediments.(char(site_coords.Site(Site))).Properties.VariableNames = {'Index' 'Sediment'};
+% site_sediments.(char(site_coords.Site(Site))).Sediment = geosamples_export.TEXT1(ptIndices); % Get the sediment types at these points
+% 
+% %site_sediments.(char(site_coords.Site(Site))) = rmmissing(site_sediments.(char(site_coords.Site(Site))));
+% disp(['Site completed: ' char(site_coords.Site(Site))])
+% end
+% hold off
 
 % Make a secondary process that examines the point coordinates of the
 % indices that actually have sediment data and finds the one with the least
@@ -117,6 +117,8 @@ disp(['Site completed: ' char(site_coords.Site(Site))])
 end
 hold off
 
-figure(1)
-pie(TypeCounts.NC.TypeCount,TypeCounts.NC.Type)
-title('NC')
+for Site = 1:length(site_coords.Site)
+figure
+pie(TypeCounts.(char(site_coords.Site(Site))).TypeCount,TypeCounts.(char(site_coords.Site(Site))).Type)
+title(char(site_coords.Site(Site)))
+end
