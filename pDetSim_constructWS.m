@@ -13,7 +13,7 @@ close all
 Site = 'NC';
 Region = 'WAT';
 sp = 'Pm';
-date = '220727092843'; %date you created the transmission loss model
+date = '220727164325'; %date you created the transmission loss model
 
 GDrive = 'I';
 inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date]; % Where your data is coming from
