@@ -13,9 +13,9 @@ siteList = char(site_coords.Site);
 
 figure
 plot(geosamples_export.LON, geosamples_export.LAT, '.b')
-xlim([-85 -65]); ylim([25 45])
 hold on
 plot(site_coords.Lon, site_coords.Lat, '.r')
+plot(site_coords.Lon, site_coords.Lat, 'or')
 hold off
 
 % figure
