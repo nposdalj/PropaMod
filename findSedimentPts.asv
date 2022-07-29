@@ -118,5 +118,5 @@ end
 hold off
 
 figure(1)
-pie(TypeCounts.NC.TypeCount,TypeCounts.NC.Type)
-title('NC')
+pie(TypeCounts.(char(site_coords.Site(Site))).TypeCount)
+title(char(site_coords.Site(Site)))

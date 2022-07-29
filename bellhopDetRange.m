@@ -217,7 +217,7 @@ end
     
 disp('General setup complete. Beginning radial construction...')
 tic
-for rad = 24:25 % 1:length(radials)
+for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
     % gives lat lon point total range (km) away in the direction of radials from source center
