@@ -129,12 +129,20 @@ for itr2 = 1:length(envIdx)
     btyOutFile = [newOutFile, '.bty'];
     trcInFile = [fileInName, '.trc'];
     trcOutFile = [newOutFile, '.trc'];
+    shdInFile = [fileInName, '.shd'];   % added by AD
+    shdOutFile = [newOutFile, '.shd'];   % added by AD
+    prtInFile = [fileInName, '.prt'];   % added by AD
+    prtOutFile = [newOutFile, '.prt'];   % added by AD
     fid_in_ssp = fopen(sspInFile);
     fid_out_ssp = fopen(sspOutFile,'w+');
     fid_in_bty = fopen(btyInFile);
     fid_out_bty = fopen(btyOutFile, 'w+');
     fid_in_trc = fopen(trcInFile);
     fid_out_trc = fopen(trcOutFile, 'w+');
+    fid_in_shd = fopen(shdInFile);  % added by AD
+    fid_out_shd = fopen(shdOutFile, 'w+');  % added by AD
+    fid_in_prt = fopen(prtInFile);  % added by AD
+    fid_out_prt = fopen(prtOutFile, 'w+');  % added by AD
     
     while ~feof(fid_in_ssp)
         s = fgets(fid_in_ssp);
@@ -147,6 +155,14 @@ for itr2 = 1:length(envIdx)
     while ~feof(fid_in_trc)
         s = fgets(fid_in_trc);
         fprintf(fid_out_trc,'%s',s);
-    end    
+    end
+    while ~feof(fid_in_shd)     % added by AD
+        s = fgets(fid_in_shd);      % added by AD
+        fprintf(fid_out_shd,'%s',s);    % added by AD
+    end
+    while ~feof(fid_in_prt)     % added by AD
+        s = fgets(fid_in_prt);      % added by AD
+        fprintf(fid_out_prt,'%s',s);    % added by AD
+    end  
     fclose all;
 end
