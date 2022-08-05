@@ -18,6 +18,7 @@
         % Construct sound propagation radials around your site with your
         % specified parameters
         % Save a .txt file w/ your selected parameters in Export directory
+        % and plot directory
         % Save .bty, .env, .shd, and .prt files to intermediate directory
         % Move these outputs to the Export directory
         % Generate radial and polar plots and save to Export directory
@@ -45,14 +46,17 @@ runSettings = 1;
 %     existing set of radials. (You will be prompted to input the path of
 %     the respective timestamp folder.)
 
+% Note from AD 8/5/22 - Ultimately this code shouldn't really be necessary.
+% As long as the code to make and save plots and pDetSim workspace is sound, they should get
+% output just fine and user shouldn't have to do it again
+
 %% Params defined by user + Info for user (for runSettings Option 1 ONLY)
 % if runSettings == 1
    
-author = 'AD'; % Your name/initials here. This will be included in the saved .txt file.
-userNote = '';
-    % Optionally, include a note about what this run is for, things you
-    % need to remember/ others should be aware of, etc. This will be
-    % included in the .txt file.
+author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+userNote = 'Hello, whale!';
+    % Optionally, include a note for yourself or other users. This will be
+    % included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'NC';
@@ -102,7 +106,7 @@ RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max e
 % Polar Plots
 makeDepthPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 
-% Radial Plots
+% Radial Plots    % THIS CAN BE PHASED OUT -- Code has been updated to just plot every radial it makes data for.
 numRadial_Plot = 4; % make it so the user only has to choose the number of radial plots they want
 % vvvv move this to the radial plot section and don't hard code it
 makeRadialPlots = [0,10,350]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
@@ -245,8 +249,8 @@ for rad = 1:length(radials)
     toc
    
     % make sound speed profile the same depth as the bathymetry
-    zssp = [1:1:max(bath)+1];
-    ssp = NCSSP([1:length(zssp)], 2);
+    zssp = 1:1:max(bath)+1;
+    ssp = NCSSP(1:length(zssp), 2);
 
     %START LOOP FOR PEAK FREQUENCY HERE - be mindful of not saving the env
     %and bellhop output files over one another (either use a different
@@ -262,7 +266,7 @@ for rad = 1:length(radials)
     toc
     clear Range bath
     
-    % Plot radial
+    %% Generate radial plots
     if generate_RadialPlots == 1
     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
@@ -273,9 +277,9 @@ for rad = 1:length(radials)
     zq = interp2(x1,y1, PL,xq1, yq1);
     
     figure(2000+radials(rad))
-    RL_rad0 = SL - zq;
-    RL_rad0(RL_rad0 < RL_threshold) = NaN;
-    ye_olde_whale = pcolor(RL_rad0(:,:)); 
+    RL_radiii = SL - zq;
+    RL_radiii(RL_radiii < RL_threshold) = NaN;
+    ye_olde_whale = pcolor(RL_radiii(:,:)); % RL_radxxx is recieved level for the given radial
     axis ij
     set(ye_olde_whale, 'EdgeColor','none')
     colormap(jet)
@@ -299,11 +303,9 @@ fileid = fopen(paramfile, 'w');
 fclose(fileid);
 fileid = fopen(paramfile, 'at');
 fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
-    '\n\nCreated by\t' author ...
-    '\nDateTime\t' timestamp_currentrun...
-    '\nUser Note' userNote...
+    '\n\nCreated by\t' author '\nDateTime\t' timestamp_currentrun '\nUser Note' userNote...
     '\n\nSite\t' Site '\nRegion\t' Region ...
-    '\n\nSSP INPUT\nFile Name\t' [SSPfile], '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
+    '\n\nSSP INPUT\nFile Name\t' SSPfile, '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
     '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' freq...
     '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
     '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
@@ -311,6 +313,7 @@ fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
     '\n\n\nSSP\nDepth\tSound Speed']);
 fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
 fclose(fileid);
+copy(paramfile,[fpath_plotSub, '\' timestamp_currentrun, '_Input_Parameters.txt']);
 
 %% Copy files to final export directory
 % Include a check that ensures the files in the export directory aren't screwed up...
@@ -324,18 +327,15 @@ for k = 1:length(allFiles)
 end
 copyfile(paramfile,fullfile(saveDir_sub, [timestamp_currentrun,'_Input_Parameters.txt']))
 
-%% Generate plots
+%% Generate Polar Plots
 if generate_PolarPlots == 1
-    
-% fpath_plotSub = [fpath, '\Plots\' Site '\' timestamp_currentrun];
-% mkdir(fpath_plotSub);
 
 % POLAR PLOTS
 % join this to the loop above keep the if generate plot check
 disp(['Now generating polar plots between depths ' num2str(makeDepthPlots(1)) 'm and ' ...
     num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
 pause(1)
-for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3);
+for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3)
 for rad = 1:length(radials)
     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDir, '\', ['Radial_' num2str(sprintf('%03d', radials(rad))) '.shd']]);
     PLslice = squeeze(pressure(1, 1,:,:));
@@ -348,24 +348,24 @@ for rad = 1:length(radials)
     %save radial depth
     rd_inter = Pos.r.z;
     
-    PL800(rad, :) = zq(plotdepth, :);
+    PLiii(rad, :) = zq(plotdepth, :); % Save PL along depth iii meters, the depth that is currently being plotted
     
     clear zq yq1 xq1 x1 y1 
     disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' num2str(sprintf('%03d', radials(rad)))])
 end
 
-PL800(isinf(PL800)) = NaN;
-PL800(PL800 > RL_threshold) = NaN; %PL800 > 125 == NaN; %AD - what is this line for
-RL800 = SL - PL800;
-RL800(RL800 < RL_threshold) = NaN; 
+PLiii(isinf(PLiii)) = NaN;
+PLiii(PLiii > RL_threshold) = NaN; %PLxxx > 125 == NaN; %AD - what is this line for
+RLiii = SL - PLiii;
+RLiii(RLiii < RL_threshold) = NaN; 
 
-R = 1:1:length(RL800(1,:));
+R = 1:1:length(RLiii(1,:));
 figure(1000 + plotdepth)
-[Radiance, calbar] = polarPcolor(R, [radials 360], [RL800;NaN(1,length(RL800(1,:)))], 'Colormap', jet, 'Nspokes', 7);
+[Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
 set(calbar,'location','EastOutside')
 caxis([RL_threshold RL_plotMax]);
 yticks(0:60:300)
-set(get(calbar,'ylabel'),'String', ['\fontsize{10} Received Level [dB]']);
+set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
 set(gcf, 'Position', [100 100 800 600])
 title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m'],'Position',[0 -1.2])
 saveas(Radiance,[fpath_plotSub,'\',Site,'_',num2str(plotdepth),'_RLPolarMap.png'])
@@ -374,7 +374,7 @@ disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 end
 end
 
-% if generate_RadialPlots == 1
+% if generate_RadialPlots == 1  -- All of this code was moved into the radial loop
 
 % RADIAL PLOTS
 % for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
@@ -403,5 +403,3 @@ end
 %% Save variables for pDetSim
 freqSave = char(freqVec/1000);
 save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',timestamp_currentrun,'_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
-
-% Whale? Yes
