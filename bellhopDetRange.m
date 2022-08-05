@@ -47,7 +47,13 @@ runSettings = 1;
 
 %% Params defined by user + Info for user (for runSettings Option 1 ONLY)
 % if runSettings == 1
-    
+   
+author = 'AD'; % Your name/initials here. This will be included in the saved .txt file.
+userNote = '';
+    % Optionally, include a note about what this run is for, things you
+    % need to remember/ others should be aware of, etc. This will be
+    % included in the .txt file.
+
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'NC';
 Region = 'WAT';
@@ -87,8 +93,8 @@ depthStep = 10;         % Depth resolution
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % CONFIGURE PLOT OUTPUT
+generate_RadialPlots = 1; % 1 = Yes, generate radial plots;  0 = No, do not generate radial plots
 generate_PolarPlots = 1; % 1 = Yes, generate polar plots;  0 = No, do not generate polar plots
-generate_RadialPlots = 1;
 
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
@@ -212,7 +218,8 @@ end
 
 %% Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
-% create a subfolder using the above section of the code
+% create a subfolder using the above section of the code (titled: Make new
+% folder w/in bellhopSaveDir for this run's files)
 
 %if runSettings == 1
     
@@ -292,6 +299,9 @@ fileid = fopen(paramfile, 'w');
 fclose(fileid);
 fileid = fopen(paramfile, 'at');
 fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
+    '\n\nCreated by\t' author ...
+    '\nDateTime\t' timestamp_currentrun...
+    '\nUser Note' userNote...
     '\n\nSite\t' Site '\nRegion\t' Region ...
     '\n\nSSP INPUT\nFile Name\t' [SSPfile], '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
     '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' freq...
