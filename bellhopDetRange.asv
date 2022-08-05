@@ -92,8 +92,9 @@ freq = 12000; % frequency of source
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
-radStep = 10;            % Angular resolution (i.e. angle between radials)
 depthStep = 10;         % Depth resolution
+numRadials = 36;        % Specify number of radials - They will be evenly spaced.
+    % Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % CONFIGURE PLOT OUTPUT
@@ -202,9 +203,8 @@ NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
 hydLoc = [hlat, hlon, hdepth];
 
 % Radial intervals and length
+radStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)
 radials = 0:radStep:(360-radStep);  % radials in #-degree interval (# is in radStep)
-% ^ we should do this in a way where you can specify the number of radials
-% you want and then it does this calculation for the range steps after that
 dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
@@ -255,15 +255,22 @@ for rad = 1:length(radials)
     %START LOOP FOR PEAK FREQUENCY HERE - be mindful of not saving the env
     %and bellhop output files over one another (either use a different
     %folder or change file name)
+        % AD - made partial progress on this; will modify whole script to have 3
+        % different intermediate directories and three output directories,
+        % one per frequency
+    
+    for freqi = 1:length(freq)
     % Make environment file (to be used in BELLHOP)
-    disp(['Making environment file for Radial ', num2str(sprintf('%03d', radials(rad))),'...'])   % Status update
+    disp(['Making environment file for Radial ', num2str(sprintf('%03d', radials(rad))),', Frequency ', num2str(sprintf('%06d', freq(freqi))),' Hz...'])   % Status update
     makeEnv(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))], freq, zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
     
     % Run BELLHOP
-    disp(['Running Bellhop for Radial ', num2str(sprintf('%03d', radials(rad))),'...']) % Status update
+    disp(['Running Bellhop for Radial ', num2str(sprintf('%03d', radials(rad))),', Frequency', freq(freqi),'...']) % Status update
     tic
     bellhop(fullfile(intermedDir, ['Radial_' num2str(sprintf('%03d', radials(rad)))])); % run bellhop on env file
     toc
+    end
+    
     clear Range bath
     
     %% Generate radial plots
@@ -306,8 +313,8 @@ fprintf(fileid, ['User Input Parameters for Run ' timestamp_currentrun...
     '\n\nCreated by\t' author '\nDateTime\t' timestamp_currentrun '\nUser Note' userNote...
     '\n\nSite\t' Site '\nRegion\t' Region ...
     '\n\nSSP INPUT\nFile Name\t' SSPfile, '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
-    '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' freq...
-    '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
+    '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' num2str(freq)...
+    '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nNumber of Radials\t' num2str(numRadials) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
     '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
     '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makeDepthPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
     '\n\n\nSSP\nDepth\tSound Speed']);
@@ -374,7 +381,7 @@ disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m'])
 end
 end
 
-% if generate_RadialPlots == 1  -- All of this code was moved in
+% if generate_RadialPlots == 1  -- All of this code was moved into the radial loop
 
 % RADIAL PLOTS
 % for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
