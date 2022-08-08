@@ -23,8 +23,8 @@
 % Move these outputs to the Export directory
 % Generate radial and polar plots and save to Export directory
 
-clear variables
-clear all
+clearvars % clear variables
+close all % clear all
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
@@ -80,14 +80,12 @@ SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Mont
 % here
 
 % SPECIFY PARAMETERS FOR INPUT
-
 SL = 220; % Source Level
 SD = 800; % Source depth
 hlat = 39.8326; % hydrophone lat
 hlon = -69.9800; % hydrophone long
 hdepth = 960; % hydrophone depth
-% freq = 12000; % frequency of source
-freq = {8000 9000 10000}; %adjust the code so that you can loop through multiple peak frequencies
+freq = {8000 9000 10000}; % frequencies of sources - Code will loop through these!! Please enter 3 values
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -106,11 +104,7 @@ RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max e
 
 % Polar Plots
 makeDepthPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
-
-% Radial Plots    % THIS CAN BE PHASED OUT -- Code has been updated to just plot every radial it makes data for.
-numRadial_Plot = 4; % make it so the user only has to choose the number of radial plots they want
-% vvvv move this to the radial plot section and don't hard code it
-makeRadialPlots = [0,10,350]; % [first radial to plot, step size, last radial to plot] can you add some more notes about this one please?
+% Radial plots are automatically generated for every radial
 
 % end
 
@@ -160,30 +154,30 @@ makeRadialPlots = [0,10,350]; % [first radial to plot, step size, last radial to
 %
 % end
 %% 3. Make new folders for this run's files
-% if runSettings == 1
+% This step prevents file overwriting, if you are running bellhopDetRange.m
+% multiple times in parallel on the same computer.
+
+%if runSettings == 1
 runTimestamp = datestr(datetime('now'), 'yymmddHHMMSS');
+%end
 
 intermedDir = [bellhopSaveDir, '\' runTimestamp];   % Intermediate save directory [Local]
 mkdir(intermedDir);
-intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Subdirectory for 1st freq
-intermedDirF2 = [intermedDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(intermedDirF2); % Subdirectory for 2nd freq
-intermedDirF3 = [intermedDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(intermedDirF3); % Subdirectory for 3rd freq
+intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Local subdirectory for 1st freq
+intermedDirF2 = [intermedDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(intermedDirF2); % Local subdirectory for 2nd freq
+intermedDirF3 = [intermedDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(intermedDirF3); % Local subdirectory for 3rd freq
 
 saveDir_sub = [saveDir, '\' runTimestamp];          % Final save directory [GDrive]
 mkdir(saveDir_sub);
-saveDir_subF1 = [saveDir_sub '\' num2str(freq{1}/1000) 'kHz']; mkdir(saveDir_subF1); % Subdirectory for 1st freq
-saveDir_subF2 = [saveDir_sub '\' num2str(freq{2}/1000) 'kHz']; mkdir(saveDir_subF2); % Subdirectory for 2nd freq
-saveDir_subF3 = [saveDir_sub '\' num2str(freq{3}/1000) 'kHz']; mkdir(saveDir_subF3); % Subdirectory for 3rd freq
+saveDir_subF1 = [saveDir_sub '\' num2str(freq{1}/1000) 'kHz']; mkdir(saveDir_subF1); % Save subdirectory for 1st freq
+saveDir_subF2 = [saveDir_sub '\' num2str(freq{2}/1000) 'kHz']; mkdir(saveDir_subF2); % Save subdirectory for 2nd freq
+saveDir_subF3 = [saveDir_sub '\' num2str(freq{3}/1000) 'kHz']; mkdir(saveDir_subF3); % Save subdirectory for 3rd freq
 
 plotDir = [fpath, '\Plots\' Site '\' runTimestamp]; % Plot save directory [GDrive]
 mkdir(plotDir);
-plotDirF1 = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF1); % Subdirectory for 1st freq
-plotDirF2 = [plotDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(plotDirF2); % Subdirectory for 2nd freq
-plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Subdirectory for 3rd freq
-
-% This prevents file overwriting, if you are running bellhopDetRange.m multiple
-% times in parallel on the same computer.
-% end
+plotDirF1 = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF1); % Plot subdirectory for 1st freq
+plotDirF2 = [plotDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(plotDirF2); % Plot subdirectory for 2nd freq
+plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
 
 %% 4. Bathymetry
 disp('Loading bathymetry data...') % Read in bathymetry data
@@ -194,6 +188,7 @@ lat = Bath(:,1);    % vector for latitude
 z = Bath(:,3);      % vector for depth (depth down is negative)
 z = -z;             % Make depth down positive
 toc
+
 %% 5. Sound Speed Profiles
 SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Site)), SSPtype)); % Select SSP file based on user input
 SSPfolder = ls(fullfile(fpath,'SSPs',Site));
@@ -215,6 +210,7 @@ NCSSPcoarse(idxNan, :) = []; %remove NANs
 
 vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
 NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
+
 %% 6. Hydrophone location and depth
 % Center of source cell
 hydLoc = [hlat, hlon, hdepth];
@@ -234,7 +230,7 @@ rr = r';                            % output to be saved for pDetSim
 %% 7. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code (titled: Make new
-% folder w/in bellhopSaveDir for this run's files)
+% folder for this run's files)
 
 %if runSettings == 1
 
@@ -269,23 +265,15 @@ for rad = 1:length(radials)
     zssp = 1:1:max(bath)+1;
     ssp = NCSSP(1:length(zssp), 2);
     
-    %START LOOP FOR PEAK FREQUENCY HERE - be mindful of not saving the env
-    %and bellhop output files over one another (either use a different
-    %folder or change file name)
+    %% Begin peak frequency loop (7.2 continues into here)
     
     for freqi = 1:length(freq)
         if freqi == freq{1} % Select directories for current sub-iteration
-            intermedDirFi = intermedDirF1;
-            saveDir_subFi = saveDir_subF1;
-            plotDirFi = plotDirF1;
+            intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
         elseif freqi == freq{2}
-            intermedDirFi = intermedDirF2;
-            saveDir_subFi = saveDir_subF2;
-            plotDirFi = plotDirF2;
+            intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
         elseif freqi == freq{3}
-            intermedDirFi = intermedDirF3;
-            saveDir_subFi = saveDir_subF1;
-            plotDirFi = plotDirF3;
+            intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
         end
         
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
@@ -349,25 +337,18 @@ toc
 
 for freqi = 1:length(freq)
     if freqi == freq{1} % Select directories for current sub-iteration
-        intermedDirFi = intermedDirF1;
-        saveDir_subFi = saveDir_subF1;
-        plotDirFi = plotDirF1;
+        intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
     elseif freqi == freq{2}
-        intermedDirFi = intermedDirF2;
-        saveDir_subFi = saveDir_subF2;
-        plotDirFi = plotDirF2;
+        intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
     elseif freqi == freq{3}
-        intermedDirFi = intermedDirF3;
-        saveDir_subFi = saveDir_subF1;
-        plotDirFi = plotDirF3;
+        intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
     end
     
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-
-%% 8. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
-
-    txtFileName = [runTimestamp '_' freqiChar 'kHz_Input_Parameters.txt'];
     
+    %% 8. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
+    
+    txtFileName = [runTimestamp '_' freqiChar 'kHz_Input_Parameters.txt'];
     paramfile = fullfile(intermedDirFi, txtFileName);
     fileid = fopen(paramfile, 'w');
     fclose(fileid);
@@ -388,31 +369,19 @@ for freqi = 1:length(freq)
     copyfile(paramfile,fullfile(saveDir_subFi, txtFileName)) % Copy to saveDir_sub
     copyfile(paramfile,fullfile(plotDirFi, txtFileName)); % Copy to plotDir
     
-    %% Copy files to final export directory -- % This function is now integrated into the loop itself
-    % Include a check that ensures the files in the export directory aren't screwed up...
-    % Since the process did take a while to run
-    
-    % allFiles = ls(fullfile(intermedDir,'*Radial*'));
-    % for k = 1:length(allFiles)
-    %     allFiles = ls(fullfile(intermedDir,'*Radial*'));
-    %     copyfile(fullfile(intermedDir,allFiles(k,:)),fullfile(saveDir_sub, allFiles(k,:)));
-    %     disp([allFiles(k,:), ' copied to new subfolder in GDrive export directory'])
-    % end
-    
     %% 9. Generate Polar Plots
     if generate_PolarPlots == 1
         
-        % POLAR PLOTS
-        % join this to the loop above keep the if generate plot check
         disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makeDepthPlots(1))...
             'm and ' num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
         pause(1)
+        
         for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3)
             for rad = 1:length(radials)
                 
                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
                 filePrefix = ['Radial_' radialiChar '_' freqiChar 'kHz']; % Current file prefix
-    
+                
                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
                 PLslice = squeeze(pressure(1, 1,:,:));
                 PL = -20*log10(abs(PLslice));
@@ -449,32 +418,6 @@ for freqi = 1:length(freq)
             
         end
     end
-    
-    % if generate_RadialPlots == 1  -- All of this code was moved into the radial loop
-    
-    % RADIAL PLOTS
-    % for o = makeRadialPlots(1):makeRadialPlots(2):makeRadialPlots(3)
-    % [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDir, ['\Radial_' num2str(sprintf('%03d', o)) '.shd']]);
-    % PLslice = squeeze(pressure(1, 1,:,:));
-    % PL = -20*log10(abs(PLslice));
-    %
-    % [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-    % [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
-    % zq = interp2(x1,y1, PL,xq1, yq1);
-    %
-    % figure(2000+o)
-    % RL_rad0 = SL - zq;
-    % RL_rad0(RL_rad0 < RL_threshold) = NaN;
-    % ye_olde_whale = pcolor(RL_rad0(:,:));
-    % axis ij
-    % set(ye_olde_whale, 'EdgeColor','none')
-    % colormap(jet)
-    % plotbty([intermedDir, '\Radial_',num2str(sprintf('%03d', o)),'.bty'])
-    % title([Site,' Radial', num2str(o)])
-    % colorbar
-    % saveas(ye_olde_whale,[fpath_plotSub,'\',Site,'_',num2str(o),'_RLRadialMap.png'])
-    % end
-    % end
     
     %% 10. Save variables for pDetSim
     freqSave = char(freqVec/1000);
