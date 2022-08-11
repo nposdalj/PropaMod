@@ -61,15 +61,15 @@ Site = 'NC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
-% bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'G';
+% bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'I';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
 % intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-% intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
+intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
 
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
@@ -231,7 +231,7 @@ rr = r';                            % output to be saved for pDetSim
 % folder for this run's files)
 
 %if runSettings == 1
-
+botDepthSort = []; %create empty array for bottom depth sorted by radials for pDetSim
 disp('General setup complete. Beginning radial construction...')
 tic
 for rad = 1:length(radials)
@@ -258,6 +258,8 @@ for rad = 1:length(radials)
     bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
     RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
     toc
+    
+    botDepthSort(rad,:) = bath'; %save bottom depth sorted by radial for pDetSim
     
     % make sound speed profile the same depth as the bathymetry
     zssp = 1:1:max(bath)+1;
@@ -419,6 +421,6 @@ for freqi = 1:length(freq)
     
     %% 10. Save variables for pDetSim
     freqSave = char(freqVec/1000);
-    save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',runTimestamp,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth');
+    save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',runTimestamp,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
     
 end

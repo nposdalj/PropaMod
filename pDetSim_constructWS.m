@@ -49,6 +49,7 @@ for idsk = 1 : length(concatFiles)
     rd_inter = (rd_inter(1):1:(rd_inter(end)+10))'; %go from 10m jumps in depth to 1m jumps to match PL
     rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
 end
+thisAngle = radials; %change radial variable to match pdetSim code
 %% Save and export workspace for pDetSim_v3Pm.m
 freqSave = freq0/1000;
-save([exportDir,['\',Site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','-v7.3')
+save([exportDir,['\',Site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','thisAngle','botDepthSort','-v7.3')
