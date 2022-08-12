@@ -87,6 +87,7 @@ makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we shoul
 
 runDate = datestr(datetime('now'), 'yymmdd');
 existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
+existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
