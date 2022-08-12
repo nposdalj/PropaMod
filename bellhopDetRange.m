@@ -33,7 +33,7 @@ global depthStep
 %% 2. Params defined by user + Info for user (for runSettings Option 1 ONLY)
 
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = 'Hello, whale!'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = 'Run previously started on Aug 11, 2022. Matlab crashed or closed during or after Radial 120. Restarted from Radial 120.'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'NC';
@@ -244,7 +244,7 @@ for rad = 1:length(radials)
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
         
         %% 7.4 Run BELLHOP - Make shade and print files
-        disp(['Running Bellhop for' filePrefix '...']) % Status update
+        disp(['Running Bellhop for ' filePrefix '...']) % Status update
         tic
         bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
         toc
@@ -273,7 +273,7 @@ for rad = 1:length(radials)
             plotbty([intermedDirFi, '\' filePrefix, '.bty'])
             title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
             colorbar
-            saveas(radplotiii,[plotDir,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+            saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
         end      
     end
     
@@ -362,7 +362,7 @@ for freqi = 1:length(freq)
             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
             set(gcf, 'Position', [100 100 800 600])
             title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'],'Position',[0 -1.2])
-            saveas(Radiance,[plotDir,'\',Site,'_',num2str(plotdepth),'m_' freqiChar 'kHz_RLPolarMap.png'])
+            saveas(Radiance,[plotDirFi,'\',Site,'_',num2str(plotdepth),'m_' freqiChar 'kHz_RLPolarMap.png'])
             disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'])
             
         end
