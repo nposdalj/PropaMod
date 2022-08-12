@@ -78,7 +78,7 @@ RL_threshold = 125; % Threshold below which you want to ignore data; will be plo
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
 
 % Polar Plots
-makeDepthPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
+makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 % Radial plots are automatically generated for every radial
 
 %% 3. Make new folders for this run's files
@@ -152,12 +152,16 @@ elseif strcmp(SSPtype, 'Mean')
 end
 
 SSP = readtable(fullfile(fpath,'SSPs',Site,SSPfile)); % read the SSP file
-NCSSPcoarse = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
-idxNan = isnan(NCSSPcoarse(:, 2)); %identify any NANs
-NCSSPcoarse(idxNan, :) = []; %remove NANs
-
-vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
-NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
+SSParray = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
+% The rest of this section shouldn't be necessary b/c plotSSP.m now
+% generates SSPs with the full 5000 depth values (actually, 5001, which may
+% mess with things but hopefully not)
+% NCSSPcoarse = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
+% idxNan = isnan(NCSSPcoarse(:, 2)); %identify any NANs
+% NCSSPcoarse(idxNan, :) = []; %remove NANs
+% 
+% vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
+% NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
 
 %% 6. Hydrophone location and depth
 % Center of source cell
@@ -182,7 +186,6 @@ rr = r';                            % output to be saved for pDetSim
 
 botDepthSort = []; %create empty array for bottom depth sorted by radials for pDetSim
 disp('General setup complete. Beginning radial construction...')
-tic
 for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
@@ -212,7 +215,7 @@ for rad = 1:length(radials)
     
     % make sound speed profile the same depth as the bathymetry
     zssp = 1:1:max(bath)+1;
-    ssp = NCSSP(1:length(zssp), 2);
+    ssp = SSParray(1:length(zssp), 2);
     
     %% Begin peak frequency loop (7.2 continues into here)
     
@@ -262,23 +265,21 @@ for rad = 1:length(radials)
             figure(2000+radials(rad))
             RL_radiii = SL - zq;
             RL_radiii(RL_radiii < RL_threshold) = NaN;
-            ye_olde_whale = pcolor(RL_radiii(:,:)); % RL_radxxx is recieved level for the given radial
+            radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial
             axis ij
-            set(ye_olde_whale, 'EdgeColor','none')
+            set(radplotiii, 'EdgeColor','none')
             colormap(jet)
             plotbty([intermedDirFi, '\' filePrefix, '.bty'])
             title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
             colorbar
-            saveas(ye_olde_whale,[plotDir,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
-        end
-        
+            saveas(radplotiii,[plotDir,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+        end      
     end
     
     clear Range bath
     
 end
-disp('Completed constructing all radials.')
-toc
+disp('Completed constructing radials.')
 
 %% Steps 8-10 - Loop through frequencies
 
@@ -307,7 +308,7 @@ for freqi = 1:length(freq)
         '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' num2str(freq{freqi})...
         '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nNumber of Radials\t' num2str(numRadials) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
         '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
-        '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makeDepthPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
+        '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makePolarPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
         '\n\n\nSSP\nDepth\tSound Speed']);
     SSP_Reporting = (table2array(SSP)).';
     fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
@@ -319,11 +320,11 @@ for freqi = 1:length(freq)
     %% 9. Generate Polar Plots
     if generate_PolarPlots == 1
         
-        disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makeDepthPlots(1))...
-            'm and ' num2str(makeDepthPlots(3)) 'm, with interval ' num2str(makeDepthPlots(2)) 'm'])
+        disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makePolarPlots(1))...
+            'm and ' num2str(makePolarPlots(3)) 'm, with interval ' num2str(makePolarPlots(2)) 'm'])
         pause(1)
         
-        for plotdepth = makeDepthPlots(1):makeDepthPlots(2):makeDepthPlots(3)
+        for plotdepth = makePolarPlots(1):makePolarPlots(2):makePolarPlots(3)
             for rad = 1:length(radials)
                 
                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
