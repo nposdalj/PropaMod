@@ -3,21 +3,28 @@
 % Edited by AD and NP
 %
 % Data needed to run:
-% - Bathymetry data (sbc_bathymetry.txt)
-% - Sound speed profiles
+% bathymetry data (sbc_bathymetry.txt)
+% sound speed profiles
+%
+% Variables to change:
+% fpath: path to where the bellhop code is.
+%   - makeBTY.m
+%   - makeENV.m
+%   - read_shd.m
+% Bath: Path and file to your bathymetry file.
+% SSP_WAT: Path and file to your sound speed profile data.
 
 % This script will:
 % Construct sound propagation radials around your site with your
-%   specified parameters
+% specified parameters
 % Save a .txt file w/ your selected parameters in Export directory
-%   and plot directory
+% and plot directory
 % Save .bty, .env, .shd, and .prt files to intermediate directory
 % Move these outputs to the Export directory
 % Generate radial and polar plots and save to Export directory
 
 clearvars % clear variables
 close all % clear all
-
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
@@ -63,7 +70,7 @@ hdepth = 960; % hydrophone depth
 freq = {9000 10000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
-total_range = 40000;    % Radial range around your site, in meters
+total_range = 1000;    % Radial range around your site, in meters % CHANGE BACK TO 40000
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
 numRadials = 36;        % Specify number of radials - They will be evenly spaced.
