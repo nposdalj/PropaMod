@@ -20,7 +20,7 @@ inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date]; % W
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
 %inputDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate\220721151649';
 %% Load workspace from bellhopDetRange to extract nrr and rr
-load(fullfile(exportDir, [Site,'_bellhopDetRange.mat']))
+load(fullfile(exportDir, [Site,'_',date,'_bellhopDetRange.mat']))
 %% Loop through .shd files and extract depth and transmission loss
 detfn = ['Radial_','.*','.shd']; %.shd file names
 fileList = cellstr(ls(inputDir)); %all file names in folder
@@ -37,16 +37,17 @@ for idsk = 1 : length(concatFiles)
     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
     PLslice = squeeze(pressure(1, 1,:,:));
     PL = -20*log10(abs(PLslice));
-    [x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
-    [xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
-    zq = interp2(x1,y1, PL,xq1, yq1);
+    %[x1,y1] = meshgrid(1:10:(10*size(PL,2)),1:10:(10*size(PL,1))); %10 in 1:10:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    %[xq1,yq1] = meshgrid(1:(10*size(PL,2)),1:(10*size(PL,1))); %10 in 1:(10*size(PL,2)) varies with resolution; note to self to remove hard-coding
+    %zq = interp2(x1,y1, PL,xq1, yq1);
     
-    zq = interp2(x1,y1, PL,xq1, yq1);
-    sortedTLVec(idsk) = {zq}; %transmission loss vector to be used in pDetSim
+    %zq = interp2(x1,y1, PL,xq1, yq1);
+    %sortedTLVec(idsk) = {zq}; %transmission loss vector to be used in pDetSim
+    sortedTLVec(idsk) = {PL}; 
     
     %save radial depth
     rd_inter = Pos.r.z;
-    rd_inter = (rd_inter(1):1:(rd_inter(end)+10))'; %go from 10m jumps in depth to 1m jumps to match PL
+    %rd_inter = (rd_inter(1):1:(rd_inter(end)+10))'; %go from 10m jumps in depth to 1m jumps to match PL
     rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
 end
 thisAngle = radials; %change radial variable to match pdetSim code
