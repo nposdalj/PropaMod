@@ -61,15 +61,13 @@ Site = 'NC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-% bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'I';
+bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
+% bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'P';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory
-% intermedDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; % Intermediate save directory on your local disk
-intermedDir = 'E:\BellHopOutputs\PropIntermediate'; %For Natalie's computer
 
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
@@ -83,10 +81,10 @@ SD = 800; % Source depth
 hlat = 39.8326; % hydrophone lat
 hlon = -69.9800; % hydrophone long
 hdepth = 960; % hydrophone depth
-freq = {8000 9000 10000}; % frequencies of sources - Code will loop through these!! Please enter 3 values
+freq = {9000 10000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
-total_range = 40000;    % Radial range around your site, in meters
+total_range = 1000;    % Radial range around your site, in meters % CHANGE BACK TO 40000
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
 numRadials = 36;        % Specify number of radials - They will be evenly spaced.
@@ -153,29 +151,49 @@ makeDepthPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we shoul
 % end
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
-% multiple times in parallel on the same computer.
+% multiple times in parallel on the same computer (or across devices).
 
-%if runSettings == 1
-runTimestamp = datestr(datetime('now'), 'yymmddHHMMSS');
-%end
+runDate = datestr(datetime('now'), 'yymmdd');
+existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
+    % Code refers to saveDir instead of bellhopSaveDir to check for folders
+    % other users may have generated today.
 
-intermedDir = [bellhopSaveDir, '\' runTimestamp];   % Intermediate save directory [Local]
-mkdir(intermedDir);
-intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Local subdirectory for 1st freq
-intermedDirF2 = [intermedDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(intermedDirF2); % Local subdirectory for 2nd freq
-intermedDirF3 = [intermedDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(intermedDirF3); % Local subdirectory for 3rd freq
+dailyFolderNum = double('a');
+while contains(existingDirs(:,7).',char(dailyFolderNum)) == 1
+    dailyFolderNum = dailyFolderNum + 1;
+    % Starting from "a", go through characters until first one that isn't in a folder name from today is reached
+end
 
-saveDir_sub = [saveDir, '\' runTimestamp];          % Final save directory [GDrive]
-mkdir(saveDir_sub);
-saveDir_subF1 = [saveDir_sub '\' num2str(freq{1}/1000) 'kHz']; mkdir(saveDir_subF1); % Save subdirectory for 1st freq
-saveDir_subF2 = [saveDir_sub '\' num2str(freq{2}/1000) 'kHz']; mkdir(saveDir_subF2); % Save subdirectory for 2nd freq
-saveDir_subF3 = [saveDir_sub '\' num2str(freq{3}/1000) 'kHz']; mkdir(saveDir_subF3); % Save subdirectory for 3rd freq
-
-plotDir = [fpath, '\Plots\' Site '\' runTimestamp]; % Plot save directory [GDrive]
-mkdir(plotDir);
-plotDirF1 = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF1); % Plot subdirectory for 1st freq
-plotDirF2 = [plotDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(plotDirF2); % Plot subdirectory for 2nd freq
-plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
+if dailyFolderNum == 123    % This is the double value of {, which comes after z (double value 122)
+    disp('Max daily limit of 26 runs has been reached. To make a new one, delete a run from today from the GDrive save directory.')
+    beep
+    return
+else % If there is still room for more run folders for today, make new directories.
+    newFolderName = [runDate char(dailyFolderNum)];
+    
+    intermedDir = [bellhopSaveDir, '\', newFolderName];
+    mkdir(intermedDir)
+    intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Local subdirectory for 1st freq
+    
+    saveDir_sub = [saveDir, '\' newFolderName];          % Final save directory [GDrive]
+    mkdir(saveDir_sub);
+    saveDir_subF1 = [saveDir_sub '\' num2str(freq{1}/1000) 'kHz']; mkdir(saveDir_subF1); % Save subdirectory for 1st freq
+    
+    plotDir = [fpath, '\Plots\' Site '\' newFolderName]; % Plot save directory [GDrive]
+    mkdir(plotDir);
+    plotDirF1 = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF1); % Plot subdirectory for 1st freq
+    
+    if length(freq) >= 2    % Create subdirectories for second frequency, if applicable.
+        intermedDirF2 = [intermedDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(intermedDirF2); % Local subdirectory for 2nd freq
+        saveDir_subF2 = [saveDir_sub '\' num2str(freq{2}/1000) 'kHz']; mkdir(saveDir_subF2); % Save subdirectory for 2nd freq
+        plotDirF2 = [plotDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(plotDirF2); % Plot subdirectory for 2nd freq
+    end
+    if length(freq) >= 3    % Create subdirectories for third frequency, if applicable.
+        intermedDirF3 = [intermedDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(intermedDirF3); % Local subdirectory for 3rd freq
+        saveDir_subF3 = [saveDir_sub '\' num2str(freq{3}/1000) 'kHz']; mkdir(saveDir_subF3); % Save subdirectory for 3rd freq
+        plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
+    end
+end
 
 %% 4. Bathymetry
 disp('Loading bathymetry data...') % Read in bathymetry data
@@ -251,7 +269,7 @@ for rad = 1:length(radials)
     
     tic
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [Range, bath] = makeBTY(intermedDir, ['Radial_' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
+    [Range, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
     
@@ -268,21 +286,21 @@ for rad = 1:length(radials)
     %% Begin peak frequency loop (7.2 continues into here)
     
     for freqi = 1:length(freq)
-        if freqi == freq{1} % Select directories for current sub-iteration
+        if freqi == 1 % Select directories for current sub-iteration
             intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
-        elseif freqi == freq{2}
+        elseif freqi == 2
             intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
-        elseif freqi == freq{3}
+        elseif freqi == 3
             intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
         end
         
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-        filePrefix = ['Radial_' radialiChar '_' freqiChar 'kHz'];
+        filePrefix = ['R' radialiChar '_' freqiChar 'kHz'];
         
-        copyfile(fullfile(intermedDir,['Radial_' radialiChar '.bty']),...
+        copyfile(fullfile(intermedDir,['R' radialiChar '.bty']),...
             fullfile(intermedDirFi, [filePrefix '.bty'])); % copy bty from intermed dir to intermed subdir
         copyfile(fullfile(intermedDirFi, [filePrefix '.bty']),...
-            fullfile(saveDirFi, [filePrefix '.bty']));    % copy bty to final save dir
+            fullfile(saveDir_subFi, [filePrefix '.bty']));    % copy bty to final save dir
         
         %% 7.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' filePrefix '...'])   % Status update
@@ -336,25 +354,25 @@ toc
 %% Steps 8-10 - Loop through frequencies
 
 for freqi = 1:length(freq)
-    if freqi == freq{1} % Select directories for current sub-iteration
+    if freqi == 1 % Select directories for current sub-iteration
         intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
-    elseif freqi == freq{2}
+    elseif freqi == 2
         intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
-    elseif freqi == freq{3}
+    elseif freqi == 3
         intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
     end
     
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
     
     %% 8. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
-    
-    txtFileName = [runTimestamp '_' freqiChar 'kHz_Input_Parameters.txt'];
+
+    txtFileName = [newFolderName '_' freqiChar 'kHz_Input_Parameters.txt'];
     paramfile = fullfile(intermedDirFi, txtFileName);
     fileid = fopen(paramfile, 'w');
     fclose(fileid);
     fileid = fopen(paramfile, 'at');
-    fprintf(fileid, ['User Input Parameters for Run ' runTimestamp ', Freq ' freqiChar ' kHz'...
-        '\n\nCreated by\t' author '\nDateTime\t' runTimestamp '\nUser Note' userNote...
+    fprintf(fileid, ['User Input Parameters for Run ' newFolderName ', Freq ' freqiChar ' kHz'...
+        '\n\nCreated by\t' author '\nDateTime\t' datestr(datetime('now'), 'yyyymmdd HHMMSS') '\nUser Note' userNote...
         '\n\nSite\t' Site '\nRegion\t' Region ...
         '\n\nSSP INPUT\nFile Name\t' SSPfile, '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
         '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' num2str(freq{freqi})...
@@ -421,6 +439,6 @@ for freqi = 1:length(freq)
     
     %% 10. Save variables for pDetSim
     freqSave = char(freqVec/1000);
-    save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',runTimestamp,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
+    save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
     
 end
