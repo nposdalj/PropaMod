@@ -128,7 +128,7 @@ for k = 1:length(fileNames(:,1))
         drawnow
     end
     
-    ALL_SSParray(:,:,(12*(str2double(fileNames(k,6:9))-str2double(fileNames(1,6:9)))+str2double(fileNames(k,10:11))-str2double(fileNames(1,10:11))+1)) = SSP_table;
+    ALL_SSParray(:,:,(12*(str2double(fileNames(k,6:9))-str2double(fileNames(1,6:9)))+str2num(fileNames(k,10:11))-str2num(fileNames(1,10:11))+1)) = SSP_table;
     % Array version of ALL_SSP - used for actual data assembly below
     
     SSP_table = array2table(SSP_table);

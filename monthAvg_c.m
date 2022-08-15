@@ -114,6 +114,9 @@ for d = 1:40 % Cycle through depth layers
     end
 end
 
+save([saveDir, '\' Region '_HYCOMc_' num2str(startYear) num2str(sprintf('%02d', startMonth)) '_'...
+    num2str(endYear) num2str(sprintf('%02d', endMonth-1))],'data_c', 'xlsx')
+
 % HYCOM EXPERIMENT PERIODS:
 % 2014/07 - 2016/09
 % 2016/10 - 2017/01
