@@ -33,7 +33,7 @@ global depthStep
 %% 2. Params defined by user + Info for user (for runSettings Option 1 ONLY)
 
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = 'Run previously started on Aug 11, 2022. Matlab crashed or closed during or after Radial 120. Restarted from Radial 120.'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = 'No notes'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'NC';

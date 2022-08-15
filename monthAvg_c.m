@@ -1,5 +1,7 @@
-clearvars
-close all
+function monthAvg_c(Region, inDir, saveDir)
+
+% clearvars
+% close all
 
 % monthAvg_c.m
 % Converts HYCOM data from LMB's app into monthly average arrays
@@ -9,12 +11,10 @@ close all
 % checked the output is acceptable.
 
 %% Parameters defined by user
-author = 'AD';
+%Region = 'WAT';
 
-Region = 'WAT';
-
-inDir = 'C:\Users\HARP\Documents\test_appoutput2';
-saveDir = '';
+%inDir = 'C:\Users\HARP\Documents\test_appoutput2';
+%saveDir = '';
 
 %% Get dataset parameters
 
