@@ -187,7 +187,7 @@ rr = r';                            % output to be saved for pDetSim
 
 botDepthSort = []; %create empty array for bottom depth sorted by radials for pDetSim
 disp('General setup complete. Beginning radial construction...')
-for rad = 1:length(radials)
+for rad = 13:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
     %% 7.1 Create radial line
@@ -274,6 +274,8 @@ for rad = 1:length(radials)
             title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
             colorbar
             saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+            
+            clear RL_radiii radplotiii x1 y1 xq1 yq1 pressure PL PLslice
         end      
     end
     
