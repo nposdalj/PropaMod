@@ -13,16 +13,18 @@ close all
 Site = 'NC';
 Region = 'WAT';
 sp = 'Pm';
-date = '220727164325'; %date you created the transmission loss model
+date = '220824h'; %date you created the transmission loss model
+freq = '9kHz';
+freqDir = '009';
 
 GDrive = 'I';
-inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date]; % Where your data is coming from
+inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
 %inputDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate\220721151649';
 %% Load workspace from bellhopDetRange to extract nrr and rr
-load(fullfile(exportDir, [Site,'_',date,'_bellhopDetRange.mat']))
+load(fullfile(exportDir, [Site,'_',date,'_',freqDir,'kHz_bellhopDetRange.mat']))
 %% Loop through .shd files and extract depth and transmission loss
-detfn = ['Radial_','.*','.shd']; %.shd file names
+detfn = ['.*','.shd']; %.shd file names
 fileList = cellstr(ls(inputDir)); %all file names in folder
 fileMatchIdx = find(~cellfun(@isempty,regexp(fileList,detfn))>0); % Find the file name that matches the filePrefix
 concatFiles = fileList(fileMatchIdx); %find actual file names
@@ -52,5 +54,4 @@ for idsk = 1 : length(concatFiles)
 end
 thisAngle = radials; %change radial variable to match pdetSim code
 %% Save and export workspace for pDetSim_v3Pm.m
-freqSave = freq0/1000;
-save([exportDir,['\',Site,'_','12kHz_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','thisAngle','botDepthSort','-v7.3')
+save([exportDir,['\',Site,'_',freq,'_3DTL.mat']],'rr','nrr','rd_all','sortedTLVec','hdepth','thisAngle','botDepthSort','freqSave','-v7.3')
