@@ -60,7 +60,7 @@ SD = 800; % Source depth
 hlat = 39.8326; % hydrophone lat
 hlon = -69.9800; % hydrophone long
 hdepth = 960; % hydrophone depth
-freq = {9000 10000}; % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -87,16 +87,16 @@ makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we shoul
 
 runDate = datestr(datetime('now'), 'yymmdd');
 existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
-existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
+%existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
 dailyFolderNum = double('a');
+
 while contains(existingDirs(:,7).',char(dailyFolderNum)) == 1
     dailyFolderNum = dailyFolderNum + 1;
     % Starting from "a", go through characters until first one that isn't in a folder name from today is reached
 end
-
 if dailyFolderNum == 123    % This is the double value of {, which comes after z (double value 122)
     disp('Max daily limit of 26 runs has been reached. To make a new one, delete a run from today from the GDrive save directory.')
     beep
@@ -274,6 +274,8 @@ for rad = 1:length(radials)
             title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
             colorbar
             saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+            
+            clear RL_radiii radplotiii x1 y1 xq1 yq1 pressure PL PLslice
         end      
     end
     
