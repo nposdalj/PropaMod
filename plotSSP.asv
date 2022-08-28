@@ -164,10 +164,7 @@ MoMeans.M12 = nanmean(ALL_SSParray(:,:,(12*(YearNums-1)+6)),3);   MoStd.M12 = na
 %% Export Data for each site
 
 for b = 1:length(siteabrev)         % Generate subfolders for each site if they don't exist yet
-    if exist(fullfile(saveDir, siteabrev(b,:)), 'dir')
-    else
-        mkdir(fullfile(saveDir, siteabrev(b,:)))
-    end
+    if exist
 end
 
 for b = 1:length(siteabrev)
@@ -222,8 +219,7 @@ for i = 1:length(siteabrev(:,1))
     SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
     SSPM = array2table(SSPM);
     SSPM.Properties.VariableNames = {'Depth' 'SS'};
-    writetable(SSPM, [saveDir,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
-    disp(['Average maximum month SSP saved for ' Site '. At this site, Month ' num2str(sprintf('%02d', minMo)) ' has the slowest average SSP.'])
+    % UNCOMMENT writetable(SSPM, [saveDir,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
     
     MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
     MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
@@ -233,8 +229,7 @@ for i = 1:length(siteabrev(:,1))
     SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
     SSPM = array2table(SSPM);
     SSPM.Properties.VariableNames = {'Depth' 'SS'};
-    writetable(SSPM, [saveDir,'\', siteabrev(i,:),'\',siteabrev(i,:), '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
-    disp(['Average maximum month SSP saved for ' Site '. At this site, Month ' num2str(sprintf('%02d', maxMo)) ' has the fastest average SSP.'])
+    % UNCOMMENT writetable(SSPM, [saveDir,'\', siteabrev(i,:),'\',siteabrev(i,:), '_SSPMmax_',num2str(sprintf('%02d', maxMo)),'.xlsx']) % Save maximum month average SSP
     
 end
 %%
