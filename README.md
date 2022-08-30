@@ -39,7 +39,7 @@ Before hitting RUN, under Parameters defined by user, enter:
 * Select whether or not to plot SSPs as they are calculated. These plots are not saved.
 
 #### U.1.3 Output
-`plotSSP.m` will produce 3 tables for each site. These are the average SSP for the entire year, the average SSP for the month with the fastest average sound speed (calculated using the sound speeds between 200 and 1000 m), and the average SSP for the month with the slowest average sound speed. The names of the minimum and maximum tables include the number of the month. Each table lists sound speeds from 0 m to 5000 m, with a resolution of 1 m.
+`plotSSP.m` will produce 3 tables for each site. These are the average SSP for the entire year, the average SSP for the month with the fastest average sound speed (calculated using the sound speeds between 200 and 1000 m *note to change: it doesn't use ALL of these points), and the average SSP for the month with the slowest average sound speed. The names of the minimum and maximum tables include the number of the month. Each table lists sound speeds from 0 m to 5000 m, with a resolution of 1 m.
 
 plotSSP.m generates sound speeds down to a depth of 5000 m even if the bathymetry at the site is shallower. This allows the next process (bellhopDetRange.m) to model sound propagation at locations within a select radius of the site where the bathymetry is deeper.
 
