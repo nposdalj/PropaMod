@@ -14,56 +14,48 @@ PropagationModeling is centered on two main steps and their associated scripts:
 ![Screenshot of Acoustics Toolbox website.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_fig1.png)
 * The toolbox includes BELLHOP, the program used to model sound propagation. For more information on BELLHOP, see the program’s [documentation](http://oalib.hlsresearch.com/Rays/HLS-2010-1.pdf).
 * **Add the toolbox and PropagationModeling to your MATLAB path.**
+* Set up a directory for all of your data with the following subdirectories:
+  * HYCOM_oceanState
+  * SSPs
+  * Radials
+  * Plots
 
 
 ## Usage
 
-### U.1 Download ocean state data: `ext_hycom_gofs_93_0.m`
-<span style = 'color: green'> This script was created by Ganesh Gopalakrishnan to download HYCOM ocean state data as .mat files for a given region. </span>
-
-The script has been adjusted to download data for the first day of each month, within the range of months specified by the user. Each day includes data every 3 hours.
-
-#### U.1.1 User input
-
-#### U.1.2 Output
-.mat files of ocean state of the region, for each time point of the first day of each month requested.
-
-#### U.1.3 Related scripts
-
-
-### U.2 Generate sound speed profiles: `plotSSP.m`
+### U.1 Download ocean state data and generate sound speed profiles: `plotSSP.m`
 `plotSSP.m` is responsible for calculating the sound speed profile at each study site.
+The script calls the function `hycom_sampleMonths.m`, which samples ocean state data.
+* `hycom_sampleMonths.m` is based on the script `ext_hycom_gofs_3_1.m`, which was created by Ganesh Gopalakrishnan to download HYCOM ocean state data as .mat files for a given region.
 
-`plotSSP.m` uses ocean state data from HYCOM in its calculations. This data must be downloaded beforehand using `ext_hycom_gofs_93_0.m`.
+#### U.1.1 Required data
+* Create a local folder on your device where HYCOM data can be downloaded
 
-#### U.2.1 Required data
-* HYCOM ocean state data, downloaded using `ext_hycom_gofs_93_0.m`.
-
-#### U.2.2 User input
+#### U.1.2 User input
 Before hitting RUN, under Parameters defined by user, enter:
 * The information for your input and export directories.
 * Coordinates of your study sites.
 * The months when your downloaded HYCOM data begins and ends.
 * Select whether or not to plot SSPs as they are calculated. These plots are not saved.
 
-#### U.2.3 Output
+#### U.1.3 Output
 `plotSSP.m` will produce 3 tables for each site. These are the average SSP for the entire year, the average SSP for the month with the fastest average sound speed (calculated using the sound speeds between 200 and 1000 m), and the average SSP for the month with the slowest average sound speed. The names of the minimum and maximum tables include the number of the month. Each table lists sound speeds from 0 m to 5000 m, with a resolution of 1 m.
 
 plotSSP.m generates sound speeds down to a depth of 5000 m even if the bathymetry at the site is shallower. This allows the next process (bellhopDetRange.m) to model sound propagation at locations within a select radius of the site where the bathymetry is deeper.
 
-#### U.2.4 Related scripts
+#### U.1.4 Related scripts
 * plotSSP.m calls the function salt_water_c to calculate sound speed using water temperature, salinity, and depth.
 * plotSSP.m calls the function inpaint_nans to extrapolate theoretical sound speed below the bathymetry, using existing data points at that depth.
 
 
-### U.3 Model sound propagation: `bellhopDetRange.m`
+### U.2 Model sound propagation: `bellhopDetRange.m`
 `bellhopDetRange.m` constructs sound propagation radials around your site using your specified parameters, using BELLHOP. It saves .bty, .env, .shd, and .prt files to an intermediate directory, before moving them to your final export directory along with a .txt file listing your parameters. `bellhopDetRange.m` also creates radial and polar plots and saves these in the export directory.
 
-#### U.3.1 Required data
+#### U.2.1 Required data
 * Bathymetry data.
 * Your sound speed profile for the site generated with `plotSSP.m`.
 
-#### U.3.2 User input
+#### U.2.2 User input
 Before hitting RUN, under Parameters defined by user, enter:
 * Author name and notes (optional)
 * Name of site and region
@@ -89,7 +81,7 @@ Before hitting RUN, under Parameters defined by user, enter:
   * Received level colorbar maximum
   * Specify minimum depth, maximum depth, and step for polar plots
 
-#### U.3.3 Output
+#### U.2.3 Output
 Every time `bellhopDetRange.m` is run, it creates new folders (with a name in the format YYMMDDx, where x is one letter of the alphabet) under the intermediate, save, and plot directories.
 
 In the intermediate and save directories, this folder contains subfolders for each frequency specified by the user for this run. A .txt file listing the input parameters for this run is also included. In turn, the frequency subfolders include one of the following for each radial:
@@ -102,7 +94,7 @@ Under the plot directory, this folder contains plots of the received level for e
 
 For each frequency, `bellhopDetRange.m` also saves a .mat file containing certain values required for animal detection simulation.
 
-#### U.3.4 Related Scripts
+#### U.2.4 Related Scripts
 bellhopDetRange.m calls two functions in the PropagationModeling repository:
 * `makeBTY.m`: Generates the bathymetry (.bty) file for each radial.
 * `makeEnv.m`: Generates the environment (.env) file for each radial.
@@ -112,7 +104,7 @@ bellhopDetRange.m calls two functions in the PropagationModeling repository:
 * `read_shd.m`: Reads data from the radial .shd files. Used in bellhopDetRange.m for plotting.
 
 
-### U.4 Prepare for detection simulation: `pDetSim_constructWS.m`
+### U.3 Prepare for detection simulation: `pDetSim_constructWS.m`
 A few lines in `bellhopDetRange.m` serve to package information for animal detection simulation. `pDetSim_constructWS.m` completes this process.
 
 
