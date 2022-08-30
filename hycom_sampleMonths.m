@@ -7,8 +7,7 @@ function hycom_sampleMonths(start_date, end_date, local_outpath, final_outpath)
 % dd should be 01, i.e. first day of the month.
 % HH:MM:SS should be 00:00:00.
 % Your local_outpath is a folder on your device.
-% Your final_outpath can be the same folder or a folder
-% on GDrive.
+% Your final_outpath can be the same folder or a folder on GDrive.
 %
 % hycom_sampleMonths.m is designed to sample HYCOM ocean state data from
 % each month in a select time period. For each month, the first day of the
@@ -22,12 +21,6 @@ function hycom_sampleMonths(start_date, end_date, local_outpath, final_outpath)
 %
 % Note that the script is currently configured for the Western Atlantic
 % Ocean.
-
-% DEFAULTS
-% start_date = '2015-10-01 00:00:00';
-% end_date = '2015-11-01 00:00:00';
-% local_outpath = 'C:\Users\HARP\Documents\AD_Working\hycom_temp';
-% final_outpath = 'C:\Users\HARP\Documents\AD_Working\hycom_temp';
 
 tic
 
@@ -61,7 +54,6 @@ msgbox(['HYCOM MOVED FROM GOMFS 3.0 (32 LEVLS) TO GOFS 3.1 (41 LEVELS)';...
 
 %% region 24-44N, and -63 - -82W (278-297E)
 formatTime = 'yyyy-mm-dd HH:MM:SS';
-%date_inc = datenum(0,0,0,24,0,0);
 monthnum = between(datetime(start_date),datetime(end_date), 'months'); %Added by AD to generate monthly values
 monthnum = split(monthnum, 'months'); %Added by AD to generate monthly values
 
@@ -77,7 +69,6 @@ diary( [fileOut]);
 disp('==========================');
 disp(fileOut)
 
-%time = [datenum(start_date,format):date_inc:datenum(end_date,format)];
 time00_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum)); %Added by AD to generate monthly values
 time12_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum)) + 0.5;
 
@@ -161,7 +152,19 @@ for itr = 1:3  % Loop through iterations
             daysToDelete = [daysToDelete string(datetime(datenum(str_dateStart), 'ConvertFrom', 'datenum', 'Format', 'yyyyMMdd'))]; % 'Label' this date for deletion
         end
         
+%         % Manually mark 01/01/2019 for deletion and add 01/02/2019 to
+%         % second iteration (because 01/01/2019 00:00:00 and 12:00:00 have different dimensions)
+%         if strcmp(stdate, '2019-01-01 00:00:00')
+%             time00_2 = [time00_2 datenum(str_dateStart)+1];
+%             time12_2 = [time12_2 datenum(str_dateStart)+1.5];
+%         end  %% Take this all out
+        
+        
     end % End loop through time points
+  
+    % Check if files of each day have the same dimensions -- if any do not,
+    % add them to the next iteration
+    
     
 end % End loop through iterations
 
@@ -175,10 +178,9 @@ for d = 1:size(filesToDelete, 1)
     delete(fullfile(opath,strcat(filesToDelete(d,:))))
 end
 
-%Get run time
-runtime = toc;
+runtime = toc; %Get run time
 
-%% Generate report of run for user -- This may not be functioning correctly
+%% Generate report of run for user -- This doesn't appear to be functioning correctly
 
 txtFileName = ['HYCOM_sM_Report_' char(datestr(datetime('now'), 'yyyymmdd_HHMMSS')) '.txt'];
 paramfile = fullfile(opath, txtFileName);

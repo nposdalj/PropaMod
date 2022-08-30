@@ -1,14 +1,13 @@
 % plotSSP
-% Plot Sound Speed Profile for region of choice.
+% Generate sound speed profiles for study sites.
 % Configured for use with HYCOM's files
-% Latitudes and longitudes are configured for Western Atlantic (WAT). To
-% change this, make edits in ext_hycom_gofs_3_1.m.
-
+% Latitudes and longitudes are configured for Western Atlantic (WAT).
+%
 % AD: HYCOM data provides data points for every 1/12 degree. I believe
 % that is at most every ~9.25 km. This MIGHT allow us to see significant
 % differences in sound speed across a 20-km range, but given such a low
 % resolution, I think those differences will be somewhat imprecise.
-
+%
 % HOW THE CODE EXTRAPOLATES DATA WHERE HYCOM HAS NONE
 % The 3D grid of regional SS data (cdat) has 40 depth levels. At each time
 % point, this grid is regenerated for that time point. A secondary process
@@ -18,7 +17,10 @@
 % evenly spaced, so extrapolating between them as though they are evenly
 % spaced will be erroneous.
 
-%ADD SOMETHING HERE ABOUT WHAT IT DOES AT THE END WITH MIN/MAX SSPs
+% This script produces 3 sound speed profiles for each site:
+%   Average SSP across entire time period
+%   SSP of the month with the fastest sound speed (maximum month)
+%   SSP of the month with the slowest sound speed (minimum month)
 
 clearvars
 close all
@@ -30,9 +32,9 @@ close all
 % Search and export directories
 regionabrev = 'WAT';
 GDrive = 'H';
-HYCOM_FilePath_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regionabrev]; % FilePath = [GDrive ':\Users\HARP\Documents\AD_Working\hycom_temp\' regionabrev];
 HYCOM_FilePath_Local = 'C:\Users\HARP\Documents\AD_Working\hycom_temp\';
-saveDir_SSP = [GDrive ':\My Drive\PropagationModeling\SSPs\WAT'];
+HYCOM_FilePath_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regionabrev];
+saveDir_SSP = [GDrive ':\My Drive\PropagationModeling\SSPs\' regionabrev];
 
 % Add site data below: siteabrev, lat, long
 siteabrev = ['NC';       'BC';       'GS';       'BP';       'BS';      'WC';       'OC';       'HZ';       'JX'];
@@ -63,7 +65,7 @@ fileNames = fileNames(file_sortOrder, :); % Arrange fileNames in chronological o
 % Takes two time points at a time (the midnight and noon pair for each day)
 % and calculates sound speed for the average
 
-for k = 87:2:length(fileNames(:,1))
+for k = 1:2:length(fileNames(:,1))
     fileName_00 = fileNames(k,:);
     fileName_12 = fileNames((k+1),:);
     
@@ -146,7 +148,8 @@ for k = 87:2:length(fileNames(:,1))
         drawnow
     end
     
-    ALL_SSParray(:,:,(12*(str2double(fileNames(k,6:9))-str2double(fileNames(1,6:9)))+str2double(fileNames(k,10:11))-str2double(fileNames(1,10:11))+1)) = SSP_table;
+    ALL_SSParray(:,:,(12*(str2double(fileNames(k,6:9))-str2double(fileNames(1,6:9)))+...
+        str2double(fileNames(k,10:11))-str2double(fileNames(1,10:11))+1)) = SSP_table;
     % Array version of ALL_SSP - used for actual data assembly below
     
     SSP_table = array2table(SSP_table);
@@ -254,18 +257,3 @@ for i = 1:length(siteabrev(:,1))
     disp(['Average maximum month SSP saved for ' Site '. At this site, Month ' num2str(sprintf('%02d', maxMo)) ' has the fastest average SSP.'])
     
 end
-%%
-%HZ
-% 41.0618; -66.35 (293.6500)
-% nearby lats: 227: 41.0400 and 228: 41.0800
-% nearby longs: 195: 293.6000 and 196: 293.6800
-% long is 238 in length, lat is 301 in length
-
-% squeeze(D.temperature(195,227,:)) % goes down to 500
-% squeeze(D.temperature(195,228,:)) % goes down to 350
-% squeeze(D.temperature(196,227,:)) % goes down to 1000
-% squeeze(D.temperature(196,228,:)) % goes down to 800
-%
-% depthlist(40-9)
-%
-% squeeze(cdat_sel(200,64,:))
