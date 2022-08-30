@@ -158,9 +158,6 @@ for k = 87:2:length(fileNames(:,1))
     disp([fileName_00, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,6:11)])
     
 end
-% NOTE: Had to skip 01/01/2019 manually because the arrays at 00:00:00 and
-% 12:00:00 were different sizes. May need to have hycom_sampleMonths.m
-% check for this.
 
 %There are 0's in ALL_SSParray for months w/ no data. I don't know how
 %those come into being but here's a line to change em to nan's so they
@@ -226,7 +223,7 @@ for sitenum = 1:length(siteabrev(:,1))
 end
 
 for i = 1:length(siteabrev(:,1))
-    Site = siteabrev(i,:);
+    Site = siteabrev(b,:);
     
     minMo = extreme_mos(i,1);
     maxMo = extreme_mos(i,2);
@@ -240,7 +237,7 @@ for i = 1:length(siteabrev(:,1))
     SSPM = array2table(SSPM);
     SSPM.Properties.VariableNames = {'Depth' 'SS'};
     writetable(SSPM, [saveDir_SSP,'\', siteabrev(i,:),'\', siteabrev(i,:), '_SSPMmin_',num2str(sprintf('%02d', minMo)),'.xlsx']) % Save minimum month average SSP
-    disp(['Average minimum month SSP saved for ' Site '. At this site, Month ' num2str(sprintf('%02d', minMo)) ' has the slowest average SSP.'])
+    disp(['Average maximum month SSP saved for ' Site '. At this site, Month ' num2str(sprintf('%02d', minMo)) ' has the slowest average SSP.'])
     
     MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
     MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
