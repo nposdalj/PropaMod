@@ -29,9 +29,9 @@ close all
 
 % Search and export directories
 regionabrev = 'WAT';
-GDrive = 'H';
-FilePath = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regionabrev];
-saveDir = 'C:\Users\HARP\Documents\AD Working\whatdoesplotsspdo';
+GDrive = 'C';
+FilePath = [GDrive ':\Users\HARP\Documents\AD_Working\hycom_temp\']; % FilePath = [GDrive ':\Users\HARP\Documents\AD_Working\hycom_temp\' regionabrev];
+saveDir = 'C:\Users\HARP\Documents\AD_Working\hycom_tempOutput';
 % saveDir = [GDrive ':\My Drive\PropagationModeling\SSPs'];
 
 % Add site data below: siteabrev, lat, long
@@ -42,13 +42,44 @@ Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37; 
 
 % Effort Period
 MonthStart = '201507';  % First month of study period (yyyymm)
-MonthEnd = '201906';    % Last month of study period (yyyymm)
+MonthEnd = '201812';    % Last month of study period (yyyymm)
 
 plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is turned on.
+
+%% Download HYCOM data as mat files
+hycom_sampleMonths('2015-07-01 00:00:00', '2019-06-01 00:00:00', 'C:\Users\HARP\Documents\AD_Working\hycom_temp', 'C:\Users\HARP\Documents\AD_Working\hycom_temp')
 
 %% Overarching loop runs through all timepoints requested
 fileNames_all = ls(fullfile(FilePath, '*0*')); % File name to match. No need to modify this line.
 fileNames = fileNames_all(find(contains(fileNames_all,MonthStart)):find(contains(fileNames_all,MonthEnd)),:); % Only use months corresponding to study period
+
+%% Report and remove incomplete/missing days
+Years = str2double(MonthStart(1:4)):str2double(MonthEnd(1:4));
+TimePtNums = [repelem(Years, 24)' repmat(repelem(1:12, 2), 1, length(Years))' repmat([0 12],1,12*length(Years))'];
+% Remove time points before first month / after last month
+firstMonth = find(TimePtNums(:,2) == str2double(MonthStart(5:6)), 1);
+lastMonth = find(TimePtNums(:,2) == str2double(MonthEnd(5:6)), 1, 'last');
+TimePtNums([1:(firstMonth-1) (lastMonth+1):end], :) = [];
+
+fileNames_YMDH = fileNames(:,6:16);
+missingTimePts = [];
+for t = 1:length(TimePtNums)
+    FileTimeName = strcat(num2str(TimePtNums(t,1)), num2str(sprintf('%02d', TimePtNums(t,2))), '01T', num2str(sprintf('%02d', TimePtNums(t,3))));
+    if ~contains(fileNames_YMDH, FileTimeName)
+        disp(['Missing data for time point ' FileTimeName])
+        missingTimePts = [missingTimePts; FileTimeName];
+        
+        fileNames(contains(fileNames(:,6:13), FileTimeName(1:8)), :) = []; % Exclude other file from this day if one file is missing
+    end
+end
+
+user_input1 = input('The above time points are missing. Those days will not be included in the monthly averages. Would you like to save this list? (y/n) ', 's');
+if user_input1 == 'y'
+else
+    clear missingTimePts
+end
+
+%% Overarching loop runs through all timepoints requested
 
 for k = 1:length(fileNames(:,1))
     fileName = fileNames(k,:);
@@ -57,9 +88,11 @@ for k = 1:length(fileNames(:,1))
     load([FilePath,'\', fileName]);
     
     temp_frame = D.temperature;
-    sal_frame = D.salinity;
     temp_frame = flip(permute(temp_frame, [2 1 3]),1); % To make maps work, swaps lat/long and flips lat
+
+    sal_frame = D.salinity;
     sal_frame = flip(permute(sal_frame, [2 1 3]),1);
+    
     depth_frame = zeros(length(D.Latitude), length(D.Longitude), length(D.Depth)); % Generates a 3D depth frame to match with sal and temp
     for i=1:301
         for j=1:length(D.Longitude)
@@ -73,7 +106,7 @@ for k = 1:length(fileNames(:,1))
             cdat(i) = salt_water_c(temp_frame(i),(-depth_frame(i)),sal_frame(i)); % Sound Speed data
         end
     end
-    for lev=1:40
+    for lev=1:40 % Apply inpaint_nans to depth levels one at a time
         lev_extracted = cdat(:,:,lev);
         lev_extracted = inpaint_nans(lev_extracted);
         cdat(:,:,lev) = lev_extracted;
