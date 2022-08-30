@@ -44,8 +44,10 @@ Before hitting RUN, under Parameters defined by user, enter:
 plotSSP.m generates sound speeds down to a depth of 5000 m even if the bathymetry at the site is shallower. This allows the next process (bellhopDetRange.m) to model sound propagation at locations within a select radius of the site where the bathymetry is deeper.
 
 #### U.1.4 Related scripts
-* plotSSP.m calls the function salt_water_c to calculate sound speed using water temperature, salinity, and depth.
-* plotSSP.m calls the function inpaint_nans to extrapolate theoretical sound speed below the bathymetry, using existing data points at that depth.
+* `plotSSP.m` calls the function `hycom_sampleMonths.m` to download HYCOM ocean state data.
+  * In turn, `hycom_sampleMonths.m` calls `ext_hycom_gofs_93_0.m` to download the data.
+* `plotSSP.m` calls the function `salt_water_c.m` to calculate sound speed using water temperature, salinity, and depth.
+* `plotSSP.m` calls the function `inpaint_nans.m` to extrapolate theoretical sound speed below the bathymetry, using existing data points at that depth.
 
 
 ### U.2 Model sound propagation: `bellhopDetRange.m`
@@ -95,7 +97,7 @@ Under the plot directory, this folder contains plots of the received level for e
 For each frequency, `bellhopDetRange.m` also saves a .mat file containing certain values required for animal detection simulation.
 
 #### U.2.4 Related Scripts
-bellhopDetRange.m calls two functions in the PropagationModeling repository:
+`bellhopDetRange.m` calls two functions in the PropagationModeling repository:
 * `makeBTY.m`: Generates the bathymetry (.bty) file for each radial.
 * `makeEnv.m`: Generates the environment (.env) file for each radial.
 
