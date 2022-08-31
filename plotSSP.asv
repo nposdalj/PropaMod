@@ -18,9 +18,9 @@
 % spaced will be erroneous.
 %
 % This script produces 3 sound speed profiles for each site:
-%   - Average SSP across entire time period
-%   - SSP of the month with the fastest sound speed (maximum month)
-%   - SSP of the month with the slowest sound speed (minimum month)
+%   Average SSP across entire time period
+%   SSP of the month with the fastest sound speed (maximum month)
+%   SSP of the month with the slowest sound speed (minimum month)
 
 clearvars
 close all
@@ -127,10 +127,10 @@ for k = 1:2:length(fileNames(:,1))
         for j=1:length(depthlist) %interpolate sound speed grid at each depth to infer sound speed values at site coordinates
             numdepths(j) = interp2(D.Longitude,flip(D.Latitude),cdat(:,:,j),siteCoords(i,2),siteCoords(i,1).');
         end
-        
         subplot(1,length(siteabrev),i, 'Parent',plottimept_sup)
         plot(numdepths, -depthlist,'-.')
         ylim([-3200 0])
+        %title(['SSP at ', char(siteabrev(i)),' | ', num2str(siteCoords(i,1)),char(176), 'N, ', num2str(siteCoords(i,2)),char(176), 'E'])
         title(char(siteabrev(i,:)))
         if i == 1
             ylabel('Depth (m)')
@@ -140,6 +140,7 @@ for k = 1:2:length(fileNames(:,1))
         if i == 5
             xlabel('Sound Speed (m/s)')
         end
+        %sgtitle(['Site SSPs | ' timestamp])
         %saveas(gcf,[saveDirectory,'\',char(plotDate),'_',char(siteabrev(i)),'_SSP'],'png');
         SSP_table(:,i+1) = numdepths;
     end

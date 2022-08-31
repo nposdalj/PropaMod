@@ -1,21 +1,24 @@
 function hycom_sampleMonths(startMonth, endMonth, local_outpath, final_outpath)
 
-% Function derived from script ext_hycom_gofs_3_1.m (developed by Ganesh Gopalakrishnan)
+% Function derived from script ext_hycom_gofs_3_1.m (developed by Ganesh
+% Gopalakrishnan)
 %
-% Please format start and end months as 'yyyy-MM'.
-% Your local_outpath is a folder on your device. The data is saved here directly.
-% Your final_outpath (optional) can be a folder on GDrive. The data is exported to here.
+% Required format for dates: 'yyyy-mm-dd HH:MM:SS'
+% Your local_outpath is a folder on your device.
+% Your final_outpath can be the same folder or a folder on GDrive.
 %
-% hycom_sampleMonths.m is designed to sample HYCOM ocean state data from each month in a
-% select time period. For each month, the first day of the month is first attempted.
-% Both noon and midnight data must be collected. If this cannot be done, the script
-% attempts to use the second day, then the third. If the third day has incomplete data,
-% the month is excluded from the dataset.
-% For a given run, the script will output a text file detailing months where the second
-% day was attempted, months where the third day was attempted, and months that were
-% excluded.
+% hycom_sampleMonths.m is designed to sample HYCOM ocean state data from
+% each month in a select time period. For each month, the first day of the
+% month is first attempted. Both noon and midnight data must be collected.
+% If this cannot be done, the script attempts to use the second day, then
+% the third. If the third day has incomplete data, the month is excluded
+% from the dataset.
+% For a given run, the script will output a text file detailing months
+% where the second day was attempted, months where the third day was
+% attempted, and months that were excluded.
 %
-% Note that the script is currently configured for the Western Atlantic Ocean.
+% Note that the script is currently configured for the Western Atlantic
+% Ocean.
 
 tic
 
