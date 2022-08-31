@@ -25,6 +25,9 @@ PropagationModeling is centered on two main steps and their associated scripts:
 
 ## Usage
 
+The workflow for PropagationModeling is summarized here:
+![Workflow diagram for PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_Fig2.png)
+
 ### U.1 Download ocean state data and generate sound speed profiles: `plotSSP.m`
 `plotSSP.m` is responsible for calculating the sound speed profile at each study site.
 The script calls the function `hycom_sampleMonths.m`, which samples ocean state data.
