@@ -5,8 +5,8 @@
 The PropagationModeling repository contains tools for modeling sound propagation for the purpose of marine animal density estimation.
 
 PropagationModeling is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
-* Creating sound speed profiles with `plotSSP.m`
-* Modeling sound propagation with `bellhopDetRange.m`
+* Creating sound speed profiles with `makeSSP.m`
+* Modeling sound propagation with `bellhop_PropMod.m`
 * Preparing for detection simulation with `pDetSim_constructWS.m`
 
 
@@ -31,8 +31,8 @@ The workflow for PropagationModeling is summarized here:
 
 White scripts are included in PropagationModeling; yellow scripts are contained in the Acoustics Toolbox. Blue boxes are file outputs.
 
-### U.1 Download ocean state data and generate sound speed profiles: `plotSSP.m`
-`plotSSP.m` is responsible for calculating the sound speed profile at each study site.
+### U.1 Download ocean state data and generate sound speed profiles: `makeSSP.m`
+`makeSSP.m` is responsible for calculating the sound speed profile at each study site.
 The script calls the function `hycom_sampleMonths.m`, which samples ocean state data.
 * hycom_sampleMonths.m is based on the script `ext_hycom_gofs_3_1.m`, which was created by Ganesh Gopalakrishnan to download HYCOM ocean state data as .mat files for a given region.
 
@@ -41,29 +41,29 @@ The script calls the function `hycom_sampleMonths.m`, which samples ocean state 
 
 #### U.1.2 User input
 Before hitting RUN, under Parameters defined by user, enter:
-* The information for your input and export directories.
-* Coordinates of your study sites.
-* The months when your downloaded HYCOM data begins and ends.
+* The information for your input and export directories, as well as your local HYCOM download directory.
+* The coordinates of your study sites.
+* The start and end months of your study period.
 * Select whether or not to plot SSPs as they are calculated. These plots are not saved.
 
 #### U.1.3 Output
-`plotSSP.m` will produce 3 tables for each site. These are the average SSP for the entire year, the average SSP for the month with the fastest average sound speed (calculated using the sound speeds every 100m between 200 and 1000m), and the average SSP for the month with the slowest average sound speed. The names of the minimum and maximum tables include the number of the month. Each table lists sound speeds from 0 m to 5000 m, with a resolution of 1 m.
+`makeSSP.m` will produce 3 tables for each site. These are the average SSP for the entire year, the average SSP for the month with the fastest average sound speed (calculated using the sound speeds every 100m between 200 and 1000m), and the average SSP for the month with the slowest average sound speed. The names of the minimum and maximum tables include the number of the month. Each table lists sound speeds from 0 m to 5000 m, with a resolution of 1 m.
 
-plotSSP.m generates sound speeds down to a depth of 5000 m even if the bathymetry at the site is shallower. This allows the next process (bellhopDetRange.m) to model sound propagation at locations within a select radius of the site where the bathymetry is deeper.
+makeSSP.m generates sound speeds down to a depth of 5000 m even if the bathymetry at the site is shallower. This allows the next process (bellhop_PropMod.m) to model sound propagation at locations within a select radius of the site where the bathymetry is deeper.
 
 #### U.1.4 Related scripts
-* plotSSP.m calls the function `hycom_sampleMonths.m` to download HYCOM ocean state data.
+* makeSSP.m calls the function `hycom_sampleMonths.m` to download HYCOM ocean state data.
   * In turn, hycom_sampleMonths.m calls `ext_hycom_gofs_93_0.m` to download the data.
-* plotSSP.m calls the function `salt_water_c.m` to calculate sound speed using water temperature, salinity, and depth.
-* plotSSP.m calls the function `inpaint_nans.m` to extrapolate theoretical sound speed below the bathymetry, using existing data points at that depth.
+* makeSSP.m calls the function `salt_water_c.m` to calculate sound speed using water temperature, salinity, and depth.
+* makeSSP.m calls the function `inpaint_nans.m` to extrapolate theoretical sound speed below the bathymetry, using existing data points at that depth.
 
 
-### U.2 Model sound propagation: `bellhopDetRange.m`
-`bellhopDetRange.m` constructs sound propagation radials around your site using your specified parameters, using BELLHOP. It saves .bty, .env, .shd, and .prt files to an intermediate directory (since BELLHOP cannot export files to Google Drive directly), before moving them to your final export directory along with a .txt file listing your parameters. bellhopDetRange.m also creates radial and polar plots and saves these in the export directory.
+### U.2 Model sound propagation: `bellhop_PropMod.m`
+`bellhop_PropMod.m` constructs sound propagation radials around your site using your specified parameters, using BELLHOP. It saves .bty, .env, .shd, and .prt files to an intermediate directory (since BELLHOP cannot export files to Google Drive directly), before moving them to your final export directory along with a .txt file listing your parameters. bellhop_PropMod.m also creates radial and polar plots and saves these in the export directory.
 
 #### U.2.1 Required data
 * Bathymetry data (under the Bathymetry subdirectory, as a text file titled "bathy.txt")
-* Your sound speed profile for the site generated with `plotSSP.m`.
+* Your sound speed profile for the site generated with `makeSSP.m`.
 
 #### U.2.2 User input
 Before hitting RUN, under Parameters defined by user, enter:
@@ -88,7 +88,7 @@ Before hitting RUN, under Parameters defined by user, enter:
   * Specify minimum depth, maximum depth, and step for polar plots
 
 #### U.2.3 Output
-Every time `bellhopDetRange.m` is run, it creates new folders (with a name in the format YYMMDDx, where x is one letter of the alphabet) under the intermediate, save, and plot directories.
+Every time `bellhop_PropMod.m` is run, it creates new folders (with a name in the format YYMMDDx, where x is one letter of the alphabet) under the intermediate, save, and plot directories.
 
 In the intermediate and save directories, this folder contains subfolders for each frequency specified by the user for this run. A .txt file listing the input parameters for this run is also included. In turn, the frequency subfolders include one of the following for each radial:
 * Bathymetry (.bty) file
@@ -98,20 +98,20 @@ In the intermediate and save directories, this folder contains subfolders for ea
 
 Under the plot directory, this folder contains plots of the received level for each radial, as well as polar plots for the region at the depths requested by the user.
 
-For each frequency, bellhopDetRange.m also saves a .mat file containing certain values required for animal detection simulation.
+For each frequency, bellhop_PropMod.m also saves a .mat file containing certain values required for animal detection simulation.
 
 #### U.2.4 Related Scripts
-bellhopDetRange.m calls two functions in the PropagationModeling repository:
+bellhop_PropMod.m calls two functions in the PropagationModeling repository:
 * `makeBTY.m`: Generates the bathymetry (.bty) file for each radial.
 * `makeEnv.m`: Generates the environment (.env) file for each radial.
 
-bellhopDetRange.m also calls two functions in the Acoustics Toolbox:
+bellhop_PropMod.m also calls two functions in the Acoustics Toolbox:
 * `bellhop.m`: Runs BELLHOP for each radial. Shade (.shd) and print (.prt) files are generated by BELLHOP as a result.
-* `read_shd.m`: Reads data from the radial .shd files. Used in bellhopDetRange.m for plotting.
+* `read_shd.m`: Reads data from the radial .shd files. Used in bellhop_PropMod.m for plotting.
 
 
 ### U.3 Prepare for detection simulation: `pDetSim_constructWS.m`
-A few lines in `bellhopDetRange.m` serve to package information for animal detection simulation. `pDetSim_constructWS.m` completes this process.
+A few lines in `bellhop_PropMod.m` serve to package information for animal detection simulation. `pDetSim_constructWS.m` completes this process.
 
 
 ## Support
