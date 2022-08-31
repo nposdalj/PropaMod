@@ -41,14 +41,14 @@ Longitude = [-69.9800;   -72.2300;   -76;        -77.0900;   -77.3900;  -73.37; 
 % HydDepth  = [950;        950;        950;        950;        950;       950;        950;        950;        950];
 
 % Effort Period
-MonthStart = '201507';  % First month of study period (yyyyMM)
-MonthEnd = '201906';    % Final month of study period (yyyyMM)
+MonthStart = '2015-07';  % First month of study period (Must format as yyyy-MM!)
+MonthEnd = '2019-06';    % Final month of study period (Must format as yyyy-MM!)
 
 plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is turned on.
 
 %% Download HYCOM data as mat files
 sprintf('\n/ / / / / / / / / / STEP 1: HYCOM DOWNLOAD / / / / / / / / / /')
-hycom_sampleMonths([MonthStart(1:4) '-' MonthStart(5:6) '-01 00:00:00'], [MonthEnd(1:4) '-' MonthEnd(5:6) '-01 00:00:00'],...
+hycom_sampleMonths(MonthStart, MonthEnd,...
     HYCOM_FilePath_Local, HYCOM_FilePath_Final)
 
 %% Get list of fileNames in chronological order
