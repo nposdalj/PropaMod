@@ -4,9 +4,10 @@
 
 The PropagationModeling repository contains tools for modeling sound propagation for the purpose of marine animal density estimation.
 
-PropagationModeling is centered on two main steps and their associated scripts:
+PropagationModeling is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
 * Creating sound speed profiles with `plotSSP.m`
 * Modeling sound propagation with `bellhopDetRange.m`
+* Preparing for detection simulation with `pDetSim_constructWS.m`
 
 
 ## Getting Started
@@ -27,6 +28,8 @@ PropagationModeling is centered on two main steps and their associated scripts:
 
 The workflow for PropagationModeling is summarized here:
 ![Workflow diagram for PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_Fig2.png)
+
+White scripts are included in PropagationModeling; yellow scripts are contained in the Acoustics Toolbox. Blue boxes are file outputs.
 
 ### U.1 Download ocean state data and generate sound speed profiles: `plotSSP.m`
 `plotSSP.m` is responsible for calculating the sound speed profile at each study site.
