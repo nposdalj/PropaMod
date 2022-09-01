@@ -159,14 +159,16 @@ for k = 1:2:length(fileNames(:,1))
     for n = 1:size(siteabrev,1)
         table_varNames(n) = {char(siteabrev(n,:))};
     end
-    SSP_table.Properties.VariableNames = table_varNames;
+    SSP_table.Properties.VariableNames = {'Depth' char(siteabrev(1,:)) char(siteabrev(2,:)) char(siteabrev(3,:)) char(siteabrev(4,:))...
+        char(siteabrev(5,:)) char(siteabrev(6,:)) char(siteabrev(7,:)) char(siteabrev(8,:)) char(siteabrev(9,:))};
+    %writetable(SSP_table,[saveDirectory,'\', 'SSP_', regionabrev, '_', fileName(strfind(fileName,'_')+1:end), '.xlsx'])
     
     ALL_SSP.(['M',fileNames(k,1:6)]) = SSP_table; % All the data from all time points and all sites is stored in ALL_SSP
-    disp([fileNames(k,1:4) '/' fileNames(k,5:6) ' - Calculated SSPs and added to ALL_SSP as M' fileNames(k,1:6)])
+    disp([fileName_00, ' - Extracted SSPs and added to ALL_SSP as M' fileNames(k,1:6)])
         % NOTE - ALL_SSP isn't actually used hereafter, but could be helpful as a reference, if needed.
     
 end
-% ALL_SSParray(ALL_SSParray==0) = NaN;
+%ALL_SSParray(ALL_SSParray==0) = NaN;
 
 % Get average SSP and stdev for each month
 Month1 = datetime(MonthStart, 'InputFormat', 'yyyyMM', 'Format', 'MM'); % Month number of first month in the data
@@ -196,7 +198,7 @@ for b = 1:length(siteabrev)
         MoMeans.M07,MoMeans.M08,MoMeans.M09,MoMeans.M10,MoMeans.M11,MoMeans.M12), 0, 3); % SD of the 12 calendar months
     
     TotMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-    TotMeanfd((depthlist+1),2) = TotMean(:,b); % Bring in site-specific data
+    TotMeanfd((depthlist+1),2) = TotMean(:,(b+1)); % Bring in site-specific data
     TotMeanfd(:,2) = interp1((depthlist+1).', TotMeanfd((depthlist.'+1),2),1:length(TotMeanfd));
     
     SSPT = [(0:5000).',inpaint_nans(TotMeanfd(:,2))];
@@ -217,24 +219,24 @@ end
 
 testmean = nan(12,size(siteabrev,1));
 for month = 1:12
-    testmean(month,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', month))])([23 25 27:33],1:length(siteabrev)));
+    testmean(month,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', month))])([23 25 27:33],2:10)); %2:10 issue
 end
 
-extremeMonths = nan(length(siteabrev(1,:)),2);
-for i = 1:length(siteabrev(:,1))
-    extremeMonths(i,1) = find(testmean == min(testmean(:,i))) - 12*(i-1); % Min months stored in first column
-    extremeMonths(i,2) = find(testmean == max(testmean(:,i))) - 12*(i-1); % Max months stored in second column
+extreme_mos = nan(length(siteabrev(1,:)),2);
+for sitenum = 1:length(siteabrev(:,1))
+    extreme_mos(sitenum,1) = find(testmean == min(testmean(:,sitenum))) - 12*(sitenum-1); % Min months stored in first column
+    extreme_mos(sitenum,2) = find(testmean == max(testmean(:,sitenum))) - 12*(sitenum-1); % Max months stored in second column
 end
 
 for i = 1:length(siteabrev(:,1))
     Site = siteabrev(i,:);
     
-    minMo = extremeMonths(i,1);
-    maxMo = extremeMonths(i,2);
+    minMo = extreme_mos(i,1);
+    maxMo = extreme_mos(i,2);
     
     MeanSSP_minMo = MoMeans.(['M',num2str(sprintf('%02d', minMo))]); % Average sound speed profiles of the month with lowest sound speeds
     MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-    MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,i); % Drop the site-specific data into this array
+    MoMeanfd((depthlist+1),2) = MeanSSP_minMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
     MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
     SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
@@ -245,7 +247,7 @@ for i = 1:length(siteabrev(:,1))
     
     MeanSSP_maxMo = MoMeans.(['M',num2str(sprintf('%02d', maxMo))]); % Average sound speed profiles of the month with lowest sound speeds
     MoMeanfd = [(0:5000).' nan(1,5001).']; % Make an array for the full depth
-    MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,i); % Drop the site-specific data into this array
+    MoMeanfd((depthlist+1),2) = MeanSSP_maxMo(:,(i+1)); % Drop the site-specific data into this array       %2:10 issue!
     MoMeanfd(:,2) = interp1((depthlist+1).', MoMeanfd((depthlist.'+1),2),1:length(MoMeanfd));
     % Interpolate to get missing depths in between and extrapolate to get deeper depths
     SSPM = [(0:5000).',inpaint_nans(MoMeanfd(:,2))];
