@@ -48,8 +48,8 @@ msgbox(['HYCOM MOVED FROM GOMFS 3.0 (32 LEVLS) TO GOFS 3.1 (41 LEVELS)';...
     'https://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0       '], 'HYCOM - Info for user')
 
 %% region 24-44N, and -63 - -82W (278-297E)
-formatTime = 'yyyy-MM-dd HH:mm:SS'; % formatTime = 'yyyy-mm-dd HH:MM:SS';
-start_date = char(datetime([startMonth '-01'], 'ConvertFrom', 'yyyy-MM-dd', 'Format', formatTime));
+formatTime = 'yyyy-MM-dd HH:mm:ss'; % formatTime = 'yyyy-mm-dd HH:MM:SS';
+start_date = char(datetime([startMonth '-01'], 'ConvertFrom', 'yyyy-mm-dd', 'Format', formatTime));
 end_date = char(datetime([endMonth '-01'], 'ConvertFrom', 'yyyy-MM-dd', 'Format', formatTime));
 
 monthnum = between(datetime(start_date),datetime(end_date), 'months'); %Added by AD to generate monthly values
@@ -84,11 +84,11 @@ for itr = 1:3  % Loop through iterations
     % old xl: [3476:3714]
     for i = 1:nt % Loop through time points
         f1 = i;
-        str_date = datestr(time(i),formatTime);
+        str_date = datestr(time(i),'yyyy-mm-dd HH:MM:SS');
         
         % there is big jump between two solutions, so using most in recent/latest solution
         eddate = datenum(date);
-        stdate = datenum(str_date,formatTime);
+        stdate = datenum(str_date,'yyyy-mm-dd HH:MM:SS');
         
         if ((datenum(2014,7,1) >= stdate) || (stdate < datenum(2016,5,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3';
