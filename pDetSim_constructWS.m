@@ -13,9 +13,9 @@ close all
 Site = 'NC';
 Region = 'WAT';
 sp = 'Pm';
-date = '220824h'; %date you created the transmission loss model
-freq = '9kHz';
-freqDir = '009';
+date = '220825i'; %date you created the transmission loss model
+freq = '10kHz'; %peak frequency
+freqDir = '010'; %peak frequency for saving purposes
 
 GDrive = 'I';
 inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from

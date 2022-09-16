@@ -62,6 +62,8 @@ hlon = -69.9800; % hydrophone long
 hdepth = 960; % hydrophone depth
 freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
+% Acousto-Elastic half space properties required for makeEnv
+
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
