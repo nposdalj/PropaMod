@@ -63,11 +63,10 @@ hdepth = 960; % hydrophone depth
 freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
-AEHS.compSpeed = 1470.00;
-AEHS.shearSpeed = 146.70;
-AEHS.density = 1.15;
-AEHS.compAtten = 0.0015;
-AEHS.shearAtten = 0.0000;
+aehs_compSpeed
+aehs_shearSpeed
+aehs_density
+aehs_comAtten
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
