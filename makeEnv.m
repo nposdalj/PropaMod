@@ -40,7 +40,7 @@ end
 % Find sediment cores for WAT?
 fprintf(fid, '''A*'' 0.0\n');
 %A = model as Acousto-Elastic half space
-fprintf(fid, ' %.2f\t %.1f\t %.1f\t %.1f\t %.1f\t %.1f\n', AEHS.compSpeed, AEHS.shearSpeed, AEHS.density, AEHS.compAtten)
+fprintf(fid, ' %.2f  %.1f  %.1f %.1f %.1f\n', max(ssp), AEHS.compSpeed, AEHS.shearSpeed, AEHS.density, AEHS.compAtten);
 % fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
 % Params: Depth, Compressional speed, Shear speed, Density, Compressional
 % attenuation, Shear attenuation

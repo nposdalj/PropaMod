@@ -42,7 +42,7 @@ Region = 'WAT';
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
 % bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'P';
+Gdrive = 'G';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 % Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
@@ -146,8 +146,8 @@ z = -z;             % Make depth down positive
 toc
 
 %% 5. Sound Speed Profiles
-SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Site)), SSPtype)); % Select SSP file based on user input
-SSPfolder = ls(fullfile(fpath,'SSPs',Site));
+SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Region, Site)), SSPtype)); % Select SSP file based on user input
+SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));
 SSPfile = SSPfolder(SSPfolderCode,:);
 SSPfile(find(SSPfile==' ')) = [];
 
@@ -246,7 +246,7 @@ for rad = 1:length(radials)
         
         %% 7.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' filePrefix '...'])   % Status update
-        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C'); % make environment file
+        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', AEHS); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
         
