@@ -50,9 +50,8 @@ saveDir = [fpath, '\Radials\', Site]; % Export directory
 
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
-% Note to self to have smth in plotSSP that exports the examined effort
-% period and other relevant deets so they can be exported in the info file
-% here
+% Note to self to have smth in plotSSP that exports the examined effort period 
+% and other relevant deets so they can be exported in the info file here
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
@@ -63,11 +62,11 @@ hdepth = 960; % hydrophone depth
 freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
-AEHS.compSpeed = 1470.00;
-AEHS.shearSpeed = 146.70;
-AEHS.density = 1.15;
-AEHS.compAtten = 0.0015;
-AEHS.shearAtten = 0.0000;
+AEHS.compSpeed = 1470.00;   % Compressional speed
+AEHS.shearSpeed = 146.70;   % Shear speed
+AEHS.density = 1.15;        % Density
+AEHS.compAtten = 0.0015;    % Compressional attenuation
+AEHS.shearAtten = 0.0000;   % Shear attenuation
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -149,7 +148,8 @@ toc
 SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Region, Site)), SSPtype)); % Select SSP file based on user input
 SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));
 SSPfile = SSPfolder(SSPfolderCode,:);
-SSPfile(find(SSPfile==' ')) = [];
+idx_rmSpace = find(SSPfile==' ');
+SSPfile(idx_rmSpace) = [];
 
 if strcmp(SSPtype, 'Mmax')        % Get month being examined to report in the output info file, if applicable
     SSPmoReporting = num2str(SSPfile(12:13));
@@ -159,7 +159,7 @@ elseif strcmp(SSPtype, 'Mean')
     SSPmoReporting = 'Not applicable';
 end
 
-SSP = readtable(fullfile(fpath,'SSPs',Site,SSPfile)); % read the SSP file
+SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
 SSParray = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
 % The rest of this section shouldn't be necessary b/c plotSSP.m now
 % generates SSPs with the full 5000 depth values (actually, 5001, which may
