@@ -82,6 +82,8 @@ generate_PolarPlots = 1; % 1 = Yes, generate polar plots;  0 = No, do not genera
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
 
+makeRadialPlots = 1; % this doesn't mean anything it's just so code doesn't get stuck on line 330-something
+
 % Polar Plots
 makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 % Radial plots are automatically generated for every radial
@@ -292,7 +294,7 @@ for rad = 1:1
             set(radplotiii, 'EdgeColor','none')
             colormap(jet)
             plotbty([intermedDirFi, '\' filePrefix, '.bty'])
-            title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz, AEHS: ' num2str(max(ssp)) ' ' num2str(AEHS.compSpeed(cS)) ' ' num2str(AEHS.shearSpeed(sS)) ' ' num2str(AEHS.density(den)) ' ' num2str(AEHS.compAtten(cA))])
+            title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz, AEHS: ' num2str(max(ssp)) ' ' num2str(AEHS.compSpeed) ' ' num2str(AEHS.shearSpeed) ' ' num2str(AEHS.density) ' ' num2str(AEHS.compAtten)])
             colorbar
             saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap' num2str(cS) num2str(sS) num2str(den) num2str(cA) '.png'])
             
