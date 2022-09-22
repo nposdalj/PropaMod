@@ -36,7 +36,7 @@ author = 'AD'; % Your name/initials here. This will be included in the .txt outp
 userNote = 'No notes'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'NC';
+Site = 'BC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
@@ -56,17 +56,17 @@ SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Mont
 % SPECIFY PARAMETERS FOR INPUT
 SL = 220; % Source Level
 SD = 800; % Source depth
-hlat = 39.8326; % hydrophone lat
-hlon = -69.9800; % hydrophone long
-hdepth = 960; % hydrophone depth
+hlat = 39.1912; % 39.8326; % hydrophone lat
+hlon = -72.23; % -69.9800; % hydrophone long
+hdepth = 1000; % 960; % hydrophone depth
 freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
-AEHS.compSpeed = 1470.00;   % Compressional speed
-AEHS.shearSpeed = 146.70;   % Shear speed
-AEHS.density = 1.15;        % Density
-AEHS.compAtten = 0.0015;    % Compressional attenuation
-AEHS.shearAtten = 0.0000;   % Shear attenuation
+AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed
+AEHS.shearSpeed = 150;  % 146.70;   % Shear speed
+AEHS.density = 1.7;  %1.15;        % Density
+AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
+AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this input doesn't actually do anything
 
 % CONFIGURE OUTPUT RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -316,6 +316,7 @@ for freqi = 1:length(freq)
         '\n\nSite\t' Site '\nRegion\t' Region ...
         '\n\nSSP INPUT\nFile Name\t' SSPfile, '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
         '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' num2str(freq{freqi})...
+        '\n\nACOUSTO ELASTIC HALF-SPACE\nCompressional Speed\t' num2str(compressional_speed) '\nShear Speed\t' num2str(shear_speed) '\nDensity\t' num2str(density_aehs) '\nCompressional Attenuation\t' num2str(compressional_atten)...
         '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nNumber of Radials\t' num2str(numRadials) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
         '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
         '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makePolarPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
