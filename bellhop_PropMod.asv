@@ -270,13 +270,13 @@ for rad = 1:length(radials)
             [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1))); % this bumps memory up a bit...
             zq = interp2(x1,y1, PL,xq1, yq1);
             
-            % figure(2000+radials(rad))
-            figure('visible', 'off')
+            figure(2000+radials(rad))
+            % figure('visible', 'off')
             RL_radiii = SL - zq; % bumps memory up a bit
             RL_radiii(RL_radiii < RL_threshold) = NaN;
-            ptVisibility = ones(size(RL_radiii));
-            ptVisibility(isnan(RL_radiii)) = 0;
-            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
+            ptVisibility = ones(size(
+            emptyData = RL_radiii(isnan(RL_radiii));
+            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', emptyData); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
             % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
             % axis ij
             % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
