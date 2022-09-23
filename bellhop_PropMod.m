@@ -45,8 +45,8 @@ bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron'
 Gdrive = 'G';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
-% Site SSP data: \SSPs\SSP_WAT_[Site].xlsx
-saveDir = [fpath, '\Radials\', Site]; % Export directory
+%                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
+saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
 
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
@@ -110,11 +110,11 @@ if dailyFolderNum == 123    % This is the double value of {, which comes after z
 else % If there is still room for more run folders for today, make new directories.
     newFolderName = [runDate char(dailyFolderNum)];
     
-    intermedDir = [bellhopSaveDir, '\', newFolderName];
+    intermedDir = [bellhopSaveDir, '\', Site, '\', newFolderName];
     mkdir(intermedDir)
     intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Local subdirectory for 1st freq
     
-    saveDir_sub = [saveDir, '\' newFolderName];          % Final save directory [GDrive]
+    saveDir_sub = [fpath, '\', Site, '\', newFolderName];          % Final save directory [GDrive]
     mkdir(saveDir_sub);
     saveDir_subF1 = [saveDir_sub '\' num2str(freq{1}/1000) 'kHz']; mkdir(saveDir_subF1); % Save subdirectory for 1st freq
     
@@ -212,6 +212,8 @@ for rad = 1:length(radials)
     tic
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
+    % The line above causes memory to climb, but ultimately it seems to go
+    % back down.
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
     
@@ -270,6 +272,7 @@ for rad = 1:length(radials)
             [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1))); % this bumps memory up a bit...
             zq = interp2(x1,y1, PL,xq1, yq1);
             
+            disp('Creating radial plot and saving...')
             % figure(2000+radials(rad))
             figure('visible', 'off')
             RL_radiii = SL - zq; % bumps memory up a bit
@@ -294,7 +297,7 @@ for rad = 1:length(radials)
     
     clear Range bath
     
-end
+end % End loop through radials
 disp('Completed constructing radials.')
 
 %% Steps 8-10 - Loop through frequencies
@@ -322,10 +325,10 @@ for freqi = 1:length(freq)
         '\n\nSite\t' Site '\nRegion\t' Region ...
         '\n\nSSP INPUT\nFile Name\t' SSPfile, '\nSSP Type\t' SSPtype '\nMonth\t' SSPmoReporting...
         '\n\nHYDROPHONE PARAMETERS\nSL\t' num2str(SL) '\nSD\t' num2str(SD) '\nhlat\t' num2str(hlat) '\nhlon\t' num2str(hlon) '\nhdepth\t' num2str(hdepth) '\nFrequency\t' num2str(freq{freqi})...
-        '\n\nACOUSTO ELASTIC HALF-SPACE\nCompressional Speed\t' num2str(compressional_speed) '\nShear Speed\t' num2str(shear_speed) '\nDensity\t' num2str(density_aehs) '\nCompressional Attenuation\t' num2str(compressional_atten)...
+        '\n\nACOUSTO ELASTIC HALF-SPACE\nCompressional Speed\t' num2str(AEHS.compSpeed) '\nShear Speed\t' num2str(AEHS.shearSpeed) '\nDensity\t' num2str(AEHS.density) '\nCompressional Attenuation\t' num2str(AEHS.compAtten)...
         '\n\nRANGE & RESOLUTION\nRange\t' num2str(total_range) '\nRange Step\t' num2str(rangeStep) '\nNumber of Radials\t' num2str(numRadials) '\nRad Step\t' num2str(radStep) '\nDepth Step\t' num2str(depthStep)...
         '\n\nPLOT GENERATION\nGenerate Polar Plots\t' num2str(generate_PolarPlots) '\nGenerate Radial Plots\t' num2str(generate_RadialPlots)...
-        '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makePolarPlots) '\nRadial Plots\t' num2str(makeRadialPlots)...
+        '\nRL Threshold\t' num2str(RL_threshold) '\nRL Plot Maximum\t' num2str(RL_plotMax) '\nDepth Levels\t' num2str(makePolarPlots)... % '\nRadial Plots\t' num2str(makeRadialPlots)...
         '\n\n\nSSP\nDepth\tSound Speed']);
     SSP_Reporting = (table2array(SSP)).';
     fprintf(fileid, '\n%4.0f\t%4.11f', SSP_Reporting);
@@ -345,7 +348,7 @@ for freqi = 1:length(freq)
             for rad = 1:length(radials)
                 
                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-                filePrefix = ['Radial_' radialiChar '_' freqiChar 'kHz']; % Current file prefix
+                filePrefix = ['R' radialiChar '_' freqiChar 'kHz']; % Current file prefix
                 
                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
                 PLslice = squeeze(pressure(1, 1,:,:));
@@ -378,7 +381,7 @@ for freqi = 1:length(freq)
             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
             set(gcf, 'Position', [100 100 800 600])
             title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'],'Position',[0 -1.2])
-            saveas(Radiance,[plotDirFi,'\',Site,'_',num2str(plotdepth),'m_' freqiChar 'kHz_RLPolarMap.png'])
+            saveas(Radiance,[plotDirFi,'\',Site,'_',num2str(plotdepth),'m_' num2str(freqiChar) 'kHz_RLPolarMap.png'])
             disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'])
             
         end
