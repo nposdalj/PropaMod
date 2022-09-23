@@ -211,7 +211,7 @@ for rad = 1:length(radials)
     
     tic
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [Range, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
+    [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
     
@@ -276,7 +276,9 @@ for rad = 1:length(radials)
             RL_radiii(RL_radiii < RL_threshold) = NaN;
             ptVisibility = ones(size(RL_radiii));
             ptVisibility(isnan(RL_radiii)) = 0;
-            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
+            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial
+            % Using imagesc instead but still hiding RLs that are too low:
+            % got help from https://www.mathworks.com/matlabcentral/answers/81938-set-nan-as-another-color-than-default-using-imagesc
             % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
             % axis ij
             % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
@@ -286,7 +288,7 @@ for rad = 1:length(radials)
             colorbar
             saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
             
-            clear RL_radiii radplotiii x1 y1 xq1 yq1 pressure PL PLslice
+            clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
         end      
     end
     
