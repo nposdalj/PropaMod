@@ -188,7 +188,7 @@ dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
 % Source Depth
-disp(['Source depth: ', num2str(SD), ' m'])
+disp(['Source depth: ', num2str(SD), ' m']) % <- won't actually print a number now b/c source depth is now decided later
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
@@ -225,6 +225,7 @@ for rad = 1:length(radials)
     
     bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
     
+    % DECIDE SD FOR ALL RADIALS (This is done during the first radial)
     if rad == 1 % If this is currently running the first radial...
         SiteDepth = bath(1); % set the first value in the bathymetry as the depth of the site.
         SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
