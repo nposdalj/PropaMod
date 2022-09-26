@@ -10,14 +10,14 @@
 clearvars
 close all
 %% Params defined by User
-Site = 'NC';
+Site = 'HZ';
 Region = 'WAT';
 sp = 'Pm';
-date = '220825i'; %date you created the transmission loss model
-freq = '10kHz'; %peak frequency
-freqDir = '010'; %peak frequency for saving purposes
+date = '220924c'; %date you created the transmission loss model
+freq = '09kHz'; %peak frequency
+freqDir = '009'; %peak frequency for saving purposes
 
-GDrive = 'I';
+GDrive = 'G';
 inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from
 exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
 %inputDir = 'C:\Users\nposd\Desktop\PropagationModelingIntermediate\220721151649';
