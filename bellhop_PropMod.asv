@@ -30,13 +30,13 @@ global rad
 global radStep
 global depthStep
 
-%% 2. Params defined by user + Info for user (for runSettings Option 1 ONLY)
+%% 2. Params defined by user + Info for user
 
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' WC, MidSize and Social Groups'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'GS';
+Site = 'WC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
@@ -54,7 +54,7 @@ SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Mont
 % and other relevant deets so they can be exported in the info file here
 
 % SPECIFY PARAMETERS FOR INPUT
-SL = 235; % Source Level
+SL = 220; % Source Level
 SD = NaN; % 800; % Source depth % <- Should this... just be the same as hdepth...?
 % ^ Before this was 800 but now I am just setting it to be the depth at
 % hlat and hlon, - 10 m. To simulate a hydrophone sitting 10 m off of the
@@ -64,7 +64,7 @@ SD = NaN; % 800; % Source depth % <- Should this... just be the same as hdepth..
 hlat = 38.3738; % 39.8326; % hydrophone lat
 hlon = -73.37; % -69.9800; % hydrophone long
 hdepth = 990; % hydrophone depth % <- This doesn't appear to actually do anything but it's input into DetSim_Workspace
-freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {10000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
 AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed
@@ -91,6 +91,13 @@ RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max e
 % Polar Plots
 makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 % Radial plots are automatically generated for every radial
+
+% SPECIAL CONDITION: Oops, my run did not finish all the radials!
+% This often occurs when this program causes the computer to run out of
+% memory.
+% First, RUN SECTIONS 8-10 MANUALLY to save your parameter file and the
+% DetSim_Workspace generated so far.
+% Then, change "
 
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
