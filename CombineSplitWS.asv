@@ -1,5 +1,12 @@
 % CombineSplitWS
 % Created by AD 2022-09-26
+%
+% To be used when a run had to be split in two (e.g., the first one crashed
+% partway through but that part of the DetSim_Workspace was salvaged).
+% The final, combined DetSim_Workspace which this script produces will be
+% named with the date of the first run followed by the suffix 'F'.
+%
+% Use this script after generating the init
 
 clearvars
 
@@ -10,12 +17,9 @@ Run1_Date = '220925';
 Run2 = '220926a';
 Freq = '009';
 
-%% Generate 
+%% Generate combined workspace
 % Things that should be same between first and second parts: 
-%   freqSave
-%   nrr
-%   radials
-%   rr
+%   freqSave, nrr, radials, rr
 
 % The thing that needs to be concatenated: botDepthSort.
 % Finally, hdepth (which is known during most of the bellhop_PropMod.m

@@ -2,7 +2,15 @@
 % Created by AD 2022-09-26
 %
 % To be used when a run had to be split in two (e.g., the first one crashed
-% partway through but that part of the DetSim_Workspace was salvaged)
+% partway through but that part of the DetSim_Workspace was salvaged).
+% The final, combined DetSim_Workspace which this script produces will be
+% named with the date of the first run followed by the suffix 'F'.
+%
+% Use this script after generating the initial workspaces with
+% bellhop_PropMod.m.
+% On the side, copy the radial data from the first and second runs into one
+% combined folder (rec: title this with date of first run followed by the
+% suffix 'F').
 
 clearvars
 
