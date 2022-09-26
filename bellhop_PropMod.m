@@ -419,7 +419,7 @@ for freqi = 1:length(freq)
     end
     
     %% 10. Save variables for pDetSim  
-    freqSave = char(freqVec/1000);
+    freqSave = char(num2str(freqVec/1000));
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
     
 end
