@@ -40,7 +40,7 @@ Site = 'WC';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Radials_Intermediate'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 % bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
 Gdrive = 'G';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
