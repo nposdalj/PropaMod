@@ -15,11 +15,11 @@
 clearvars
 
 %% Params Defined by user
-Site = 'GS';
-Run1 = '220925a';
+Site = 'WC';
+Run1 = '220926c';
 Run1_Date = '220925';
 Run2 = '220926a';
-Freq = '009';
+Freq = '010';
 
 %% Generate combined workspace
 % Things that should be same between first and second parts: 
