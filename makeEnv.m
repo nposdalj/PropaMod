@@ -2,8 +2,6 @@
 
 function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, modelType, AEHS)
 
-
-
 fpn = fullfile(filepath, [filename, '.env']);
 
 % make file or erase current contents of file:
@@ -94,6 +92,8 @@ end
 fprintf(fid, '0  90 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
+%ZBOX - maximum ray depth
+%RBOX - maximum ray range
 fprintf(fid, '50  2000 101.0');
 
 fclose(fid);
