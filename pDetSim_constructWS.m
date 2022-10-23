@@ -10,10 +10,10 @@
 clearvars
 close all
 %% Params defined by User
-Site = 'BS';
+Site = 'JX';
 Region = 'WAT';
 sp = 'Pm';
-date = '220930b'; %date you created the transmission loss model
+date = '221002a'; %date you created the transmission loss model
 freq = '10kHz'; %peak frequency
 freqDir = '010'; %peak frequency for saving purposes
 
