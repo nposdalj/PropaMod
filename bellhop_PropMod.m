@@ -33,16 +33,16 @@ global depthStep
 %% 2. Params defined by user + Info for user
 
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' NC, Males'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'NC';
+Site = 'GS';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 % bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'G';
+Gdrive = 'P';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
@@ -67,7 +67,8 @@ hdepth = 960; % hydrophone depth % <- This doesn't appear to actually do anythin
 freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
-AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed
+% AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
+        % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
 AEHS.shearSpeed = 150;  % 146.70;   % Shear speed
 AEHS.density = 1.7;  %1.15;        % Density
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
@@ -241,10 +242,13 @@ for rad = startRad:length(radials)
     
     bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
     
-    % DECIDE SD FOR ALL RADIALS (This is done during the first radial)
+    % DECIDE SD AND AEHS.COMPSPEED FOR ALL RADIALS (This is done during the first radial)
     if rad == 1 % If this is currently running the first radial...
         SiteDepth = bath(1); % set the first value in the bathymetry as the depth of the site.
         SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
+        
+        Seafloor_SoundSpeed = SSP.SS(find(SSP.Depth == round(SiteDepth))); % Find soundspeed at seafloor depth of site
+        AEHS.compSpeed = Seafloor_SoundSpeed; % Set this as the compressional speed for the seafloor AEHS.
     end
     
     RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
