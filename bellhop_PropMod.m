@@ -17,7 +17,6 @@
 
 clearvars % clear variables
 close all % clear all
-
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
@@ -29,9 +28,7 @@ global loni
 global rad
 global radStep
 global depthStep
-
 %% 2. Params defined by user + Info for user
-
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' NC, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
@@ -51,7 +48,7 @@ saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
 % Note to self to have smth in plotSSP that exports the examined effort period 
-% and other relevant deets so they can be exported in the info file here
+% and other relevant details so they can be exported in the info file here
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 235; % Source Level
@@ -102,7 +99,6 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 % For this "resumed" run, completely new run folders will be generated, as
 % well as a new DetSim_Workspace. You will need to combine the two
 % DetSim_Workspaces manually before running pDetSim_constructWS.
-
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
 % multiple times in parallel on the same computer (or across devices).
@@ -150,7 +146,6 @@ else % If there is still room for more run folders for today, make new directori
         plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
     end
 end
-
 %% 4. Bathymetry
 disp('Loading bathymetry data...') % Read in bathymetry data
 tic
@@ -160,7 +155,6 @@ lat = Bath(:,1);    % vector for latitude
 z = Bath(:,3);      % vector for depth (depth down is negative)
 z = -z;             % Make depth down positive
 toc
-
 %% 5. Sound Speed Profiles
 SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Region, Site)), SSPtype)); % Select SSP file based on user input
 SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));
@@ -187,7 +181,6 @@ SSParray = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of inter
 % 
 % vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
 % NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
-
 %% 6. Hydrophone location and depth
 % Center of source cell
 hydLoc = [hlat, hlon, hdepth];
@@ -203,7 +196,6 @@ disp(['Source depth: ', num2str(SD), ' m']) % <- won't actually print a number n
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
-
 %% 7. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code (Section 3)
