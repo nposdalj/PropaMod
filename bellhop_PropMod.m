@@ -29,7 +29,7 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+author = 'NP'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
@@ -37,10 +37,10 @@ Site = 'GS';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-% bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'P';
-fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
+%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'I';
+fpath = [Gdrive, ':\My Drive\PropagationModeling\']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
@@ -49,6 +49,9 @@ SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Mont
 
 % Note to self to have smth in plotSSP that exports the examined effort period 
 % and other relevant details so they can be exported in the info file here
+
+% Which version of Bellhop do you want to use?
+verBel = 1; % FORTRAN version from Acoustic toolbox (0) or C++ version (1)
 
 % SPECIFY PARAMETERS FOR INPUT
 SL = 235; % Source Level
@@ -106,7 +109,7 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 
 runDate = datestr(datetime('now'), 'yymmdd');
 existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
-existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
+existingDirs = existingDirs(contains(existingDirs(2:end), runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
@@ -280,7 +283,11 @@ for rad = startRad:length(radials)
         %% 7.4 Run BELLHOP - Make shade and print files
         disp(['Running Bellhop for ' filePrefix '...']) % Status update
         tic
+        if verBel == 1
+        bellhopcxx2d(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
+        else
         bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
+        end
         toc
         copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
             fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
