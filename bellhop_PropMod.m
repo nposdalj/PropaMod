@@ -370,7 +370,6 @@ for freqi = 1:length(freq)
     
     copyfile(paramfile,fullfile(saveDir_subFi, txtFileName)) % Copy to saveDir_sub
     copyfile(paramfile,fullfile(plotDirFi, txtFileName)); % Copy to plotDir
-    
     %% 9. Generate Polar Plots
     if generate_PolarPlots == 1
         
