@@ -29,7 +29,7 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'NP'; % Your name/initials here. This will be included in the .txt output.
+author = 'AD'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
@@ -37,10 +37,10 @@ Site = 'GS';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'I';
-fpath = [Gdrive, ':\My Drive\PropagationModeling\']; % Input directory
+bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+%bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'G';
+fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
@@ -78,7 +78,7 @@ AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 36;        % Specify number of radials - They will be evenly spaced.
+numRadials = 4;        % Specify number of radials - They will be evenly spaced.
 % Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
@@ -109,7 +109,8 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 
 runDate = datestr(datetime('now'), 'yymmdd');
 existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
-existingDirs = existingDirs(contains(existingDirs(2:end), runDate), :); % Only consider folder names with today's date
+% existingDirs = existingDirs(contains(existingDirs(2:end), runDate), :); % Only consider folder names with today's date
+existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
@@ -212,6 +213,8 @@ if resumeRun == 1 % Choose start radial based on whether user requested to resum
 else
     startRad = 1;
 end
+bathyTimes = nan(rad, 1); % List of durations of bathymetry file section
+blhopTimes = nan(rad, 1); % List of durations of bellhop section
 for rad = startRad:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
@@ -227,7 +230,7 @@ for rad = startRad:length(radials)
     %% 7.2 Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     
-    tic
+    tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
     % The line above causes memory to climb, but ultimately it seems to go
@@ -247,7 +250,7 @@ for rad = startRad:length(radials)
     end
     
     RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
-    toc
+    bathyTimes(rad) = toc(tBegin);
         
     botDepthSort(rad,:) = bath'; %save bottom depth sorted by radial for pDetSim
     
@@ -282,13 +285,13 @@ for rad = startRad:length(radials)
         
         %% 7.4 Run BELLHOP - Make shade and print files
         disp(['Running Bellhop for ' filePrefix '...']) % Status update
-        tic
+        tBegin = tic;
         if verBel == 1
         bellhopcxx2d(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
         else
         bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
         end
-        toc
+        blhopTimes(rad) = toc(tBegin);
         copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
             fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
         copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
