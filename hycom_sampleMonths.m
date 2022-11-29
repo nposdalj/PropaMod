@@ -1,6 +1,7 @@
 function hycom_sampleMonths(startMonth, endMonth, local_outpath, final_outpath, LatRange, LonRange)
 
-% Function derived from script ext_hycom_gofs_3_1.m (developed by Ganesh Gopalakrishnan)
+% Function modified from script ext_hycom_gofs_3_1.m (developed by Dr. Ganesh Gopalakrishnan)
+%   Utilizes ext_hycom_gofs_93_0.m (developed by Dr. Ganesh Gopalakrishnan)
 %
 % Please format start and end months as 'yyyy-MM'.
 % Your local_outpath is a folder on your device. The data is saved here directly.
@@ -116,9 +117,7 @@ for itr = 1:3  % Loop through iterations
     end
     nt = length(time);
     
-    %% we keep the starttime same, only counter is incremented
-    % br = 1;
-    % old xl: [3476:3714]
+    %% Loop through time points to download data
     for i = 1:nt % Loop through time points
         f1 = i;
         str_date = datestr(time(i),'yyyy-mm-dd HH:MM:SS');
@@ -245,7 +244,6 @@ end
 
 %% Move files to final directory, if it is different from local directory
 if exist(final_outpath) && ~strcmp(local_outpath, final_outpath)
-    %allFiles = ls(fullfile(opath,'*000*'));
     filesList_new = ls(fullfile(opath));
     for k = 1:size(filesList_new,1)
         movefile(fullfile(opath, filesList_new(k,:)),...
