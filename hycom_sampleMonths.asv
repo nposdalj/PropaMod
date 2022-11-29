@@ -62,35 +62,32 @@ msgbox(['HYCOM MOVED FROM GOMFS 3.0 (32 LEVLS) TO GOFS 3.1 (41 LEVELS)';...
 % GLBv0.08 Lat Resolution
 %   Resolution 0.08 degrees, for 40S-40N; 0.04 degrees, for 80-40 S and 40-90 N.
 v008_lats = [-79.96:.04:-40, -39.92:.08:39.92, 40:.04:90];
-v008_latGR = dsearchn(v008_lats.', LatRange(1)):dsearchn(v008_lats.', LatRange(2));
+v008_latGR = [dsearchn(v008_lats.', LatRange(1)):dsearchn(v008_lats.', LatRange(2))];
 
 % GLBv0.08 Lon Resolution, Type A: Applies for expt_56.3, expt_57.2, and expt_57.7.
 %   Resolution 0.08 degrees.
-v008a_lons = -180:0.08:180;
-v008a_lonGR = dsearchn(v008a_lons.', LonRange(1)):dsearchn(v008a_lons.', LonRange(2));
+v008a_lons = [-180:0.08:180];
+v008a_lonGR = [dsearchn(v008a_lons.', LonRange(1)):dsearchn(v008a_lons.', LonRange(2))];
 % GLBv0.08 Lon Resolution, Type B: Applies for expt_92.8, expt_92.9, and expt_93.0.
 %   Resolution 0.08 degrees, in terms of 0-360E rather than 180W-180E.
-v008b_lons = 0:0.08:360;
-v008b_lonGR = dsearchn(v008b_lons.', LonRange(1)+360):dsearchn(v008b_lons.', LonRange(2)+360);
+v008b_lons = [0:0.08:360];
+v008b_lonGR = [dsearchn(v008b_lons.', LonRange(1)+360):dsearchn(v008b_lons.', LonRange(2)+360)];
 
 % GLBy0.08 Lat and Lon Resolution: The following applies for GLBy0.08, expt_93.0.
 %   Lat Resolution 0.04 degrees
-y008_lats = -79.96:.04:90;
-y008_latGR = dsearchn(y008_lats.', LatRange(1)):dsearchn(y008_lats.', LatRange(2));
 %   Lon Resolution 0.08 degrees, in terms of 0-360E, like GLBv0.08.
-y008_lons = 0:0.08:360;
-y008_lonGR = dsearchn(y008_lons.', LonRange(1)+360):dsearchn(y008_lons.', LonRange(2)+360);
-
-% Depth: The depth grid is the same for all experiments.
-depthGR = 0:1:39;
+y008_lats = [-79.96:.04:90];
+y008_latGR = [dsearchn(y008_lats.', LatRange(1)):dsearchn(y008_lats.', LatRange(2))];
+y008_lons = [0:0.08:360];
+y008_lonGR = [dsearchn(y008_lons.', LonRange(1)+360):dsearchn(y008_lons.', LonRange(2)+360)];
 
 %% Time
 formatTime = 'yyyy-MM-dd HH:mm:ss'; % formatTime = 'yyyy-mm-dd HH:MM:SS';
 start_date = char(datetime([startMonth '-01'], 'ConvertFrom', 'yyyy-mm-dd', 'Format', formatTime));
 end_date = char(datetime([endMonth '-01'], 'ConvertFrom', 'yyyy-MM-dd', 'Format', formatTime));
 
-monthnum = between(datetime(start_date),datetime(end_date), 'months');
-monthnum = split(monthnum, 'months');
+monthnum = between(datetime(start_date),datetime(end_date), 'months'); % Added by AD to generate monthly values
+monthnum = split(monthnum, 'months'); % Added by AD to generate monthly values
 
 %% Create empty time lists for second and third iterations, for files that can be removed, and for excluded months
 daysToDelete = double.empty(1,0);   excludedMonths = double.empty(0,1);
@@ -102,7 +99,7 @@ diary( [fileOut]);
 disp('==========================');
 disp(fileOut)
 
-time00_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum));
+time00_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum)); % Added by AD to generate monthly values
 time12_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum)) + 0.5;
 
 for itr = 1:3  % Loop through iterations
@@ -127,39 +124,39 @@ for itr = 1:3  % Loop through iterations
         eddate = datenum(date);
         stdate = datenum(str_date,'yyyy-mm-dd HH:MM:SS');
         
-        if ((datenum(2014,7,1) >= stdate) || (stdate < datenum(2016,5,1))) % GLBv0.08 expt_56.3
+        if ((datenum(2014,7,1) >= stdate) || (stdate < datenum(2016,5,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3';
-            xl = v008a_lonGR; yl = v008_latGR; zl = depthGR;
+            xl = v008a_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             %%GAP
-        elseif ((datenum(2016,5,1) >= stdate) || (stdate < datenum(2017,2,1))) % GLBv0.08 expt_57.2
+        elseif ((datenum(2016,5,1) >= stdate) || (stdate < datenum(2017,2,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.2';
-            xl = v008a_lonGR; yl = v008_latGR; zl = depthGR;
+            xl = v008a_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             %%GAP
-        elseif ((datenum(2017,2,1) >= stdate) || (stdate < datenum(2017,6,1))) % GLBv0.08 expt_92.8
+        elseif ((datenum(2017,2,1) >= stdate) || (stdate < datenum(2017,6,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.8';
-            xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
+            xl = v008b_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             
         elseif ((datenum(2017,6,1) >= stdate) || (stdate < datenum(2017,10,1)))
-            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.7'; % GLBv0.08 expt_57.7
-            xl = v008a_lonGR; yl = v008_latGR; zl = depthGR;
+            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.7';
+            xl = v008a_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             %%GAP
         elseif ((datenum(2017,10,1) >= stdate) || (stdate < datenum(2018,1,1)))
-            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.9'; % GLBv0.08 expt_92.9
-            xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
+            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.9';
+            xl = v008b_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             
         elseif ((datenum(2018,1,1) >= stdate) || (stdate <= datenum(2019,1,1)))
-            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0'; % GLBv0.08 expt_93.0
-            xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
+            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0';
+            xl = v008b_lonGR; yl = v008_latGR; zl = [0:1:39];
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
             
         elseif ((datenum(2019,1,1) >= stdate) || (stdate <= eddate))
-            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0'; % GLBy0.08 expt_93.0
-            xl = y008_lonGR;  yl = y008_latGR; zl = depthGR;    % GLBy0.08 has a different GRID!
+            OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0';
+            xl = [3476:3714];yl = y008_latGR; zl = [0:1:39];    % GLBy0.08 has a different GRID!
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
         end
                 

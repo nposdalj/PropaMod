@@ -37,6 +37,11 @@ SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
 siteCoordsFile = 'C:\Users\HARP\Documents\GitHub\PropagationModeling\SiteCoords_Template.xlsx';
 
+% Range of data to download [Be mindful of the deepest bathymetry available
+% in this region]
+LatRange = [24 44];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-82 -63];   % in degrees E (-180 W to 180 E). In order of W->E.
+
 % Effort Period
 Month_Start = '2015-07';  % First month of study period. Format as yyyy-MM.
 Month_End = '2019-06';    % Final month of study period. Format as yyyy-MM.
@@ -50,7 +55,7 @@ Lat = siteCoords.Lat; Lon = siteCoords.Lon;
 
 %% Download HYCOM data as mat files
 sprintf('\n/ / / / / / / / / / STEP 1: HYCOM DOWNLOAD / / / / / / / / / /')
-hycom_sampleMonths(Month_Start, Month_End, HYCOM_saveDir_Local, HYCOM_saveDir_Final)
+hycom_sampleMonths(Month_Start, Month_End, HYCOM_saveDir_Local, HYCOM_saveDir_Final, LatRange, LonRange)
 
 %% Get list of fileNames in chronological order
 MonthStart = [Month_Start(1:4) Month_Start(6:7)];
