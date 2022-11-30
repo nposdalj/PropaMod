@@ -35,6 +35,7 @@ userNote = ' GS, Males'; % Include a note for yourself/others. This will be incl
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'GS';
 Region = 'WAT';
+BathyRegion = 'WAT'; %If you're site is outside of the Western Atlantic, change this to GlobalCoverage
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
@@ -154,7 +155,7 @@ end
 %% 4. Bathymetry
 disp('Loading bathymetry data...') % Read in bathymetry data
 tic
-Bath = load([fpath, '\Bathymetry\bathy.txt']);
+Bath = load([fpath, '\Bathymetry\',BathyRegion,'\bathy.txt']);
 lon = Bath(:,2);    % vector for longitude
 lat = Bath(:,1);    % vector for latitude
 z = Bath(:,3);      % vector for depth (depth down is negative)

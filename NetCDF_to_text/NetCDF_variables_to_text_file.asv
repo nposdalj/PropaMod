@@ -16,7 +16,7 @@ clc
 delete varnames.txt
 delete varsizes.txt
 %% Directories
-ReRun = 0; %If you want to convert the .nc file to a txt, make this equal to 1
+ReRun = 1; %If you want to conver the .nc file to a txt, make this equal to 1
 NCdir = 'I:\My Drive\PropagationModeling\Bathymetry\GlobalCoverage\GEBCO\netCDF';
 txtdir = 'I:\My Drive\PropagationModeling\Bathymetry\GlobalCoverage\GEBCO\txt';
 NCfn = 'gebco_2022'; %.nc file name
