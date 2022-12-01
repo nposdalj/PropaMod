@@ -1,7 +1,5 @@
 function [x,y] = latlon2xy(dlat,dlon,dlat0,dlon0)
 %
-% [x,y] = latlon2xy(dlat,dlon,dlat0,dlon0)
-%
 % calculate xy distances in meters from Earth coordinates in decimal
 % degrees
 %
