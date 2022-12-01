@@ -33,9 +33,12 @@ Site = 'GS';
 Region = 'WAT';
 BathyRegion = 'WAT'; %If you're site is outside of the Western Atlantic, change this to GlobalCoverage
 
+%outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
+
 %bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
 Gdrive = 'I';
+
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
