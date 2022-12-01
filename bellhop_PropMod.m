@@ -29,7 +29,7 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+author = 'NP'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
@@ -37,9 +37,9 @@ Site = 'GS';
 Region = 'WAT';
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'C:\Users\DAM1\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 %bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'G';
+Gdrive = 'P';
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
