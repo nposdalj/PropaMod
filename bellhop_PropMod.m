@@ -20,9 +20,6 @@ close all % clear all
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
-global lat
-global lon
-global z
 global lati
 global loni
 global rad
@@ -35,15 +32,19 @@ userNote = ' GS, Males'; % Include a note for yourself/others. This will be incl
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'GS';
 Region = 'WAT';
+BathyRegion = 'WAT'; %If you're site is outside of the Western Atlantic, change this to GlobalCoverage
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
-bellhopSaveDir = 'C:\Users\DAM1\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-%bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'P';
+
+%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'I';
+
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
 %                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
+GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
 
 SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
@@ -109,8 +110,8 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 
 runDate = datestr(datetime('now'), 'yymmdd');
 existingDirs = ls(saveDir); % Check what folder names already exist in the final save directory
-% existingDirs = existingDirs(contains(existingDirs(2:end), runDate), :); % Only consider folder names with today's date
-existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
+existingDirs = existingDirs(contains(existingDirs(2:end), runDate), :); % Only consider folder names with today's date
+%existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
@@ -151,17 +152,8 @@ else % If there is still room for more run folders for today, make new directori
         plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
     end
 end
-%% 4. Bathymetry
-disp('Loading bathymetry data...') % Read in bathymetry data
-tic
-Bath = load([fpath, '\Bathymetry\bathy.txt']);
-lon = Bath(:,2);    % vector for longitude
-lat = Bath(:,1);    % vector for latitude
-z = Bath(:,3);      % vector for depth (depth down is negative)
-z = -z;             % Make depth down positive
-toc
-%% 5. Sound Speed Profiles
-SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Region, Site)), SSPtype)); % Select SSP file based on user input
+%% 4. Sound Speed Profiles
+SSPfolderCode = find(contains(ls(fullfile(fpath,'SSPs',Region,Site)),SSPtype)); % Select SSP file based on user input
 SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));
 SSPfile = SSPfolder(SSPfolderCode,:);
 idx_rmSpace = find(SSPfile==' ');
@@ -177,16 +169,7 @@ end
 
 SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
 SSParray = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
-% The rest of this section shouldn't be necessary b/c plotSSP.m now
-% generates SSPs with the full 5000 depth values (actually, 5001, which may
-% mess with things but hopefully not)
-% NCSSPcoarse = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
-% idxNan = isnan(NCSSPcoarse(:, 2)); %identify any NANs
-% NCSSPcoarse(idxNan, :) = []; %remove NANs
-% 
-% vq = interp1(NCSSPcoarse(:, 1), NCSSPcoarse(:, 2), 1:1:NCSSPcoarse(end, 1)); % Fill in missing depths - every 1 m
-% NCSSP = [1:1:NCSSPcoarse(end, 1); vq]';
-%% 6. Hydrophone location and depth
+%% 5. Hydrophone location and depth
 % Center of source cell
 hydLoc = [hlat, hlon, hdepth];
 
@@ -201,7 +184,7 @@ disp(['Source depth: ', num2str(SD), ' m']) % <- won't actually print a number n
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
-%% 7. Build Radials
+%% 6. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code (Section 3)
 
@@ -213,12 +196,13 @@ if resumeRun == 1 % Choose start radial based on whether user requested to resum
 else
     startRad = 1;
 end
+
 bathyTimes = nan(rad, 1); % List of durations of bathymetry file section
 blhopTimes = nan(rad, 1); % List of durations of bellhop section
 for rad = startRad:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
     
-    %% 7.1 Create radial line
+    %% 6.1 Create radial line
     % gives lat lon point total range (km) away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
     
@@ -227,12 +211,12 @@ for rad = startRad:length(radials)
     lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rangeStep:total_range));
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:total_range));
     
-    %% 7.2 Make bathymetry file (to be used in BELLHOP)
+    %% 6.2 Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
     
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2)); % make bathymetry file in intermed dir Freq 1
+    [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
     % The line above causes memory to climb, but ultimately it seems to go
     % back down.
     % Within the frequency loop, this .bty file is copied to the intermed
@@ -258,7 +242,7 @@ for rad = startRad:length(radials)
     zssp = 1:1:max(bath)+1;
     ssp = SSParray(1:length(zssp), 2);
     
-    %% Begin peak frequency loop (7.2 continues into here)
+    %% Begin peak frequency loop (6.2 continues into here)
     
     for freqi = 1:length(freq)
         if freqi == 1 % Select directories for current sub-iteration
@@ -277,13 +261,13 @@ for rad = startRad:length(radials)
         copyfile(fullfile(intermedDirFi, [filePrefix '.bty']),...
             fullfile(saveDir_subFi, [filePrefix '.bty']));    % copy bty to final save dir
         
-        %% 7.3 Make environment file (to be used in BELLHOP)
+        %% 6.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' filePrefix '...'])   % Status update
         makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', AEHS); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
         
-        %% 7.4 Run BELLHOP - Make shade and print files
+        %% 6.4 Run BELLHOP - Make shade and print files
         disp(['Running Bellhop for ' filePrefix '...']) % Status update
         tBegin = tic;
         if verBel == 1
@@ -297,7 +281,7 @@ for rad = startRad:length(radials)
         copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
             fullfile(saveDir_subFi, [filePrefix '.prt'])); % copy prt to final save dir
         
-        %% 7.5 Generate radial plots
+        %% 6.5 Generate radial plots
         if generate_RadialPlots == 1
             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
             PLslice = squeeze(pressure(1, 1,:,:));
@@ -329,14 +313,10 @@ for rad = startRad:length(radials)
             clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
         end      
     end
-    
     clear Range bath
-    
 end % End loop through radials
 disp('Completed constructing radials.')
-
-%% Steps 8-10 - Loop through frequencies
-
+%% Steps 7-9 - Loop through frequencies
 for freqi = 1:length(freq)
     if freqi == 1 % Select directories for current sub-iteration
         intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
@@ -348,7 +328,7 @@ for freqi = 1:length(freq)
     
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
     
-    %% 8. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
+    %% 7. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
 
     hdepth = SD; % ADDED BY AD
     
@@ -373,7 +353,7 @@ for freqi = 1:length(freq)
     
     copyfile(paramfile,fullfile(saveDir_subFi, txtFileName)) % Copy to saveDir_sub
     copyfile(paramfile,fullfile(plotDirFi, txtFileName)); % Copy to plotDir
-    %% 9. Generate Polar Plots
+    %% 8. Generate Polar Plots
     if generate_PolarPlots == 1
         
         disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makePolarPlots(1))...
@@ -423,7 +403,7 @@ for freqi = 1:length(freq)
         end
     end
     
-    %% 10. Save variables for pDetSim  
+    %% 9. Save variables for pDetSim  
     freqSave = char(num2str(freqVec/1000));
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
     
