@@ -264,10 +264,11 @@ for rad = startRad:length(radials)
         disp(['Running Bellhop for ' filePrefix '...']) % Status update
         tBegin = tic;
         if verBel == 1
+            addpath('I:\My Drive\PropagationModeling\bellhopcxx v1.10')
             bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
         else
             addpath('I:\My Drive\PropagationModeling\AcousticsToolbox')
-            bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
+        bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
         end
         blhopTimes(rad) = toc(tBegin);
         copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...

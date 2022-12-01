@@ -25,7 +25,7 @@ latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
 elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
 
 % Extract lat, lon, and elevation that matches site location
-latRange = [hlat+.1 hlat-.1]; %+/- 1 degree for lat
+latRange = [hlat+1 hlat-1]; %+/- 1 degree for lat
 latValsIDX = find(AllVariables{2,latLoc}<latRange(1) & AllVariables{2,latLoc}>latRange(2));
 latVals = AllVariables{2,latLoc}(latValsIDX);
 lonRange = [hlon+1 hlon-1]; %+/- 1 degree for lon
