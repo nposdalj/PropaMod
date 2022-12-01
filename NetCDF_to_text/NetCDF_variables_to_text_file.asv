@@ -16,21 +16,28 @@ clc
 delete varnames.txt
 delete varsizes.txt
 %% Directories
-ReRun = 1; %If you want to conver the .nc file to a txt, make this equal to 1
+LoadNC = 1; % (1) Load the .nc files
+ConvTXT = 0; % (1) Convert the .nc file to .txt files and save them
+LoadTXT = 0; % (1) Load the .txt files
 NCdir = 'I:\My Drive\PropagationModeling\Bathymetry\GlobalCoverage\GEBCO\netCDF';
 txtdir = 'I:\My Drive\PropagationModeling\Bathymetry\GlobalCoverage\GEBCO\txt';
 NCfn = 'gebco_2022'; %.nc file name
 %% NC to txt file
-if ReRun == 1
+if LoadNC == 1
 ncid=netcdf.open([NCdir,'\',NCfn,'.nc'],'nowrite'); % 'xxx.nc': netcdf file name
 vars=netcdf.inqVarIDs(ncid);
 dlmwrite([txtdir,'\vars.txt'],vars);
+AllVariables = cell(2,width(vars));
 for i=vars(1:end)
     [varname]=netcdf.inqVar(ncid,i);
     dlmwrite([txtdir,'\varnames.txt'],varname,'delimiter','','-append');
     var=netcdf.getVar(ncid,i);
     varsize=size(var);
     dlmwrite([txtdir,'\varsizes.txt'],varsize,'delimiter',';','-append');
+    cellLoc = find(vars==i);
+    AllVariables{1,cellLoc} = char(varname);
+    AllVariables{2,cellLoc} = var;
+    if ConvTXT == 1
     if numel(varsize)<3
         dlmwritetemp = sprintf('var%d.txt',i);
         dlmwrite([txtdir,'\',dlmwritetemp],var);
@@ -44,10 +51,12 @@ for i=vars(1:end)
             dlmwritetemp = sprintf('var%d.txt',i);
             dlmwrite([txtdir,'\',dlmwritetemp],var(:,:,j),'-append');
         end
+    else
+    end
     end
 end
 else
-%% Convert from grid to columns
+if LoadTXT == 1
 %load txt files
 latdir = [txtdir,'\var1.txt'];
 lat = importdata(latdir);

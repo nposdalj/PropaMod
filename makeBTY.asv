@@ -2,6 +2,7 @@ function [Range, bath] = makeBTY(fpath, fname, slat, slon, hlat, hlon, GEBCODir)
 % VZ: Modified from Eric Snyder's makeBTY.m code
 % NOTE: I'm using the hydrophone as the source and ship as receiver for now
 global rangeStep
+
 global lati
 global loni
 global rad
