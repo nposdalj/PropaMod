@@ -1,3 +1,5 @@
+![Banner and logo PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_Banner.png)
+
 # PropagationModeling
 
 ## Introduction
