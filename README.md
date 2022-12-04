@@ -29,7 +29,7 @@ PropagationModeling is centered on three main steps, each associated with a part
 ## Usage
 
 The workflow for PropagationModeling is summarized here:
-![Workflow diagram for PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_Fig2.png)
+![Workflow diagram for PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_fig2.png)
 
 White scripts are included in PropagationModeling; yellow scripts are contained in the Acoustics Toolbox. Blue boxes are file outputs.
 
