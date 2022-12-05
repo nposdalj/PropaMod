@@ -64,7 +64,9 @@ freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 % AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
         % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
 AEHS.shearSpeed = 150;  % 146.70;   % Shear speed
-AEHS.density = 1.7;  %1.15;        % Density
+AEHS.density = 1.7;  %1.15;        % Density.
+%   This value (1.7 g/cm^3) chosen based on the average density of marine
+%   sediments found by Tenzer and Gladkikh (2014).
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this input doesn't actually do anything
 
