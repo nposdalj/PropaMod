@@ -1,12 +1,12 @@
-![Banner and logo PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_Banner.png)
+![Banner and logo for PropaMod.](https://github.com/nposdalj/PropaMod/blob/main/PM_GitHub_Banner.png)
 
-# PropagationModeling
+# PropaMod
 
 ## Introduction
 
-The PropagationModeling repository contains tools for modeling sound propagation for the purpose of marine animal density estimation.
+The PropaMod repository contains tools for modeling sound propagation for the purpose of marine animal density estimation.
 
-PropagationModeling is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
+PropaMod is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
 * Creating sound speed profiles with `makeSSP.m`
 * Modeling sound propagation with `bellhop_PropMod.m`
 * Preparing for detection simulation with `pDetSim_constructWS.m`
@@ -14,9 +14,9 @@ PropagationModeling is centered on three main steps, each associated with a part
 
 ## Getting Started
 * **Install the Acoustics Toolbox.** Head to http://oalib.hlsresearch.com/AcousticsToolbox/ and download the older of the two versions, which includes the source code.
-![Screenshot of Acoustics Toolbox website.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_fig1.png)
+![Screenshot of Acoustics Toolbox website.](https://github.com/nposdalj/PropaMod/blob/main/PropagationModeling_README_fig1.png)
 * The toolbox includes BELLHOP, the program used to model sound propagation. For more information on BELLHOP, see the program’s [documentation](http://oalib.hlsresearch.com/Rays/HLS-2010-1.pdf).
-* **Add the toolbox and PropagationModeling to your MATLAB path.**
+* **Add the toolbox and PropaMod to your MATLAB path.**
 * Set up a directory for all of your data with the following subdirectories:
   * HYCOM_oceanState
   * SSPs
@@ -28,10 +28,10 @@ PropagationModeling is centered on three main steps, each associated with a part
 
 ## Usage
 
-The workflow for PropagationModeling is summarized here:
-![Workflow diagram for PropagationModeling.](https://github.com/nposdalj/PropagationModeling/blob/main/PropagationModeling_README_fig2.png)
+The workflow for PropaMod is summarized here:
+![Workflow diagram for PropaMod.](https://github.com/nposdalj/PropaMod/blob/main/PropagationModeling_README_fig2.png)
 
-White scripts are included in PropagationModeling; yellow scripts are contained in the Acoustics Toolbox. Blue boxes are file outputs.
+White scripts are included in PropaMod; yellow scripts are contained in the Acoustics Toolbox. Blue boxes are file outputs.
 
 ### U.1 Download ocean state data and generate sound speed profiles: `makeSSP.m`
 `makeSSP.m` is responsible for calculating the sound speed profile at each study site.
@@ -103,7 +103,7 @@ Under the plot directory, this folder contains plots of the received level for e
 For each frequency, bellhop_PropMod.m also saves a .mat file containing certain values required for animal detection simulation.
 
 #### U.2.4 Related Scripts
-bellhop_PropMod.m calls two functions in the PropagationModeling repository:
+bellhop_PropMod.m calls two functions in the PropaMod repository:
 * `makeBTY.m`: Generates the bathymetry (.bty) file for each radial.
 * `makeEnv.m`: Generates the environment (.env) file for each radial.
 
@@ -117,7 +117,7 @@ A few lines in `bellhop_PropMod.m` serve to package information for animal detec
 
 
 ## Support
-For questions regarding the PropagationModeling repository, please reach out to Natalie Posdaljian at nposdalj@ucsd.edu.
+For questions regarding the PropaMod repository, please reach out to Natalie Posdaljian at nposdalj@ucsd.edu.
 
 
 ## Authors
