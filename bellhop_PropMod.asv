@@ -101,19 +101,18 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 % multiple times in parallel on the same computer (or across devices).
 
 runDate = datestr(datetime('now'), 'yymmdd');
-existingDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
-existingDirs(1:2) = []; % delete first two rows
-existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
+existingDirs = dir(saveDir); % Check what folder names already exist in the final save directory
+existingDirs(1:2) = [];
+existingDirs = existingDirs(contains(existingDirs.name, runDate), :); % Only consider folder names with today's date
+%existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
     % Code refers to saveDir instead of bellhopSaveDir to check for folders
     % other users may have generated today.
 
 dailyFolderNum = double('a');
 if ~isempty(existingDirs)
-    for k = 1:height(existingDirs)
-    if contains(existingDirs(k),char(dailyFolderNum)) == 1
+    while contains(existingDirs(:,7).',char(dailyFolderNum)) == 1
         dailyFolderNum = dailyFolderNum + 1;
         % Starting from "a", go through characters until first one that isn't in a folder name from today is reached
-    end
     end
 end
 if dailyFolderNum == 123    % This is the double value of {, which comes after z (double value 122)
