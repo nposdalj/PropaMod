@@ -96,7 +96,7 @@ for i=1:height(geosamples_sediment);
     end
 end
 % plot(site_coords.Lon, site_coords.Lat, '.r')
-plot(selSite_geosamples(:,2),selSite_geosamples(:,1), '.b')
+plot(selSite_geosamples(:,3),selSite_geosamples(:,2), '.b')
 plot(site_coords.Lon(Site),site_coords.Lat(Site), '.r')
 selSite_geosamples = rmmissing(selSite_geosamples); %Remove points that are beyond 40 km
 
