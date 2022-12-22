@@ -25,8 +25,8 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
+author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+userNote = ' GS, Males - Four-radial test run with Sand Grain Size'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'GS';
@@ -35,9 +35,9 @@ BathyRegion = 'WAT'; %If you're site is outside of the Western Atlantic, change 
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 
-%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'I';
+bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+% bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'G';
 
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
