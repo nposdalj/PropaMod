@@ -59,6 +59,7 @@ freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % SPECIFY SEA FLOOR MODEL
 botModel = 'A'; % Set 'A' to model bottom as Acousto Elastic Half-Space; Set 'G' to model bottom using grain size.
+sedDatPath = 'C:/Users/waaro/Documents/Pm2022/ESME/BST/BST'; % Set this if using sediment data
 
 % ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
 % AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
