@@ -26,12 +26,12 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GS, Males - Four-radial test run with Sand Grain Size'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' JX, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
-% CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'GS';
+% A. CONFIGURE PATHS - INPUT AND EXPORT
+Site = 'JX';
 Region = 'WAT';
-BathyRegion = 'WAT'; %If you're site is outside of the Western Atlantic, change this to GlobalCoverage
+BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
 %outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 
@@ -40,28 +40,31 @@ bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer %
 Gdrive = 'G';
 
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
-% fpath must contain:   % bathymetry file: \Bathymetry\bathy.txt
-%                         site SSP data: \SSPs\SSP_WAT_[Site].xlsx
+% fpath must contain:   - bathymetry file: \Bathymetry\bathy.txt
+%                       - site SSP data: \SSPs\SSP_WAT_[Site].xlsx
+%                       - sediment data*: \Sediment_Data\...
+%                           Sediment data is optional, required only if modeling bottom using grain size.
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
 GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
-
-SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
 % Note to self to have smth in plotSSP that exports the examined effort period 
 % and other relevant details so they can be exported in the info file here
 
-% SPECIFY PARAMETERS FOR INPUT
-SL = 235; % Source Level
-hlat = 39.8326; % 39.8326; % hydrophone lat
-hlon = -69.98; % -69.9800; % hydrophone long
-hdepth = 960; % hydrophone depth % <- inputted into DetSim_Workspace
-freq = {9000}; % Frequencies of sources, in Hz. Enter up to 3 values.
+% B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
+hlat = 30.1523; % 39.8326; % hydrophone lat
+hlon = -79.77;     % -69.9800; % hydrophone long
+hdepth = 739;   % hydrophone depth % <- inputted into DetSim_Workspace
+SL = 235;       % Source Level
+freq = {9000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
-% SPECIFY SEA FLOOR MODEL
-botModel = 'A'; % Set 'A' to model bottom as Acousto Elastic Half-Space; Set 'G' to model bottom using grain size.
-sedDatPath = 'C:/Users/waaro/Documents/Pm2022/ESME/BST/BST'; % Set this if using sediment data
+% C. SSP TYPE
+SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
 
-% ACOUSTO ELASTIC HALF-SPACE PROPERTIES REQUIRED FOR MAKEENV
+% D. SPECIFY SEA FLOOR MODEL
+botModel = 'G'; % Set 'A' to model bottom as Acousto Elastic Half-Space; Set 'G' to model bottom using grain size.
+
+% D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
+%      (required for makeEnv.m to run, if botModel = 'A'):
 % AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
         % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
 AEHS.shearSpeed = 150;  % 146.70;   % Shear speed
@@ -71,15 +74,18 @@ AEHS.density = 1.7;  %1.15;        % Density.
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this input doesn't actually do anything
 
-% CONFIGURE OUTPUT RANGE AND RESOLUTION
+% D.ii. If modeling bottom using grain size, modify the following lines:
+sedDatType = 'I'; % Set 'B' to utilize BST data; Set 'I' to utilize IMLGS data (available only for Western North Atlantic).
+
+% E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 4;        % Specify number of radials - They will be evenly spaced.
-% Keep in mind, 360/numRadials = Your angular resolution.
+numRadials = 36;        % Specify number of radials - They will be evenly spaced.
+%   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
-% CONFIGURE PLOT OUTPUT
+% F. CONFIGURE PLOT OUTPUT
 generate_RadialPlots = 1; % 1 = Yes, generate radial plots;  0 = No, do not generate radial plots
 generate_PolarPlots = 0; % 1 = Yes, generate polar plots;  0 = No, do not generate polar plots
 
@@ -90,16 +96,16 @@ RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max e
 makePolarPlots = [150, 50, 1200]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 % Radial plots are automatically generated for every radial
 
-% SPECIAL CONDITION: Oops, the run did not finish all the radials!
-% This often occurs when this program causes the computer to run out of memory.
-% First, RUN SECTIONS 8-10 MANUALLY to save your parameter file and the
-% DetSim_Workspace generated so far.
-% Then, change resumeRun from 0 to 1 below and enter the radial to resume on.
+% G. SPECIAL CONDITION: Oops, the run did not finish all the radials!
+%       This often occurs when this program causes the computer to run out of memory.
+%       (1) First, RUN SECTIONS 8-10 MANUALLY to save your parameter file and the
+%           DetSim_Workspace generated so far.
+%       (2) Then, change resumeRun from 0 to 1 below and enter the radial to resume on.
 resumeRun = 0;  % 0 = Resume run from a specified radial; 1 = Start new run from first radial.
 resumeRad = 33; % This value is only used if resumeRun == 1.
-% For this "resumed" run, completely new run folders will be generated, as
-% well as a new DetSim_Workspace. You will need to combine the two
-% DetSim_Workspaces manually before running pDetSim_constructWS.
+%       For this "resumed" run, completely new run folders will be generated, as
+%       well as a new DetSim_Workspace. You will need to combine the two
+%       DetSim_Workspaces manually before running pDetSim_constructWS.
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
 % multiple times in parallel on the same computer (or across devices).
@@ -187,6 +193,10 @@ rr = r';                            % output to be saved for pDetSim
 % It is only calculated once, during the generation of the first radial.
 
 %% 6G. If bottom is modeled according to grain size, retrieve sediment data for the corresponding region
+if botModel == 'G'
+    sedDatPath = [fpath '\Sediment_Data']; % Path where sediment data are located
+    getGrainSize(sedDatType, sedDatPath, hydLoc, distDeg, total_range, radials, plotDir)
+end
 
 %% 6. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
