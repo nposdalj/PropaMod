@@ -1,6 +1,6 @@
 %VZ: Modified from Eric Snyder's makeEnv.m code
 
-function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, modelType, botModel, botParms)
+function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, modelType, botModel, AEHS)
 
 fpn = fullfile(filepath, [filename, '.env']);
 
@@ -39,10 +39,11 @@ end
 switch botModel
     case 'A'
         fprintf(fid, '''A*'' 0.0\n');
-        %A = model as Acousto-Elastic half space
-        fprintf(fid, ' %.2f  %.1f  %.1f %.1f %.1f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);
+%A = model as Acousto-Elastic half space
+fprintf(fid, ' %.2f  %.1f  %.1f %.1f %.1f  /\n', max(ssp), AEHS.compSpeed, AEHS.shearSpeed, AEHS.density, AEHS.compAtten);
 % fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
-% Params: Depth, Compressional speed, Shear speed, Density, Compressional attenuation, Shear attenuation
+% Params: Depth, Compressional speed, Shear speed, Density, Compressional
+% attenuation, Shear attenuation
 %1.5 likely density (according to VZ)
 %max(ssp)*1.01 = 1500 = sound speed profile in the mud (but probably off)
 %0.5 is the attenuation
@@ -52,10 +53,6 @@ switch botModel
 %Format of the above (added by AD for clarification)
 %fprintf(fid, 'max depth, %.3f, density contrast, likely density,
 %attenuation, /\n', sound speed profile in the mud)
-case 'G'
-        fprintf(fid, '''G*'' 0.0\n');
-        fprintf(fid, ' %.2f  %.1f  /\n', max(ssp), botParms);
-end
 
 % Number of source depths (hydrophone location)
 fprintf(fid, '%d\t! No. of SD\n', length(SD));

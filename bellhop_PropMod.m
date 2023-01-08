@@ -6,10 +6,8 @@
 % - Sound speed profiles
 
 % This script will:
-% Construct sound propagation radials around your site with your
-%   specified parameters
-% Save a .txt file w/ your selected parameters in Export directory
-%   and plot directory
+% Construct sound propagation radials around your site with your specified parameters
+% Save a .txt file w/ your selected parameters in Export directory and plot directory
 % Save .bty, .env, .shd, and .prt files to intermediate directory
 % Move these outputs to the Export directory
 % Generate radial and polar plots and save to Export directory
@@ -26,14 +24,12 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' JX, Males'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' HZ, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'JX';
+Site = 'HZ';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
-
-%outDir = [fpath, '\Radials\', SITE]; % EDIT - Set up Google Drive folder - for loading in items and saving
 
 bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 % bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
@@ -43,7 +39,7 @@ fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   - bathymetry file: \Bathymetry\bathy.txt
 %                       - site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 %                       - sediment data*: \Sediment_Data\...
-%                           Sediment data is optional, required only if modeling bottom using grain size.
+%                           Sediment data is optional, required only if modeling bottom using grain size. SEE WIKI FOR FOLDER CONFIGURATION.
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
 GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
 
@@ -51,17 +47,17 @@ GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry n
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 30.1523; % 39.8326; % hydrophone lat
-hlon = -79.77;     % -69.9800; % hydrophone long
-hdepth = 739;   % hydrophone depth % <- inputted into DetSim_Workspace
+hlat = 41.0618; % 39.8326; % hydrophone lat
+hlon = -66.35;     % -69.9800; % hydrophone long
+hdepth = 968;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 235;       % Source Level
 freq = {9000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
-% C. SSP TYPE
-SSPtype = 'Mean'; % Indicate your SSP type. 'Mean' = Overall mean, 'Mmax' = Month w/ max SS, 'Mmin' = Month w/ min SS.
+% C. SSP TYPE: Indicate the type of SSP you want to use.
+SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
 
 % D. SPECIFY SEA FLOOR MODEL
-botModel = 'G'; % Set 'A' to model bottom as Acousto Elastic Half-Space; Set 'G' to model bottom using grain size.
+botModel = 'G'; % 'A' = model bottom as Acousto Elastic Half-Space; 'G' = model bottom using grain size.
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
@@ -69,13 +65,13 @@ botModel = 'G'; % Set 'A' to model bottom as Acousto Elastic Half-Space; Set 'G'
         % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
 AEHS.shearSpeed = 150;  % 146.70;   % Shear speed
 AEHS.density = 1.7;  %1.15;        % Density.
-%   This value (1.7 g/cm^3) chosen based on the average density of marine
-%   sediments found by Tenzer and Gladkikh (2014).
+%   This value (1.7 g/cm^3) was chosen based on the average density of
+%   marine sediments found by Tenzer and Gladkikh (2014).
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this input doesn't actually do anything
 
-% D.ii. If modeling bottom using grain size, modify the following lines:
-sedDatType = 'I'; % Set 'B' to utilize BST data; Set 'I' to utilize IMLGS data (available only for Western North Atlantic).
+% D.ii. If modeling bottom using grain size, select which dataset to use:
+sedDatType = 'I'; % 'B' = BST data; 'I' = IMLGS data.
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
@@ -86,8 +82,8 @@ numRadials = 36;        % Specify number of radials - They will be evenly spaced
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
-generate_RadialPlots = 1; % 1 = Yes, generate radial plots;  0 = No, do not generate radial plots
-generate_PolarPlots = 0; % 1 = Yes, generate polar plots;  0 = No, do not generate polar plots
+generate_RadialPlots = 1; % Generate radial plots? 1 = Yes, 0 = No
+generate_PolarPlots = 0; % Generate polar plots? 1 = Yes, 0 = No
 
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
@@ -110,7 +106,7 @@ resumeRad = 33; % This value is only used if resumeRun == 1.
 % This step prevents file overwriting, if you are running bellhopDetRange.m
 % multiple times in parallel on the same computer (or across devices).
 
-runDate = datestr(datetime('now'), 'yymmdd');
+runDate = char(datetime('now', 'Format', 'yyMMdd'));
 existingDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
 existingDirs(1:2) = []; % delete first two rows
 existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
@@ -133,9 +129,9 @@ if dailyFolderNum == 123    % This is the double value of {, which comes after z
 else % If there is still room for more run folders for today, make new directories.
     newFolderName = [runDate char(dailyFolderNum)];
     
-    intermedDir = [bellhopSaveDir, '\', Site, '\', newFolderName];
-    mkdir(intermedDir)
-    intermedDirF1 = [intermedDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(intermedDirF1); % Local subdirectory for 1st freq
+    midDir = [bellhopSaveDir, '\', Site, '\', newFolderName];
+    mkdir(midDir)
+    midDirF1 = [midDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(midDirF1); % Local subdirectory for 1st freq
     
     saveDir_sub = [saveDir '\', newFolderName];          % Final save directory [GDrive]
     mkdir(saveDir_sub);
@@ -146,33 +142,28 @@ else % If there is still room for more run folders for today, make new directori
     plotDirF1 = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF1); % Plot subdirectory for 1st freq
     
     if length(freq) >= 2    % Create subdirectories for second frequency, if applicable.
-        intermedDirF2 = [intermedDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(intermedDirF2); % Local subdirectory for 2nd freq
+        midDirF2 = [midDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(midDirF2); % Local subdirectory for 2nd freq
         saveDir_subF2 = [saveDir_sub '\' num2str(freq{2}/1000) 'kHz']; mkdir(saveDir_subF2); % Save subdirectory for 2nd freq
         plotDirF2 = [plotDir '\' num2str(freq{2}/1000) 'kHz']; mkdir(plotDirF2); % Plot subdirectory for 2nd freq
     end
     if length(freq) >= 3    % Create subdirectories for third frequency, if applicable.
-        intermedDirF3 = [intermedDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(intermedDirF3); % Local subdirectory for 3rd freq
+        midDirF3 = [midDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(midDirF3); % Local subdirectory for 3rd freq
         saveDir_subF3 = [saveDir_sub '\' num2str(freq{3}/1000) 'kHz']; mkdir(saveDir_subF3); % Save subdirectory for 3rd freq
         plotDirF3 = [plotDir '\' num2str(freq{3}/1000) 'kHz']; mkdir(plotDirF3); % Plot subdirectory for 3rd freq
     end
 end
 %% 4. Sound Speed Profiles
-SSPfolderCode = find(contains(string(ls(fullfile(fpath,'SSPs',Region,Site))),SSPtype)); % Select SSP file based on user input
-SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));
-SSPfile = SSPfolder(SSPfolderCode,:);
-idx_rmSpace = find(SSPfile==' ');
-SSPfile(idx_rmSpace) = [];
+SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));          % Get list of files in SSP folder
+SSPfolderIdx = find(contains(string(SSPfolder),SSPtype));    % Index of desired SSP file based on user input
+SSPfile = strtrim(SSPfolder(SSPfolderIdx,:));                % Get that SSP file
+SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
+SSParray = table2array(SSP);                                 % Convert to array
 
-if strcmp(SSPtype, 'Mmax')        % Get month being examined to report in the output info file, if applicable
-    SSPmoReporting = num2str(SSPfile(12:13));
-elseif strcmp(SSPtype, 'Mmin')
+if strcmp(SSPtype, 'Mmax') || strcmp(SSPtype, 'Mmin') % Get month being examined to report in the output info file, if applicable
     SSPmoReporting = num2str(SSPfile(12:13));
 elseif strcmp(SSPtype, 'Mean')
-    SSPmoReporting = 'Not applicable';
+    SSPmoReporting = 'Not applicable'; % If using mean SSP, then report "Not applicable"
 end
-
-SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
-SSParray = [SSP.Depth SSP.SS]; % pull out the SSP for the specific site of interest
 %% 5. Hydrophone location and depth
 % Center of source cell
 hydLoc = [hlat, hlon, hdepth];
@@ -187,17 +178,21 @@ distDeg = km2deg(dist);             % radial length in degrees
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 rr = r';                            % output to be saved for pDetSim
-% Source depth is set it to be the depth at hlat and hlon, - 10 m. 
+
+% Source Depth is set it to be the depth at hlat and hlon, - 10 m. 
 % This simulates a hydrophone sitting 10 m off of the bottom. 
 % This calculation is made after the bathymetry is generated by makeBTY (within the big loop). 
 % It is only calculated once, during the generation of the first radial.
-
-%% 6G. If bottom is modeled according to grain size, retrieve sediment data for the corresponding region
+%% 6G. Retrieve sediment data (if needed) and pack bottom parameters
 if botModel == 'G'
-    sedDatPath = [fpath '\Sediment_Data']; % Path where sediment data are located
-    getGrainSize(sedDatType, sedDatPath, hydLoc, distDeg, total_range, radials, plotDir)
+    sedPath = [fpath '\Sediment_Data']; % Path where sediment data are located
+    if sedDatType == 'I' % If using IMLGS data...
+        imlgs2hfeva_WAT(sedPath) % Run imlgs2hfeva_WAT on the IMLGS data first to translate it to HFEVA types
+        % I wonder if this part should be removed from the code and just
+        % have the user run it... cuz it only ever needs to be run once. Maybe can solve once GUI is made
+    end
+    radGrainSize = getGrainSize(sedDatType, sedPath, hydLoc, distDeg, total_range, radials, plotDir, rangeStep);
 end
-
 %% 6. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
 % create a subfolder using the above section of the code (Section 3)
@@ -230,9 +225,8 @@ for rad = startRad:length(radials)
     
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [~, bath] = makeBTY(intermedDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
-    % The line above causes memory to climb, but ultimately it seems to go
-    % back down.
+    [~, bath] = makeBTY(midDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
+    % The line above causes memory to climb, but ultimately it seems to go back down.
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
     
@@ -260,24 +254,29 @@ for rad = startRad:length(radials)
     
     for freqi = 1:length(freq)
         if freqi == 1 % Select directories for current sub-iteration
-            intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
+            intermedDirFi = midDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
         elseif freqi == 2
-            intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
+            intermedDirFi = midDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
         elseif freqi == 3
-            intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
+            intermedDirFi = midDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
         end
         
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
         filePrefix = ['R' radialiChar '_' freqiChar 'kHz'];
         
-        copyfile(fullfile(intermedDir,['R' radialiChar '.bty']),...
+        copyfile(fullfile(midDir,['R' radialiChar '.bty']),...
             fullfile(intermedDirFi, [filePrefix '.bty'])); % copy bty from intermed dir to intermed subdir
         copyfile(fullfile(intermedDirFi, [filePrefix '.bty']),...
             fullfile(saveDir_subFi, [filePrefix '.bty']));    % copy bty to final save dir
         
         %% 6.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' filePrefix '...'])   % Status update
-        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', AEHS); % make environment file
+        if botModel == 'A'  % Pack bottom parameters (AEHS params or grain sizes) for makeEnv input
+            botParms = AEHS;
+        elseif botModel == 'G'
+            botParms = radGrainSize(rad);
+        end
+        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', botModel, botParms); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
         
@@ -329,11 +328,11 @@ disp('Completed constructing radials.')
 %% Steps 7-9 - Loop through frequencies
 for freqi = 1:length(freq)
     if freqi == 1 % Select directories for current sub-iteration
-        intermedDirFi = intermedDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
+        intermedDirFi = midDirF1; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF1;
     elseif freqi == 2
-        intermedDirFi = intermedDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
+        intermedDirFi = midDirF2; saveDir_subFi = saveDir_subF2; plotDirFi = plotDirF2;
     elseif freqi == 3
-        intermedDirFi = intermedDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
+        intermedDirFi = midDirF3; saveDir_subFi = saveDir_subF1; plotDirFi = plotDirF3;
     end
     
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
@@ -402,7 +401,7 @@ for freqi = 1:length(freq)
             figure('visible', 'off') % figure(1000 + plotdepth)
             [Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
             set(calbar,'location','EastOutside')
-            caxis([RL_threshold RL_plotMax]);
+            clim([RL_threshold RL_plotMax]);
             yticks(0:60:300)
             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
             set(gcf, 'Position', [100 100 800 600])
