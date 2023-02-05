@@ -154,7 +154,8 @@ else % If there is still room for more run folders for today, make new directori
 end
 %% 4. Sound Speed Profiles
 SSPfolder = ls(fullfile(fpath,'SSPs',Region,Site));          % Get list of files in SSP folder
-SSPfolderIdx = find(contains(string(SSPfolder),SSPtype));    % Index of desired SSP file based on user input
+SSPfolderIdx = find(contains(string(SSPfolder),SSPtype) & ~contains(string(SSPfolder), "$"));
+    % Index of desired SSP file based on user input. MODIFIED TO IGNORE TEMPORARY FILES.
 SSPfile = strtrim(SSPfolder(SSPfolderIdx,:));                % Get that SSP file
 SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
 SSParray = table2array(SSP);                                 % Convert to array
