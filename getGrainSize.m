@@ -222,7 +222,7 @@ elseif sedDatType == 'I'  % If using IMLGS data...
     geoscatter(NearSed.LAT, NearSed.LON, 40, NearSed.Grain_Size, 'o', 'filled') % plot grain size with circles.
 end
 geobasemap grayland % Make land gray and ocean white, easier to see things this way.
-clim([-1.25 9.25])
+caxis([-1.25 9.25])
 colormap(turbo(21)) % Set colormap so that each possible grain size has a color (plus a color for 8.5 φ, the only unused grain size).
 grainSizeKey = colorbar; % Add grain size colorbar
 grainSizeKey.Label.String = 'Grain Size (φ)';

@@ -23,16 +23,16 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' HZ, Males'; % Include a note for yourself/others. This will be included in the .txt output.
+author = 'NP'; % Your name/initials here. This will be included in the .txt output.
+userNote = ' GS, Males'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'HZ';
+Site = 'GS';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
-bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-% bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
 Gdrive = 'G';
 
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
@@ -71,13 +71,13 @@ AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation % <- as it currently stands this input doesn't actually do anything
 
 % D.ii. If modeling bottom using grain size, select which dataset to use:
-sedDatType = 'I'; % 'B' = BST data; 'I' = IMLGS data.
+sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 36;        % Specify number of radials - They will be evenly spaced.
+numRadials = 4;        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
