@@ -24,6 +24,7 @@ PropaMod is centered on three main steps, each associated with a particular scri
   * Plots
   * Bathymetry
   * DetSim_Workspace
+  * \Sediment_Data <- ONLY required if using bottom model Options G or Y in bellhop_PropMod.m
 
 
 ## Usage
