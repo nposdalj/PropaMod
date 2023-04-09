@@ -59,8 +59,8 @@ SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Mo
 % D. SPECIFY SEA FLOOR MODEL
 botModel = 'O'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually enter parameters. SEE D.i.
 %               % 'G' = Model bottom using grain size. SEE D.ii.
-%               % 'Y' = Model bottom as Acousto Elastic Half-Space; Calculate
-%               %       parameters with grain size and Algorithm Y. SEE D.ii.
+%               % 'O' = Model bottom as Acousto Elastic Half-Space; Calculate
+%               %       parameters with grain size and OALIB algorithms. SEE D.ii.
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
@@ -280,9 +280,11 @@ for rad = startRad:length(radials)
             botParms = AEHS;
         elseif botModel == 'G' % G - Use grain size
             botParms = radGrainSize(rad);
-        elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
-            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.shearAtten] = hamilton_aehs(radGrainSize(rad), freq{freqi});
-            % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
+        elseif botModel == 'O' % O - Generate AEHS parameters from grain size based on OALIB algorithms
+            AEHS.compSpeed = hamilton_interp(GrainSizes(gs)); % Calculate compressional speed
+            [AEHS.compAtten, AEHS.shearSpeed, ~AEHS.shearAtten] = atten_OALIB(freq{freqi}, radGrainSize(rad), AEHS.compSpeed);
+            % Calculate shear speed, compressional attenuation, and shear attenuation
+            AEHS.density = 1.65; % Constant sediment density used by OALIB's function socal_sed.m.
             botParms = AEHS;
         end
         % Make environment file
