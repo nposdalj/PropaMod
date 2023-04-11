@@ -1,4 +1,4 @@
-function radGrainSize = getGrainSize(sedDatType, sedDatPath, hydLoc, distDeg, total_range, radials, plotDir, rangeStep);
+function radGrainSize = getGrainSize(sedDatType, sedDatPath, hydLoc, distDeg, total_range, radials, plotDir, rangeStep, forceLR);
 % Built in R2022b
 % Get grain sizes of local sediment
 % Steps:
@@ -39,6 +39,9 @@ if sedDatType == 'B' % For using BST data
     BSTtileLons = floor(maxLons(1)):floor(maxLons(2));
 
     % Check available data resolution in this region
+    % ONLY bother doing this if user hasn't told the program to only use
+    % low-res data
+    if forceLR == 0
     useHighRes = 1; % Start by assuming high-resolution (6-second, or 600 per degree) data is available.
     for j = 1:length(BSTtileLats) % Go through each tile. If even one does not have high-res available, will use low-res for all tiles.
         for i = 1:length(BSTtileLons)
@@ -63,6 +66,8 @@ if sedDatType == 'B' % For using BST data
     %         useHighRes = 1; % If region required fits inside any high-res zone, enable high-resolution formatting.
     %     end
     % end
+
+    end
 
     % useHighRes = 0; % Uncomment this line to force low-res if needed
     if useHighRes == 1 % If high-res is indeed available for all tiles
