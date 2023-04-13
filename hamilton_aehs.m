@@ -1,18 +1,7 @@
 function [compSpd, shearSpd, density, compAtten] = hamilton_aehs(phi)
-% function [sed_vel, shear_vel, sed_dens, atten_comp, shear_atten]=hamilton_aehs(freq, grain_size)
-
 % hamilton_aehs.m
-% Two functions by Miller and Potti -- hamilton.m and atten.m -- adapted
-% for our use and merged
 
-%% Part I: Compressional Speed
-% See relevant function by Miller and Potti: hamilton.m
-
-% Combine Tables IA and IB from Hamilton 1980 with relevant variables
-% NOTE: These values are for the continental shelf and continental slope.
-%       Hamilton lists different values for the abyssal plain and hills.
-
-%% -9-1 Version
+% function [sed_vel, shear_vel, sed_dens, atten_comp, shear_atten]=hamilton_aehs(freq, grain_size)
 
 % Generate table of AEHS values.
 % 5 cols: grain size (phi units), compressional speed, shear speed,
@@ -52,7 +41,17 @@ phi_idx = find(aehsTab.phi == phi);
 [density] = aehsTab.density(phi_idx);     % Assign density
 [compAtten] = aehsTab.compAtten(phi_idx); % Assign compressional attenuation
 
-%% Hamilton's sizes version
+% %% Hamilton's sizes version
+% % Two functions by Miller and Potti -- hamilton.m and atten.m -- adapted
+% % for our use and merged
+% 
+% %% Part I: Compressional Speed
+% % See relevant function by Miller and Potti: hamilton.m
+% 
+% % Combine Tables IA and IB from Hamilton 1980 with relevant variables
+% % NOTE: These values are for the continental shelf and continental slope.
+% %       Hamilton lists different values for the abyssal plain and hills.
+% 
 % 
 % aehsTab = array2table([-1:0.5:8, 9], 'VariableNames', {'phi'});
 % 
