@@ -54,7 +54,7 @@ switch botModel
 %attenuation, /\n', sound speed profile in the mud)
 case 'G'
         fprintf(fid, '''G*'' 0.0\n');
-        fprintf(fid, ' %.2f  %.1f  /\n', max(ssp), botParms);
+        fprintf(fid, ' %.2f  %.2f  /\n', max(ssp), botParms);
 end
 
 % Number of source depths (hydrophone location)

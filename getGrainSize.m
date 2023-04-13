@@ -42,31 +42,33 @@ if sedDatType == 'B' % For using BST data
     % ONLY bother doing this if user hasn't told the program to only use
     % low-res data
     if forceLR == 0
-    useHighRes = 1; % Start by assuming high-resolution (6-second, or 600 per degree) data is available.
-    for j = 1:length(BSTtileLats) % Go through each tile. If even one does not have high-res available, will use low-res for all tiles.
-        for i = 1:length(BSTtileLons)
-            try % Assume tile is high-resolution and experimentally attempt to get its size % Make sure this is working or it will ALWAYS return error
-                size(h5read(BSTpath, ['/0.10000/G/UNCLASSIFIED/' num2str(BSTtileLats(j)) '_' num2str(BSTtileLons(i))]));
-            catch % If this returns an error, high-resolution data isn't available for this tile.
-                useHighRes = 0; % So, use low-res data (5-minute, or 12 per degree) instead.
+        useHighRes = 1; % Start by assuming high-resolution (6-second, or 600 per degree) data is available.
+        for j = 1:length(BSTtileLats) % Go through each tile. If even one does not have high-res available, will use low-res for all tiles.
+            for i = 1:length(BSTtileLons)
+                try % Assume tile is high-resolution and experimentally attempt to get its size % Make sure this is working or it will ALWAYS return error
+                    size(h5read(BSTpath, ['/0.10000/G/UNCLASSIFIED/' num2str(BSTtileLats(j)) '_' num2str(BSTtileLons(i))]));
+                catch % If this returns an error, high-resolution data isn't available for this tile.
+                    useHighRes = 0; % So, use low-res data (5-minute, or 12 per degree) instead.
+                end
             end
         end
-    end
 
-    % % An alternate way to do the above data resolution check: The BST documentation lists which specific zones have
-    % % high-res data. Could just compare the required tiles to download with that information and see if the tiles
-    % % are inside the high-res zones or not.
-    % % Check available data resolution: See if the region required fits
-    % % inside a zone where BST has high-resolution data available.
-    % useHighRes = 0; % Use low-res data by default
-    % HRdat = readtable('H:\PropaMod\BST_HighResRegions.xlsx'); % Load list of high res regions from... somewhere idk where
-    % for reg = 1:height(HRdat)
-    %     if HRdat.Lat_min(reg) <= maxLats(1) && HRdat.Lat_max(reg) >= maxLats(2) && ...
-    %             HRdat.Lon_min(reg) <= maxLons(1) && HRdat.Lon_max(reg) >= maxLons(2)
-    %         useHighRes = 1; % If region required fits inside any high-res zone, enable high-resolution formatting.
-    %     end
-    % end
+        % % An alternate way to do the above data resolution check: The BST documentation lists which specific zones have
+        % % high-res data. Could just compare the required tiles to download with that information and see if the tiles
+        % % are inside the high-res zones or not.
+        % % Check available data resolution: See if the region required fits
+        % % inside a zone where BST has high-resolution data available.
+        % useHighRes = 0; % Use low-res data by default
+        % HRdat = readtable('H:\PropaMod\BST_HighResRegions.xlsx'); % Load list of high res regions from... somewhere idk where
+        % for reg = 1:height(HRdat)
+        %     if HRdat.Lat_min(reg) <= maxLats(1) && HRdat.Lat_max(reg) >= maxLats(2) && ...
+        %             HRdat.Lon_min(reg) <= maxLons(1) && HRdat.Lon_max(reg) >= maxLons(2)
+        %         useHighRes = 1; % If region required fits inside any high-res zone, enable high-resolution formatting.
+        %     end
+        % end
 
+    elseif forceLR == 1 % If want to use high-res data when possible;
+        useHighRes = 0;
     end
 
     % useHighRes = 0; % Uncomment this line to force low-res if needed
@@ -75,7 +77,10 @@ if sedDatType == 'B' % For using BST data
         datasetName = '/0.10000/G/UNCLASSIFIED/'; % high-res datasets
         tileSize = 600;
     elseif useHighRes == 0 % If only low-res data available for any tile
-        disp('High-resolution (6-second) sediment data is not sufficiently available at this site. Low-resolution (5-minute) data will be used.') % Let user know
+        if forceLR == 0
+            disp('High-resolution (6-second) sediment data is not sufficiently available at this site. Low-resolution (5-minute) data will be used.') % Let user know
+        elseif forceLR == 1
+        end
         datasetName = '/5.00000/G/UNCLASSIFIED/'; % low-res datasets
         tileSize = 12;
     end
@@ -131,7 +136,7 @@ elseif sedDatType == 'I' % for using IMLGS data
         [~, idx_Nearest] = min(distance([hydLoc(1),hydLoc(2)],[IMLGS_HFEVA_WAT.LAT,IMLGS_HFEVA_WAT.LON]));
         idx_Near(idx_Nearest) = 1; % Force idx_Near to recognize this point
     end
-    
+
     % Make NearSed, the list of the sediment points within search_range (or
     % the single closest point, if none within search_range)
     NearSed = IMLGS_HFEVA_WAT(idx_Near, :);
@@ -193,7 +198,7 @@ for rad = 1:length(radials) % For each radial...
         RADi.Grain_Size(k) = NearSed.Grain_Size(sedIdx); % Using that sediment point's index, get its grain size...
         RADi.Weight(k) = NearSed.Weight(sedIdx); % ... and its weight.
     end
-    % Additionally, calculate the adjusted weight. The adjustment is made 
+    % Additionally, calculate the adjusted weight. The adjustment is made
     % using the same linear 1->.25 scale as the calculation of the raw weight.
     RADi.Adj_Wt = RADi.Weight - (0.75*RADi.Dist_km / (total_range/1000)); % Total range is again used to determine how fast weight changes, even though this is in a different context.
 
@@ -222,7 +227,7 @@ figure('Name', 'Map of Grain Size Points and Radials', 'NumberTitle', 'off')
 if sedDatType == 'B' && useHighRes == 0 % If using BST data and using low res data...
     geoscatter(NearSed.LAT, NearSed.LON, 80, NearSed.Grain_Size, 'square', 'filled') % plot grain size with large boxes (to cover gray space).
 elseif sedDatType == 'B' && useHighRes == 1 % If using BST and using high res data...
-        geoscatter(NearSed.LAT, NearSed.LON, 1, NearSed.Grain_Size) % plot grain size with small points.
+    geoscatter(NearSed.LAT, NearSed.LON, 1, NearSed.Grain_Size) % plot grain size with small points.
 elseif sedDatType == 'I'  % If using IMLGS data...
     geoscatter(NearSed.LAT, NearSed.LON, 40, NearSed.Grain_Size, 'o', 'filled') % plot grain size with circles.
 end

@@ -9,9 +9,56 @@ function [sed_vel, shear_vel, sed_dens, atten_comp, shear_atten]=hamilton_aehs(f
 % Combine Tables IA and IB from Hamilton 1980 with relevant variables
 % NOTE: These values are for the continental shelf and continental slope.
 %       Hamilton lists different values for the abyssal plain and hills.
+
+% aehsTab = array2table([-1:0.5:8, 9], 'VariableNames', {'phi'});
+
+%% -9-1 Version
+
+% Generate table of AEHS values.
+% 5 cols: grain size (phi units), compressional speed, shear speed,
+% density, and compressional attenuation.
+aehsTab = [-1	2005.44	33.57	2.49	0.0167	% Sandy Gravel
+    -0.5	1960.05	32.07	2.40	0.0164	% Very Coarse Sand
+    0	1916.70	30.67	2.31	0.0160	% Muddy Sandy Gravel
+    0.5	1875.38	30.15	2.23	0.0161	% Coarse Sand
+    1	1836.19	29.66	2.15	0.0162	% Gravelly Muddy Sand
+    1.5	1767.29	28.18	1.84	0.0159	% Sand or Medium Sand
+    2	1709.42	27.02	1.62	0.0158	% Muddy Gravel
+    2.5	1660.89	26.12	1.45	0.0157	% Silty Sand or Fine Sand
+    3	1620.04	27.47	1.34	0.0170	% Muddy Sand
+    3.5	1585.19	29.17	1.27	0.0184	% Very Fine Sand
+    4	1554.66	30.82	1.22	0.0198	% Clayey Sand
+    4.5	1526.79	32.34	1.19	0.0212	% Coarse Silt
+    5	1499.90	18.57	1.17	0.0124	% Sandy Silt
+    5.5	1482.78	9.84	1.15	0.0066	% Medium Silt
+    6	1480.96	5.61	1.15	0.0038	% Silt
+    6.5	1479.13	4.44	1.15	0.0030	% Fine Silt
+    7	1477.31	3.51	1.15	0.0024	% Sandy Clay
+    7.5	1475.49	2.81	1.15	0.0019	% Very Fine Silt
+    8	1473.66	2.35	1.15	0.0016	% Silty Clay
+    9	1470.01	2.13	1.14	0.0015];	% Clay
+aehsTab = array2table(aehsTab, 'VariableNames', {'phi', 'compSpd', 'shearSpd', 'density', 'compAtten'});
+
+% Edit shear speed column, as we do not want to use the default values
+aehsTab.shearSpd = nan(size(aehsTab.shearSpd)); % Clear column
+aehsTab.shearSpd(1:11) = 150; % Shear speed for "sand-type" sediments.
+aehsTab.shearSpd(12:16) = 200; % Shear speed for "silt-type" sediments.
+aehsTab.shearSpd(17:20) = 170; % Shear speed for "clay-type" sediments.
+
+% Assign AEHS values depending on input grain size
+phi = 5;
+phi_idx = find(aehsTab.phi == phi);
+[compSpd] = aehsTab.compSpd(phi_idx);     % Assign compressional speed
+[shearSpd] = aehsTab.shearSpd(phi_idx);   % Assign shear speed
+[density] = aehsTab.density(phi_idx);     % Assign density
+[compAtten] = aehsTab.compAtten(phi_idx); % Assign compressional attenuation
+
+%%
+
+
 HamiltonTab = array2table([0.92; 2.65; 3.38; 4.35; 5.02; 5.40; 5.86; 7.02; 8.52], ...
     'VariableNames', {'phi'});                                            % grain diams. (φ) from Hamilton (1980), Table IA
-HamiltonTab.vel = [1836; 1749; 1702; 1646; 1652; 1615; 1579; 1549; 1520]; % Velocities from Hamilton (1980), Table IB
+HamiltonTab.vel = [1842.24; 1647.90; 1593.09; 1534.97; 1498.82; 1483.15; 1481.47; 1477.24; 1471.76];
 
 % Interpolate sediment velocities to the grain size of the current radial
 sed_vel=interp1(HamiltonTab.phi, HamiltonTab.vel, grain_size);
@@ -46,23 +93,12 @@ HamiltonPhi = [0.92; 2.65; 3.38; 4.35; 5.02; 5.40; 5.86; 7.02; 8.52]; % Grain di
 bestPhi = HamiltonPhi(idx_bestPhi);                     % IA which the input grain size is nearest to
 
 % Assign values for sand, or set up table for interpolation
-att_sand = [20 0.0001;
-    4000 0.2;
-    20000 5;
-    100000 100];  % No reference given in atten.m
 shear_sand = 170; % Check value and citation
-shear_atten_sand = 13.2*(freq/1000); % Hamilton (1980) - See table on p.1331
 
 % Assign values for silt, or set up table for interpolation
-att_silt = [20 0.0003;
-    10000 2;
-    100000 20]; % No reference given in atten.m
 shear_silt = 200; % Hard-coded in atten.m; no reference given
-shear_atten_silt = 13.4*(freq/1000); % Hamilton (1980) - See table on p.1331
 
 % Assign values for clay, or set up table for interpolation
-att_clay = 2.42*(10^-5)*(freq^1.12); % Bowles-JASA (1997)
-shear_atten_clay = 15.2*(freq/1000); % Hamilton (1980) - See table on p.1331
 shear_clay=[1500 125;
     1600 300;
     1700 400;
@@ -71,19 +107,13 @@ shear_clay=[1500 125;
 
 switch bestPhi
     case {0.92, 2.65, 3.38, 4.35} % SAND-TYPE SEDIMENTS
-        atten_comp = interp1(att_sand(:,1),att_sand(:,2),freq);
         shear_vel = shear_sand;
-        shear_atten = shear_atten_sand;
 
     case {5.02, 5.40} % SILT-TYPE SEDIMENTS
-        atten_comp = interp1(att_silt(:,1),att_silt(:,2),freq);
         shear_vel = shear_silt;
-        shear_atten = shear_atten_silt;
 
     case {5.86, 7.02, 8.52} % CLAY-TYPE SEDIMENTS
-        atten_comp = att_clay;
         shear_vel = interp1(shear_clay(:,1),shear_clay(:,2),sed_vel); % shear_vel = interp1(shear_clay(:,1),shear_clay(:,2),sed_speed);
-        shear_atten = shear_atten_clay;
 end
 
 %% NOTES: Differences between this function and atten.m
