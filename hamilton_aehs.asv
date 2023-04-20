@@ -1,4 +1,5 @@
-function [compSpd, compAtten, shearSpd, density] = hamilton_aehs(phi,SedDep)
+function [compSpd, shearSpd, density, compAtten] = hamilton_aehs(phi,SedDep)
+AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.shearAtten
 % hamilton_aehs.m
 
 % function [sed_vel, shear_vel, sed_dens, atten_comp, shear_atten]=hamilton_aehs(freq, grain_size)

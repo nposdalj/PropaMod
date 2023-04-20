@@ -284,7 +284,7 @@ for rad = startRad:length(radials)
         elseif botModel == 'G' % G - Use grain size
             botParms = radGrainSize(rad);
         elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
-            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.shearAtten] = hamilton_aehs(radGrainSize(rad), freq{freqi},SedDep);
+            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.density] = hamilton_aehs(radGrainSize(rad),SedDep);
             % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
             botParms = AEHS;
         end
