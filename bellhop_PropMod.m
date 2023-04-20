@@ -1,6 +1,5 @@
 % code to calculate detection range around HARP
-% Vanessa ZoBell June 9, 2022
-% Edited by AD and NP
+% AD and NP
 %
 % Data needed to run:
 % - Sound speed profiles
@@ -32,7 +31,7 @@ Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
 %bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'E:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'D:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
 Gdrive = 'G';
 
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
@@ -57,7 +56,7 @@ freq = {9000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
 
 % D. SPECIFY SEA FLOOR MODEL
-botModel = 'O'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually enter parameters. SEE D.i.
+botModel = 'Y'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually enter parameters. SEE D.i.
 %               % 'G' = Model bottom using grain size. SEE D.ii.
 %               % 'Y' = Model bottom as Acousto Elastic Half-Space; Calculate
 %               %       parameters with grain size and Algorithm Y. SEE D.ii.
@@ -72,8 +71,10 @@ AEHS.density = 1.7;  %1.15;        % Density.
 %   marine sediments found by Tenzer and Gladkikh (2014).
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation
-SedDep = 3; %sediment depth you expect for shear velocity calculations
-% ^^ 3 m = surficial sediment
+
+% D.ii If modeling bottom using Acousto Elastic Half-Space, modify the following properties
+%        (required for makeEnv.m to run if botModel = 'Y'
+SedDep = 3; %sediment depth you expect for shear velocity calculations (3m = surficial sediment)
 
 % D.ii. If modeling bottom using grain size, select which dataset to use:
 sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
