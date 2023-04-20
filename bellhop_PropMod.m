@@ -72,6 +72,8 @@ AEHS.density = 1.7;  %1.15;        % Density.
 %   marine sediments found by Tenzer and Gladkikh (2014).
 AEHS.compAtten = 0.1;    %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation
+SedDep = 3; %sediment depth you expect for shear velocity calculations
+% ^^ 3 m = surficial sediment
 
 % D.ii. If modeling bottom using grain size, select which dataset to use:
 sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
@@ -281,7 +283,7 @@ for rad = startRad:length(radials)
         elseif botModel == 'G' % G - Use grain size
             botParms = radGrainSize(rad);
         elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
-            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.shearAtten] = hamilton_aehs(radGrainSize(rad), freq{freqi});
+            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.shearAtten] = hamilton_aehs(radGrainSize(rad), freq{freqi},SedDep);
             % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
             botParms = AEHS;
         end

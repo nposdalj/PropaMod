@@ -1,4 +1,4 @@
-function [compSpd, shearSpd, density, compAtten] = hamilton_aehs(phi)
+function [compSpd, shearSpd, density, compAtten] = hamilton_aehs(phi,SedDep)
 % hamilton_aehs.m
 
 % function [sed_vel, shear_vel, sed_dens, atten_comp, shear_atten]=hamilton_aehs(freq, grain_size)
@@ -30,9 +30,15 @@ aehsTab = array2table(aehsTab, 'VariableNames', {'phi', 'compSpd', 'shearSpd', '
 
 % Edit shear speed column, as we do not want to use the default values
 aehsTab.shearSpd = nan(size(aehsTab.shearSpd)); % Clear column
-aehsTab.shearSpd(1:11) = 150; % Shear speed for "sand-type" sediments.
-aehsTab.shearSpd(12:16) = 200; % Shear speed for "silt-type" sediments.
-aehsTab.shearSpd(17:20) = 170; % Shear speed for "clay-type" sediments.
+
+aehsTab.shearSpd(1:11) = 128*SedDep^0.28; % Shear speed for "sand-type" sediments.
+% Hamilton 1976 regression equation for 29 in-situ meas at depths to 12m
+
+%aehsTab.shearSpd(12:16) = 200; % Shear speed for "silt-type" sediments.
+
+aehsTab.shearSpd(17:20) = 116+(4.65*SedDep); % Shear speed for "clay-type" sediments.
+% Hamilton 1976 regression equation for 0 to 40 m interval including 47
+% in-situ measurments
 
 % Assign AEHS values depending on input grain size
 phi_idx = find(aehsTab.phi == phi);
