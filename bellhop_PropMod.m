@@ -50,7 +50,7 @@ hlat = 41.0618; % 39.8326; % hydrophone lat
 hlon = -66.35;     % -69.9800; % hydrophone long
 hdepth = 968;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 235;       % Source Level
-freq = {9000};  % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {9000, 9500, 10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
@@ -84,7 +84,7 @@ forceLR = 1; % If using BST data, set 0 to use high-res data where possible; 1, 
 total_range = 40000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 4;        % Specify number of radials - They will be evenly spaced.
+numRadials = 36;        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 

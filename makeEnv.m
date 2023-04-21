@@ -35,9 +35,8 @@ for nz = 2:length(z)
 end
 
 % Acoustic elastic half-space properties
-% Find sediment cores for WAT?
 switch botModel
-    case {'A', 'O'}
+    case {'A', 'Y'}
         fprintf(fid, '''A*'' 0.0\n');
         %A = model as Acousto-Elastic half space
         fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.1f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);
