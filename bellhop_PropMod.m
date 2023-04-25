@@ -12,7 +12,7 @@
 % Generate radial and polar plots and save to Export directory
 
 clearvars % clear variables
-close all % clear all
+close all;clear all;clc; % clear all
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
@@ -23,7 +23,7 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' BS, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' BS, Social Groups'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'BS';
@@ -50,8 +50,8 @@ GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file
 hlat = 30.58; % 39.8326; % hydrophone lat
 hlon = -77.39;     % -69.9800; % hydrophone long
 hdepth = 1000;   % hydrophone depth % <- inputted into DetSim_Workspace
-SL = 235;       % Source Level
-freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
+SL = 230;       % Source Level
+freq = {10500};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
@@ -240,7 +240,6 @@ for rad = startRad:length(radials)
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables); % make bathymetry file in intermed dir Freq 1
-    %[~, bath] = makeBTY_old(midDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
     % The line above causes memory to climb, but ultimately it seems to go back down.
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
