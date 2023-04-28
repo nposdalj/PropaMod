@@ -106,6 +106,9 @@ For each frequency, bellhop_PropMod.m also saves a .mat file containing certain 
 
 #### U.2.4 Related Scripts
 bellhop_PropMod.m calls two functions in the PropaMod repository:
+* `loadBTY.m`: Loads the GEBCO bathymetry data.
+* `getGrainSize.m`: Calculates the grain size of each radial, if grain size is being used.
+* `imlgs2hfeva.m`: Converts IMLGS sediment definitions to HFEVA definitions, if IMLGS sediment data is being used.
 * `makeBTY.m`: Generates the bathymetry (.bty) file for each radial.
 * `makeEnv.m`: Generates the environment (.env) file for each radial.
 
