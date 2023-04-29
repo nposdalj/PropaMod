@@ -30,7 +30,7 @@ PropaMod is centered on three main steps, each associated with a particular scri
 ## Usage
 
 The workflow for PropaMod is summarized here:
-![Workflow diagram for PropaMod.](https://github.com/nposdalj/PropaMod/blob/main/PropagationModeling_README_Fig2_revised.png)
+![Workflow diagram for PropaMod.](https://github.com/nposdalj/PropaMod/blob/main/PropagationModeling_README_fig2_revised.png)
 
 User-operated scripts (bold, color border) contain sections which must be edited by the user; other white scripts are functions called by the user-operated scripts.
 Yellow scripts are contained in the Acoustics Toolbox. Red scripts are called are called only when using sediment data. Blue boxes are function outputs.
