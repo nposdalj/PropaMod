@@ -6,7 +6,7 @@
 
 The PropaMod repository contains tools for modeling sound propagation for the purpose of marine animal density estimation.
 
-PropaMod is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
+PropaMod is centered on two main steps, each associated with a particular script. The user must enter their desired parameters in each.
 * Creating sound speed profiles with `makeSSP.m`
 * Modeling sound propagation with `bellhop_PropMod.m`
 
