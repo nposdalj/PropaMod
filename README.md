@@ -9,7 +9,6 @@ The PropaMod repository contains tools for modeling sound propagation for the pu
 PropaMod is centered on three main steps, each associated with a particular script. The user must enter their desired parameters in each.
 * Creating sound speed profiles with `makeSSP.m`
 * Modeling sound propagation with `bellhop_PropMod.m`
-* Preparing for detection simulation with `pDetSim_constructWS.m`
 
 
 ## Getting Started
