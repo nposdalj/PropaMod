@@ -96,7 +96,7 @@ Every time `bellhop_PropMod.m` is run, it creates new folders (with a name in th
 
 In the intermediate and save directories, this folder contains subfolders for each frequency specified by the user for this run. A .txt file listing the input parameters for this run is also included. In turn, the frequency subfolders include one of the following for each radial:
 * Bathymetry (.bty) file
-* Environment (.env) file
+* Environment (.env) file 
 * Shade (.shd) file
 * Print (.prt) file.
 
