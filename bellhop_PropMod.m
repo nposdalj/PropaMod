@@ -23,10 +23,10 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' BS, Social Groups'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' GS, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'BS';
+Site = 'GS';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
@@ -47,11 +47,11 @@ GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 30.58; % 39.8326; % hydrophone lat
-hlon = -77.39;     % -69.9800; % hydrophone long
-hdepth = 1000;   % hydrophone depth % <- inputted into DetSim_Workspace
-SL = 230;       % Source Level
-freq = {10500};  % Frequencies of sources, in Hz. Enter up to 3 values.
+hlat = 33.67; % 39.8326; % hydrophone lat
+hlon = -75.999;     % -69.9800; % hydrophone long
+hdepth = 960;   % hydrophone depth % <- inputted into DetSim_Workspace
+SL = 235;       % Source Level
+freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
@@ -90,7 +90,7 @@ numRadials = 36;        % Specify number of radials - They will be evenly spaced
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
-generate_RadialPlots = 1; % Generate radial plots? 1 = Yes, 0 = No
+generate_RadialPlots = 0; % Generate radial plots? 1 = Yes, 0 = No
 generate_PolarPlots = 0; % Generate polar plots? 1 = Yes, 0 = No
 
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
@@ -166,7 +166,7 @@ SSPfolderIdx = find(contains(string(SSPfolder),SSPtype) & ~contains(string(SSPfo
 % Index of desired SSP file based on user input. MODIFIED TO IGNORE TEMPORARY FILES.
 SSPfile = strtrim(SSPfolder(SSPfolderIdx,:));                % Get that SSP file
 SSP = readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile)); % read the SSP file
-SSParray = table2array(SSP);                                 % Convert to array
+SSParray = table2array(SSP);  % Convert to array
 
 if strcmp(SSPtype, 'Mmax') || strcmp(SSPtype, 'Mmin') % Get month being examined to report in the output info file, if applicable
     SSPmoReporting = num2str(SSPfile(12:13));
@@ -185,8 +185,7 @@ distDeg = km2deg(dist);             % radial length in degrees
 
 % Reciever Depth
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
-r = 0:rangeStep:total_range;        % range with steps
-rr = r';                            % output to be saved for pDetSim
+r = 0:rangeStep:total_range;        % range with steps                         
 
 % Source Depth is set it to be the depth at hlat and hlon, - 10 m.
 % This simulates a hydrophone sitting 10 m off of the bottom.
@@ -197,7 +196,7 @@ rr = r';                            % output to be saved for pDetSim
 distDec = dist*0.08; %convert distance from km to degrees
 hlat_range = [hlat+distDec hlat-distDec];
 hlon_range = [hlon+distDec hlon-distDec];
-AllVariables = loadBTY(GEBCODir);
+AllVariables = loadBTY(distDec,hlat_range,hlon_range,GEBCODir);
 %% 6G. Retrieve sediment data (if needed) and pack bottom parameters
 if botModel == 'G' || botModel == 'Y' % For bottom models requiring grain size...
     sedPath = [fpath '\Sediment_Data']; % Path where sediment data are located
@@ -240,11 +239,12 @@ for rad = startRad:length(radials)
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables); % make bathymetry file in intermed dir Freq 1
+    %[~, bath] = makeBTY_old(midDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
     % The line above causes memory to climb, but ultimately it seems to go back down.
     % Within the frequency loop, this .bty file is copied to the intermed
     % frequency subdirectories and to the save directories
 
-    bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
+    %bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
 
     % DECIDE SD AND AEHS.COMPSPEED FOR ALL RADIALS (This is done during the first radial)
     if rad == 1 % If this is currently running the first radial...
@@ -360,7 +360,6 @@ for freqi = 1:length(freq)
     %% 7. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
 
     hdepth = SD; % ADDED BY AD
-
     txtFileName = [newFolderName '_' freqiChar 'kHz_Input_Parameters.txt'];
     paramfile = fullfile(intermedDirFi, txtFileName);
     fileid = fopen(paramfile, 'w');
@@ -433,7 +432,8 @@ for freqi = 1:length(freq)
     end
 
     %% 9. Save variables for pDetSim
-    freqSave = char(num2str(freqVec/1000));
+    freqSave = char(num2str(freq{freqi}/1000));
+    rr = r'; % output to be saved for pDetSim
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
 
 end

@@ -4,12 +4,13 @@ function [Range, bath] = makeBTY(fpath, fname, hlat, hlon, AllVariables)
 global lati
 global loni
 global rad
+
 % Find which cell contains lat, lon, and elevation/depth
 lonLoc = (find(strcmp(AllVariables,'lon'))+1)/2; % Find which cell contains lon
 latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
 elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
 
-% Extract lat, lon, and elevation for entire site
+% Extract lat, lon, and elevation for radial
 latRange = [hlat+1 hlat-1]; %+/- 1 degree for lat
 latValsIDX = find(AllVariables{2,latLoc}<latRange(1) & AllVariables{2,latLoc}>latRange(2));
 latVals = AllVariables{2,latLoc}(latValsIDX);
@@ -18,18 +19,6 @@ lonValsIDX = find(AllVariables{2,lonLoc}<lonRange(1) & AllVariables{2,lonLoc}>lo
 lonVals = AllVariables{2,lonLoc}(lonValsIDX);
 
 depthVals = AllVariables{2,elevationLoc}(lonValsIDX,latValsIDX); %index depth based on +/- lat and lon away from reciever
-% Extract lat, lon, and elevation that matches site location
-% latRange = [hlat+1 hlat-1]; %+/- 1 degree for lat
-% latValsIDX = find(latlon(:,1)<latRange(1) & latlon(:,1)>latRange(2));
-% 
-% lonRange = [hlon+1 hlon-1]; %+/- 1 degree for lon
-% lonValsIDX = find(latlon(:,2)<lonRange(1) & latlon(:,2)>lonRange(2));
-% 
-% Find lat/lon values that match
-% [idx,~] = ismember(latValsIDX,lonValsIDX);
-% lonVals = latlon(idx,2);
-% latVals = latlon(idx,1);
-% depthVals = latlon(idx,3); %index depth based on +/- lat and lon away from reciever
 
 %create two columns for lat and lon
 [X,Y] = meshgrid(latVals,lonVals);
