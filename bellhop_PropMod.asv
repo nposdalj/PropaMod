@@ -40,19 +40,18 @@ fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 %                       - sediment data*: \Sediment_Data\...
 %                           Sediment data is optional, required only if modeling bottom using grain size. SEE WIKI FOR FOLDER CONFIGURATION.
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
-%GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
-GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's local GEBO bathymetry netCDF file
-%GEBCODir = 'I:\BellHopOutputs'; %Natalie's local GEBCO bathymetry netCDF file
+GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
+%GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file
 
 % Note to self to have smth in plotSSP that exports the examined effort period
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 41.062; % 39.8326; % hydrophone lat
-hlon = -66.352;     % -69.9800; % hydrophone long
-hdepth = 903;   % hydrophone depth % <- inputted into DetSim_Workspace
+hlat = 33.67; % 39.8326; % hydrophone lat
+hlon = -75.999;     % -69.9800; % hydrophone long
+hdepth = 960;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 235;       % Source Level
-freq = {9500};  % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
