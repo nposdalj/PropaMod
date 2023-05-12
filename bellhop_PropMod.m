@@ -23,10 +23,10 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GS, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' HZ, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'GS';
+Site = 'HZ';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
@@ -47,10 +47,10 @@ GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 33.67; % 39.8326; % hydrophone lat
-hlon = -75.999;     % -69.9800; % hydrophone long
-hdepth = 960;   % hydrophone depth % <- inputted into DetSim_Workspace
-SL = 235;       % Source Level
+hlat = 41.062; % hydrophone lat
+hlon = -66.352; % hydrophone long
+hdepth = 903;   % hydrophone depth % <- inputted into DetSim_Workspace
+SL = 230;       % Source Level
 freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
