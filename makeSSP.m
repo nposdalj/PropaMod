@@ -29,7 +29,7 @@ close all
 
 % Export directories
 regAbrev = 'WAT'; % Abbreviation of region name
-GDrive = 'G';     % GDrive drive
+GDrive = 'L';     % GDrive drive
 HYCOM_saveDir_Local = 'H:\hycom_temp\'; % Local save directory on your machine for HYCOM data
 HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
 SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
@@ -43,7 +43,7 @@ LatRange = [24 44];     % in degrees N (-80 S to 90 N). In order of S->N.
 LonRange = [-82 -63];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2015-04';  % First month of study period. Format as yyyy-MM.
+Month_Start = '2015-07';  % First month of study period. Format as yyyy-MM.
 Month_End = '2019-06';    % Final month of study period. Format as yyyy-MM.
 
 plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
