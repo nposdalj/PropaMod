@@ -22,17 +22,22 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
+<<<<<<< HEAD
 author = 'NP'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' HZ, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
+=======
+author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+userNote = ' HZ, Adult Males'; % Include a note for yourself/others. This will be included in the .txt output.
+>>>>>>> d287b8adf5a038bfd6306dbe23d8e93f55be64ef
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'HZ';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
-%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'G';
+bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+%bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+Gdrive = 'L';
 
 fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 % fpath must contain:   - bathymetry file: \Bathymetry\bathy.txt
@@ -41,17 +46,26 @@ fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
 %                           Sediment data is optional, required only if modeling bottom using grain size. SEE WIKI FOR FOLDER CONFIGURATION.
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
 %GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
-GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file
+GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's local GEBO bathymetry netCDF file
+%GEBCODir = 'I:\BellHopOutputs'; %Natalie's local GEBCO bathymetry netCDF file
 
 % Note to self to have smth in plotSSP that exports the examined effort period
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
+<<<<<<< HEAD
 hlat = 41.062; % hydrophone lat
 hlon = -66.352; % hydrophone long
 hdepth = 903;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 230;       % Source Level
 freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
+=======
+hlat = 41.062; % 39.8326; % hydrophone lat
+hlon = -66.352;     % -69.9800; % hydrophone long
+hdepth = 903;   % hydrophone depth % <- inputted into DetSim_Workspace
+SL = 235;       % Source Level
+freq = {9500};  % Frequencies of sources, in Hz. Enter up to 3 values.
+>>>>>>> d287b8adf5a038bfd6306dbe23d8e93f55be64ef
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
