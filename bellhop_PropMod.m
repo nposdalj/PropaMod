@@ -22,17 +22,6 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' NFC, Adult Males'; % Include a note for yourself/others. This will be included in the .txt output.
-
-% A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'NFC';
-Region = 'WAT';
-BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
-
-%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-Gdrive = 'G';
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
 userNote = ' GI, Adult males'; % Include a note for yourself/others. This will be included in the .txt output.
 
