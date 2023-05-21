@@ -28,23 +28,25 @@ close all
 %% Parameters defined by user
 
 % Export directories
-regAbrev = 'WAT'; % Abbreviation of region name
-GDrive = 'L';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\hycom_temp\'; % Local save directory on your machine for HYCOM data
-HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
-SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
+regAbrev = 'Baja'; % Abbreviation of region name
+GDrive = 'H';     % GDrive drive
+HYCOM_saveDir_Local = 'H:\Baja_GI\PropaMod\HYCOM_temp\Baja'; % Local save directory on your machine for HYCOM data
+% HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
+% SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
+HYCOM_saveDir_Final = ['H:\Baja_GI\PropaMod\HYCOM_data\' regAbrev]; % For Baja_GI
+SSP_saveDir =         ['H:\Baja_GI\PropaMod\SSPs\' regAbrev]; % For Baja_GI
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
-siteCoordsFile = 'C:\Users\HARP\Documents\GitHub\PropagationModeling\SiteCoords_Template.xlsx';
+siteCoordsFile = 'H:\Baja_GI\PropaMod\SiteCoords_Template.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available
 % in this region]
-LatRange = [24 44];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-82 -63];   % in degrees E (-180 W to 180 E). In order of W->E.
+LatRange = [27 31];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-120 -116];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2015-07';  % First month of study period. Format as yyyy-MM.
-Month_End = '2019-06';    % Final month of study period. Format as yyyy-MM.
+Month_Start = '2018-12';  % First month of study period. Format as yyyy-MM.
+Month_End = '2022-07';    % Final month of study period. Format as yyyy-MM.
 
 plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 

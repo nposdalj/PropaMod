@@ -33,26 +33,37 @@ BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change t
 %bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
 Gdrive = 'G';
+author = 'AD'; % Your name/initials here. This will be included in the .txt output.
+userNote = ' GI, Adult males'; % Include a note for yourself/others. This will be included in the .txt output.
 
-fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory
+% A. CONFIGURE PATHS - INPUT AND EXPORT
+Site = 'GI';
+Region = 'Baja';
+BathyRegion = 'Baja'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
+
+% bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+%bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
+bellhopSaveDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
+Gdrive = 'H';
+% fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory for WAT
+fpath = [Gdrive, ':\Baja_GI\PropaMod']; % Input directory for Baja_GI
 % fpath must contain:   - bathymetry file: \Bathymetry\bathy.txt
 %                       - site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 %                       - sediment data*: \Sediment_Data\...
 %                           Sediment data is optional, required only if modeling bottom using grain size. SEE WIKI FOR FOLDER CONFIGURATION.
 saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be unused now
 %GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
-
-GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file - Natalie
-%GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron
-
+%GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file - Natalie
+%GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron WAT
+GEBCODir = 'H:\Baja_GI\PropaMod\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron GI
 
 % Note to self to have smth in plotSSP that exports the examined effort period
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 37.166; % hydrophone lat
-hlon = -74.467; % hydrophone long
-hdepth = 1030;   % hydrophone depth % <- inputted into DetSim_Workspace
+hlat = 29.14176667; % hydrophone lat
+hlon = -118.2600611; % hydrophone long
+hdepth = 1124.666667;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 235;       % Source Level
 freq = {9500};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
