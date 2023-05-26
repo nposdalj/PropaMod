@@ -23,7 +23,7 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GI, Adult males'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = ' GI, Ultrasonic Antifouling'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
 Site = 'GI';
