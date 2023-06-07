@@ -22,20 +22,21 @@ global rad
 global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
-author = 'AD'; % Your name/initials here. This will be included in the .txt output.
-userNote = ' GI, Ultrasonic Antifouling'; % Include a note for yourself/others. This will be included in the .txt output.
+author = 'NP'; % Your name/initials here. This will be included in the .txt output.
+userNote = 'BS, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'GI';
-Region = 'Baja';
-BathyRegion = 'Baja'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
+Site = 'BS';
+Region = 'WAT';
+BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
-% bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 %bellhopSaveDir = 'I:\BellHopOutputs'; %Natalie's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
-Gdrive = 'H';
-% fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory for WAT
-fpath = [Gdrive, ':\Baja_GI\PropaMod']; % Input directory for Baja_GI
+%bellhopSaveDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
+bellhopSaveDir = 'C:\PropMod_Intermed';
+Gdrive = 'G';
+fpath = [Gdrive, ':\My Drive\PropagationModeling']; % Input directory for WAT
+%fpath = [Gdrive, ':\Baja_GI\PropaMod']; % Input directory for Baja_GI
 % fpath must contain:   - bathymetry file: \Bathymetry\bathy.txt
 %                       - site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 %                       - sediment data*: \Sediment_Data\...
@@ -44,7 +45,8 @@ saveDir = [fpath, '\Radials\', Site]; % Export directory % < This line should be
 %GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
 %GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file - Natalie
 %GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron WAT
-GEBCODir = 'H:\Baja_GI\PropaMod\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron GI
+%GEBCODir = 'H:\Baja_GI\PropaMod\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron GI
+GEBCODir = 'D:\';
 
 % Note to self to have smth in plotSSP that exports the examined effort period
 % and other relevant details so they can be exported in the info file here
@@ -54,7 +56,7 @@ hlat = 29.14176667; % hydrophone lat
 hlon = -118.2600611; % hydrophone long
 hdepth = 1124.666667;   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = 235;       % Source Level
-freq = {9500};  % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
