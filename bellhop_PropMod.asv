@@ -65,7 +65,7 @@ botModel = 'Y'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually ent
 %               % 'G' = Model bottom using grain size. SEE D.ii.
 %               % 'Y' = Model bottom as Acousto Elastic Half-Space; Calculate
 %               %       parameters with grain size and Algorithm Y. SEE D.ii.
-botModela = 'A'; 
+botModelb = 'A'; %Regardless of how you get the AEHS parameters, we still want the bottom modeled as an 'Acousto-Elastic Half Space'
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
@@ -301,7 +301,7 @@ for rad = startRad:length(radials)
             botParms = AEHS;
         end
         % Make environment file
-        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', botModela, botParms); % make environment file
+        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', botModelb, botParms); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
 

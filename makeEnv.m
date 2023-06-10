@@ -34,12 +34,17 @@ for nz = 2:length(z)
     fprintf(fid, '%.3f\t%.6f\t/ \n', z(nz), ssp(nz));
 end
 
+%Round compAtten up if needed
+% if botParms.compAtten < 0.1
+%     botParms.compAtten = round(botParms.compAtten,2);
+% end
+
 % Acoustic elastic half-space properties
 switch botModel
     case {'A', 'Y'}
         fprintf(fid, '''A*'' 0.0\n');
         %A = model as Acousto-Elastic half space
-        fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.1f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);
+        fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.3f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);
 % fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
 % Params: Depth, Compressional speed, Shear speed, Density, Compressional attenuation, Shear attenuation
 %1.5 likely density (according to VZ)
