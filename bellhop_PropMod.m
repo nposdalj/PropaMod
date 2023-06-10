@@ -75,7 +75,7 @@ AEHS.shearSpeed = 174.10; %150;  % 146.70;   % Shear speed
 AEHS.density = 1.84; %1.7  %1.15;        % Density.
 %   This value (1.7 g/cm^3) was chosen based on the average density of
 %   marine sediments found by Tenzer and Gladkikh (2014).
-AEHS.compAtten = 0.000;  %0.1 %0.0015;    % Compressional attenuation
+AEHS.compAtten = 0.016; %0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation
 
 % D.ii If modeling bottom using Acousto Elastic Half-Space, modify the following properties
@@ -87,16 +87,16 @@ sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
 forceLR = 1; % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
-total_range = 40000;    % Radial range around your site, in meters
+total_range = 45000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 4;        % Specify number of radials - They will be evenly spaced.
+numRadials = 8;        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
 generate_RadialPlots = 1; % Generate radial plots? 1 = Yes, 0 = No
-generate_PolarPlots = 1; % Generate polar plots? 1 = Yes, 0 = No
+generate_PolarPlots = 0; % Generate polar plots? 1 = Yes, 0 = No
 
 RL_threshold = 125; % Threshold below which you want to ignore data; will be plotted as blank (white space)
 RL_plotMax = 200; % Colorbar maximum for plots; indicates that this is the max expected RL
@@ -298,6 +298,7 @@ for rad = startRad:length(radials)
         elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
             [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.density] = hamilton_aehs(radGrainSize(rad),SedDep);
             % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
+            AEHS.compSpeed = 1470;
             botParms = AEHS;
         end
         % Make environment file

@@ -34,11 +34,6 @@ for nz = 2:length(z)
     fprintf(fid, '%.3f\t%.6f\t/ \n', z(nz), ssp(nz));
 end
 
-%Round compAtten up if needed
-% if botParms.compAtten < 0.1
-%     botParms.compAtten = round(botParms.compAtten,2);
-% end
-
 % Acoustic elastic half-space properties
 switch botModel
     case {'A', 'Y'}
