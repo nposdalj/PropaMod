@@ -65,7 +65,8 @@ botModel = 'Y'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually ent
 %               % 'G' = Model bottom using grain size. SEE D.ii.
 %               % 'Y' = Model bottom as Acousto Elastic Half-Space; Calculate
 %               %       parameters with grain size and Algorithm Y. SEE D.ii.
-botModela = 'A'; 
+
+modelType = 'L';
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
@@ -87,10 +88,10 @@ sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
 forceLR = 1; % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
-total_range = 45000;    % Radial range around your site, in meters
+total_range = 50000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 8;        % Specify number of radials - They will be evenly spaced.
+numRadials = 4;        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
@@ -243,7 +244,7 @@ for rad = startRad:length(radials)
 
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables); % make bathymetry file in intermed dir Freq 1
+    [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,modelType); % make bathymetry file in intermed dir Freq 1
     %[~, bath] = makeBTY_old(midDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
     % The line above causes memory to climb, but ultimately it seems to go back down.
     % Within the frequency loop, this .bty file is copied to the intermed
@@ -298,11 +299,11 @@ for rad = startRad:length(radials)
         elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
             [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.density] = hamilton_aehs(radGrainSize(rad),SedDep);
             % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
-            AEHS.compSpeed = 1470;
+            AEHS.shearSpeed = 28.18;
             botParms = AEHS;
         end
         % Make environment file
-        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, 'C', botModela, botParms); % make environment file
+        makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, modelType, botModela, botParms); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
 

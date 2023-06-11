@@ -1,4 +1,4 @@
-function [Range, bath] = makeBTY(fpath, fname, hlat, hlon, AllVariables)
+function [Range, bath] = makeBTY(fpath, fname, hlat, hlon, AllVariables, modelType)
 % VZ: Modified from Eric Snyder's makeBTY.m code
 % NOTE: I'm using the hydrophone as the source and ship as receiver for now
 global lati
@@ -46,4 +46,4 @@ bath = abs(bathi).';
 [Rsort, I] = sort(Range);
 bathSort = bath(I);
 
-writebdry( fpn, 'C', ([Rsort, bathSort]) ) % write bty file
+writebdry( fpn, modelType, ([Rsort, bathSort]) ) % write bty file
