@@ -23,10 +23,10 @@ global radStep
 global depthStep
 %% 2. Params defined by user + Info for user
 author = 'NP'; % Your name/initials here. This will be included in the .txt output.
-userNote = 'BS, Mid-Size'; % Include a note for yourself/others. This will be included in the .txt output.
+userNote = 'JAX, SocialGroup'; % Include a note for yourself/others. This will be included in the .txt output.
 
 % A. CONFIGURE PATHS - INPUT AND EXPORT
-Site = 'BS';
+Site = 'JAX';
 Region = 'WAT';
 BathyRegion = 'WAT'; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
 
@@ -51,18 +51,18 @@ GEBCODir = 'I:\BellHopOutputs'; %local GEBCO bathymetry netCDF file - Natalie
 % and other relevant details so they can be exported in the info file here
 
 % B. SPECIFY MODEL INPUT PARAMETERS: Hydrophone Location, Source Level, and Source Frequency.
-hlat = 30.58; % hydrophone lat
-hlon = -77.39; % hydrophone long
-hdepth = 1000;   % hydrophone depth % <- inputted into DetSim_Workspace
-SL = 235;       % Source Level
-freq = {10000};  % Frequencies of sources, in Hz. Enter up to 3 values.
+hlat = 30.152; % hydrophone lat
+hlon = -79.770; % hydrophone long
+hdepth = 759;   % hydrophone depth % <- inputted into DetSim_Workspace
+SL = 230;       % Source Level - 230 for Social Groups, 235 for Mid-Size and Males
+freq = {10500};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = 'Mean'; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
 
 % D. SPECIFY MODELS
 % D.a makeBTY model - interpolation type
-BTYmodel = 'L'; % L: Linear interpolation of the surface
+BTYmodel = 'C'; % L: Linear interpolation of the surface
                 % C: Curvlinear interpolation
 
 %D.b makeENV model - method of interpolation used by Bellhop to calculate
@@ -84,13 +84,13 @@ botModel = 'A'; % 'A' = Model bottom as Acousto Elastic Half-Space; manually ent
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
-AEHS.compSpeed = 1500; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
+AEHS.compSpeed = 1470.0; % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
 % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
-AEHS.shearSpeed = 174.10; %150;  % 146.70;   % Shear speed
-AEHS.density = 1.84; %1.7  %1.15;        % Density.
+AEHS.shearSpeed = 230; %129.90; %150;  % 146.70;   % Shear speed
+AEHS.density = 1.14; %1.7  %1.15;        % Density.
 %   This value (1.7 g/cm^3) was chosen based on the average density of
 %   marine sediments found by Tenzer and Gladkikh (2014).
-AEHS.compAtten = 0.016; %0.0015;    % Compressional attenuation
+AEHS.compAtten = 0.0015;    % Compressional attenuation
 AEHS.shearAtten = 0.0000;   % Shear attenuation
 
 % D.ii If modeling bottom using Acousto Elastic Half-Space, modify the following properties
@@ -102,10 +102,10 @@ sedDatType = 'B'; % 'B' = BST data; 'I' = IMLGS data.
 forceLR = 1; % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
-total_range = 50000;    % Radial range around your site, in meters
+total_range = 60000;    % Radial range around your site, in meters
 rangeStep = 10;         % Range resolution
 depthStep = 10;         % Depth resolution
-numRadials = 4;        % Specify number of radials - They will be evenly spaced.
+numRadials = 36;        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
