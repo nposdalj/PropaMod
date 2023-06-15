@@ -21,7 +21,7 @@ global loni
 global rad
 global radStep
 global depthStep
-%% 2. Params defined by user
+%% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file
 % path below.
 settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx';
