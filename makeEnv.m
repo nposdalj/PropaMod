@@ -1,6 +1,6 @@
 %VZ: Modified from Eric Snyder's makeEnv.m code
 
-function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, modelType, botModel, botParms)
+function makeEnv(filepath, filename, freq, z, ssp, SD, RD, NR, RR, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms)
 
 fpn = fullfile(filepath, [filename, '.env']);
 
@@ -23,7 +23,8 @@ fprintf(fid, [num2str(freq),'\t!Freq (Hz)\n']);
 fprintf(fid, '1\t! NMEDIA\n');
 
 % line 4: interpolation type
-fprintf(fid, '''SVW''\t! SSPOPT (Analytic or C-linear interpolation)\n');
+txtCombo = [SSPint,SurfaceType,BottomAtten,VolAtten];
+fprintf(fid, ['''',txtCombo,'''\t! SSPOPT (Analytic or C-linear interpolation)\n']);
 
 % line 5: Bottom depth, number of depth values
 fprintf(fid, '%d  0.0  %.3f\t! Depth of bottom (m)\n', 2, max(z));
