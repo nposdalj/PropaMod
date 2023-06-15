@@ -79,6 +79,7 @@ fprintf(fid, '%.4f  ', RR./1000);
 fprintf(fid, '/\t! RR\n');
 
 % model type
+modelType = 'C';
 fprintf(fid, ['''', modelType, '''\n']);
 
 % No. of beams

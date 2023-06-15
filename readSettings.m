@@ -15,7 +15,6 @@ userNote = settings.Value_EDIT_{3}; % Include a note for yourself/others. This w
 Site = settings.Value_EDIT_{4};
 Region = settings.Value_EDIT_{5};
 BathyRegion = settings.Value_EDIT_{6}; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
-
 %bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
 bellhopSaveDir = settings.Value_EDIT_{7}; %Natalie's Computer % Intermediate save directory on your local disk
 %bellhopSaveDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
@@ -41,7 +40,7 @@ hlat = str2double(settings.Value_EDIT_{12}); % hydrophone lat
 hlon = str2double(settings.Value_EDIT_{13}); % hydrophone long
 hdepth = str2double(settings.Value_EDIT_{14});   % hydrophone depth % <- inputted into DetSim_Workspace
 SL = str2double(settings.Value_EDIT_{15});       % Source Level - 230 for Social Groups, 235 for Mid-Size and Males
-freq = str2double(settings.Value_EDIT_{16});  % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {str2double(settings.Value_EDIT_{16})};  % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % C. SSP TYPE: Indicate the type of SSP you want to use.
 SSPtype = settings.Value_EDIT_{17}; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
