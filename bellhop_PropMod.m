@@ -13,15 +13,15 @@
 % Generate radial and polar plots and save to Export directory
 
 clearvars % clear variables
-close all;clear;clc; % clear all
+close all;clear all;clc; % clear all
 %% 1. Define global vars
-% % These are being called in the loop but are not functions
-% global rangeStep
-% global lati
-% global loni
-% global rad
-% global radStep
-% global depthStep
+% These are being called in the loop but are not functions
+global rangeStep
+global lati
+global loni
+global rad
+global radStep
+global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
 %settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
@@ -331,7 +331,7 @@ for freqi = 1:length(freq)
             figure('visible', 'off') % figure(1000 + plotdepth)
             [Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
             set(calbar,'location','EastOutside')
-            clim([RL_threshold RL_plotMax]);
+            caxis([RL_threshold RL_plotMax]);
             yticks(0:60:300)
             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
             set(gcf, 'Position', [100 100 800 600])
