@@ -1,5 +1,6 @@
 % code to calculate detection range around HARP
 % AD and NP
+% Built for MATLAB R2022b, or later.
 %
 % Data needed to run:
 % - Sound speed profiles
@@ -12,19 +13,19 @@
 % Generate radial and polar plots and save to Export directory
 
 clearvars % clear variables
-close all;clear all;clc; % clear all
+close all;clear;clc; % clear all
 %% 1. Define global vars
-% These are being called in the loop but are not functions
-global rangeStep
-global lati
-global loni
-global rad
-global radStep
-global depthStep
+% % These are being called in the loop but are not functions
+% global rangeStep
+% global lati
+% global loni
+% global rad
+% global radStep
+% global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-%settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx';
-settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx';
+%settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
+settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
@@ -129,12 +130,6 @@ end
 botDepthSort = []; %create empty array for bottom depth sorted by radials for pDetSim
 disp('General setup complete. Beginning radial construction...')
 
-% if resumeRun == 1 % Choose start radial based on whether user requested to resume a run or not
-%     startRad = resumeRad;
-% else
-     startRad = 1;
-% end
-
 bathyTimes = nan(rad, 1); % List of durations of bathymetry file section
 blhopTimes = nan(rad, 1); % List of durations of bellhop section
 for rad = startRad:length(radials)
@@ -162,7 +157,7 @@ for rad = startRad:length(radials)
 
     %bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
 
-    % DECIDE SD AND AEHS.COMPSPEED FOR ALL RADIALS (This is done during the first radial)
+    % DECIDE SD FOR ALL RADIALS (Done during the first radial)
     if rad == 1 % If this is currently running the first radial...
         SiteDepth = bath(1); % set the first value in the bathymetry as the depth of the site.
         SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
@@ -336,7 +331,7 @@ for freqi = 1:length(freq)
             figure('visible', 'off') % figure(1000 + plotdepth)
             [Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
             set(calbar,'location','EastOutside')
-            caxis([RL_threshold RL_plotMax]);
+            clim([RL_threshold RL_plotMax]);
             yticks(0:60:300)
             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
             set(gcf, 'Position', [100 100 800 600])
