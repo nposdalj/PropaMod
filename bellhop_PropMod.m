@@ -203,7 +203,6 @@ for rad = startRad:length(radials)
         disp(['Making environment file for ' filePrefix '...'])
         % Prepare and pack bottom parameters (AEHS params or grain sizes) for makeEnv input
         if botModel == 'A'     % A - Use manually-entered AEHS parameters
-            AEHS.compSpeed = 1470.0;
             botParms = AEHS;
         elseif botModel == 'G' % G - Use grain size
             botParms = radGrainSize(rad);
