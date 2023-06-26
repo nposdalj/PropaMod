@@ -132,7 +132,7 @@ disp('General setup complete. Beginning radial construction...')
 
 bathyTimes = nan(rad, 1); % List of durations of bathymetry file section
 blhopTimes = nan(rad, 1); % List of durations of bellhop section
-for rad = startRad:length(radials)
+for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
 
     %% 6.1 Create radial line
