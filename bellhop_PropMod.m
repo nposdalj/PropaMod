@@ -251,6 +251,7 @@ for rad = 1:length(radials)
             saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
 
             clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
+            close all
         end
     end
     clear Range bath

@@ -41,7 +41,7 @@ ri = sqrt(xi.^2 + yi.^2)./1000;
 bathi = griddata(latlon(:,1), latlon(:,2), latlon(:,3), lati(rad, :), loni(rad, :), 'linear');
 
 Range = ri.';
-bath = abs(bathi).';
+bath = bathi.'; % bath = abs(bathi).'; % Old ver
 
 [Rsort, I] = sort(Range);
 bathSort = bath(I);
