@@ -161,9 +161,6 @@ for rad = 1:length(radials)
     if rad == 1 % If this is currently running the first radial...
         SiteDepth = bath(1); % set the first value in the bathymetry as the depth of the site.
         SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
-
-        % REMOVED % Seafloor_SoundSpeed = SSP.SS(find(SSP.Depth == round(SiteDepth))); % Find soundspeed at seafloor depth of site
-        % REMOVED % AEHS.compSpeed = Seafloor_SoundSpeed; % Set this as the compressional speed for the seafloor AEHS.
     end
 
     RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
