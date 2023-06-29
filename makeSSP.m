@@ -24,32 +24,30 @@
 
 clearvars
 close all
-
 %% Parameters defined by user
 
 % Export directories
-regAbrev = 'Baja'; % Abbreviation of region name
-GDrive = 'H';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\Baja_GI\PropaMod\HYCOM_temp\Baja'; % Local save directory on your machine for HYCOM data
+regAbrev = 'MC'; % Abbreviation of region name
+GDrive = 'L';     % GDrive drive
+HYCOM_saveDir_Local = 'I:\BellHopOutputs\GOM'; % Local save directory on your machine for HYCOM data
 % HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
 % SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
-HYCOM_saveDir_Final = ['H:\Baja_GI\PropaMod\HYCOM_data\' regAbrev]; % For Baja_GI
-SSP_saveDir =         ['H:\Baja_GI\PropaMod\SSPs\' regAbrev]; % For Baja_GI
+HYCOM_saveDir_Final = ['I:\BellHopOutputs\GOM']; % For Baja_GI
+SSP_saveDir =         ['I:\BellHopOutputs\GOM']; % For Baja_GI
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
-siteCoordsFile = 'H:\Baja_GI\PropaMod\SiteCoords_Template.xlsx';
+siteCoordsFile = 'I:\BellHopOutputs\GOM\SiteCoords_Template.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available
 % in this region]
-LatRange = [27 31];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-120 -116];   % in degrees E (-180 W to 180 E). In order of W->E.
+LatRange = [26 28];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-92 -90];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2018-12';  % First month of study period. Format as yyyy-MM.
-Month_End = '2022-07';    % Final month of study period. Format as yyyy-MM.
+Month_Start = '2014-07';  % First month of study period. Format as yyyy-MM.
+Month_End = '2014-08';    % Final month of study period. Format as yyyy-MM.
 
-plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
-
+plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 %% Load site coordinates
 siteCoords = readtable(siteCoordsFile);
 siteAbrev = cell2mat(siteCoords.Site);

@@ -79,12 +79,12 @@ fprintf(fid, '%.4f  ', RR./1000);
 fprintf(fid, '/\t! RR\n');
 
 % model type
-modelType = 'C';
+modelType = 'I';
 fprintf(fid, ['''', modelType, '''\n']);
 
-% No. of beams
+%No. of beams
 switch modelType
-    case 'A'
+    case 'I'
         fprintf(fid, '0\n');
     case 'E'
         fprintf(fid, '2001\n')
@@ -95,11 +95,13 @@ end
 % Beam angles - from Kait's 2016 paper
 % "Three thousand rays were projected from the sensor position along each 
 % radial at launch angles ranging from 0 to 90, where 90 is directly above the instrument"
-fprintf(fid, '0  90 /\n');
+%fprintf(fid, '0  90 /\n');
+fprintf(fid, '-90  90 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
 %ZBOX - maximum ray depth
 %RBOX - maximum ray range
 fprintf(fid, '50  5000 101.0');
+%fprintf(fid, '0.0 1511 40.4'); 
 
 fclose(fid);

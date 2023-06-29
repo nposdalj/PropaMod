@@ -171,7 +171,6 @@ for rad = 1:length(radials)
     % make sound speed profile the same depth as the bathymetry
     zssp = 1:1:max(bath)+1;
     ssp = SSParray(1:length(zssp), 2);
-
     %% Begin peak frequency loop (6.2 continues into here)
 
     for freqi = 1:length(freq)
@@ -190,7 +189,6 @@ for rad = 1:length(radials)
             fullfile(intermedDirFi, [filePrefix '.bty'])); % copy bty from intermed dir to intermed subdir
         copyfile(fullfile(intermedDirFi, [filePrefix '.bty']),...
             fullfile(saveDir_subFi, [filePrefix '.bty']));    % copy bty to final save dir
-
         %% 6.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' filePrefix '...'])
         % Prepare and pack bottom parameters (AEHS params or grain sizes) for makeEnv input
@@ -207,7 +205,6 @@ for rad = 1:length(radials)
         makeEnv(intermedDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms); % make environment file
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
-
         %% 6.4 Run BELLHOP - Make shade and print files
         disp(['Running Bellhop for ' filePrefix '...']) % Status update
         tBegin = tic;
@@ -217,7 +214,6 @@ for rad = 1:length(radials)
             fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
         copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
             fullfile(saveDir_subFi, [filePrefix '.prt'])); % copy prt to final save dir
-
         %% 6.5 Generate radial plots
         if generate_RadialPlots == 1
             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
@@ -265,7 +261,6 @@ for freqi = 1:length(freq)
     end
 
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-
     %% 7. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
 
     hdepth = SD; % ADDED BY AD
@@ -339,10 +334,8 @@ for freqi = 1:length(freq)
 
         end
     end
-
     %% 9. Save variables for pDetSim
     freqSave = char(num2str(freq{freqi}/1000));
     rr = r'; % output to be saved for pDetSim
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
-
 end
