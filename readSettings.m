@@ -26,7 +26,7 @@ fpath = settings.Value_EDIT_{9}; % Input directory for WAT
 %                       - site SSP data: \SSPs\SSP_WAT_[Site].xlsx
 %                       - sediment data*: \Sediment_Data\...
 %                           Sediment data is optional, required only if modeling bottom using grain size. SEE WIKI FOR FOLDER CONFIGURATION.
-saveDir = settings.Value_EDIT_{10}; % Export directory % < This line should be unused now
+saveDir = [settings.Value_EDIT_{10} '\' settings.Value_EDIT_{4}]; % Export directory % < This line should be unused now
 %GEBCODir = [Gdrive,':\My Drive\PropagationModeling_GDrive']; %GEBCO bathymetry netCDF file
 GEBCODir = settings.Value_EDIT_{11}; %local GEBCO bathymetry netCDF file - Natalie
 %GEBCODir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %local GEBCO bathymetry netCDF file - Aaron WAT
