@@ -24,8 +24,8 @@ global radStep
 global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
-%settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
+% settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
+settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
