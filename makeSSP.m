@@ -29,7 +29,7 @@ close all
 % Export directories
 regAbrev = 'AB'; % Abbreviation of region name
 GDrive = 'G';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\GoA_AB\PropaMod\HYCOM_temp'; % Local save directory on your machine for HYCOM data
+HYCOM_saveDir_Local = 'H:\GoA_AB\PropaMod\HYCOM_data'; % Local save directory on your machine for HYCOM data
 % HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
 % SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
 HYCOM_saveDir_Final = 'H:\GoA_AB\PropaMod\HYCOM_data'; % For Baja_GI

@@ -55,7 +55,7 @@ msgbox(['HYCOM MOVED FROM GOMFS 3.0 (32 LEVLS) TO GOFS 3.1 (41 LEVELS)';...
 % exact grid of data you need to download varies depending on the
 % experiment. This section of the code translates your chosen latitude and
 % longitude ranges to get the grids that are right for each experiment.
-%   The max/min lats and max/min lons you chose may not match perfectly 
+%   The max/min lats and max/min lons you chose may not match perfectly
 % with the grid points available, so the code should round to the nearest
 % grid point. (EX. if you request the minimum longitude 297E, the code will
 % choose the grid points that match with 296.9600 since 297 isn't in the grid.)
@@ -107,7 +107,7 @@ time00_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum));
 time12_1 = datenum(dateshift(datetime(start_date),'start','month',0:monthnum)) + 0.5;
 
 for itr = 1:3  % Loop through iterations
-    
+
     if itr == 1
         time_1 = sort([time00_1 time12_1]); time = time_1;
     elseif itr == 2
@@ -116,16 +116,16 @@ for itr = 1:3  % Loop through iterations
         time_3 = sort([time00_3 time12_3]); time = time_3;
     end
     nt = length(time);
-    
+
     %% Loop through time points to download data
     for i = 1:nt % Loop through time points
         f1 = i;
         str_date = datestr(time(i),'yyyy-mm-dd HH:MM:SS');
-        
+
         % there is big jump between two solutions, so using most in recent/latest solution
         eddate = datenum(date);
         stdate = datenum(str_date,'yyyy-mm-dd HH:MM:SS');
-        
+
         if ((datenum(2014,7,1) >= stdate) || (stdate < datenum(2016,5,1))) % GLBv0.08 expt_56.3
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_56.3';
             xl = v008a_lonGR; yl = v008_latGR; zl = depthGR;
@@ -140,7 +140,7 @@ for itr = 1:3  % Loop through iterations
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.8';
             xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
-            
+
         elseif ((datenum(2017,6,1) >= stdate) || (stdate < datenum(2017,10,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_57.7'; % GLBv0.08 expt_57.7
             xl = v008a_lonGR; yl = v008_latGR; zl = depthGR;
@@ -150,36 +150,36 @@ for itr = 1:3  % Loop through iterations
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_92.9'; % GLBv0.08 expt_92.9
             xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
-            
+
         elseif ((datenum(2018,1,1) >= stdate) || (stdate <= datenum(2019,1,1)))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBv0.08/expt_93.0'; % GLBv0.08 expt_93.0
             xl = v008b_lonGR; yl = v008_latGR; zl = depthGR;
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
-            
+
         elseif ((datenum(2019,1,1) >= stdate) || (stdate <= eddate))
             OpenDAP_URL = 'http://tds.hycom.org/thredds/dodsC/GLBy0.08/expt_93.0'; % GLBy0.08 expt_93.0
             xl = y008_lonGR;  yl = y008_latGR; zl = depthGR;    % GLBy0.08 has a different GRID!
             ext_hycom_gofs_93_0(opath,f1,str_date,zl,yl,xl,OpenDAP_URL);
         end
-                
+
         % If a file couldn't be downloaded, add serial number of the following
         % day to the list of dates for the next iteration
         expected_FileName = [num2str(sprintf('%04d', i)), '_', char(datetime(str_date, 'Format', 'yyyyMMdd')), 'T' char(datetime(str_date, 'Format', 'HHmmSS')) '.mat'];
         expected_FilePath = fullfile(opath, expected_FileName);
-        
+
         if ~exist(expected_FilePath, 'file')
             str_dateStart = dateshift(datetime(str_date), 'start', 'day');
             if itr == 1
                 disp('Complete data cannot be generated for this date. Will attempt to use second day of month.')
                 if isempty(time00_2) || ~any(contains(string(time00_2), string(datenum(str_dateStart)+1))) % Avoid duplicate dates in 2nd iteration
-                time00_2 = [time00_2 datenum(str_dateStart)+1];
-                time12_2 = [time12_2 datenum(str_dateStart)+1.5];
+                    time00_2 = [time00_2 datenum(str_dateStart)+1];
+                    time12_2 = [time12_2 datenum(str_dateStart)+1.5];
                 end
             elseif itr == 2
                 disp('Complete data cannot be generated for this date. Will attempt to use third day of month.')
                 if isempty(time00_3) || ~any(contains(string(time00_3), string(datenum(str_dateStart)+1))) % Avoid duplicate dates in 3rd iteration
-                time00_3 = [time00_3 datenum(str_dateStart)+1];
-                time12_3 = [time12_3 datenum(str_dateStart)+1.5];
+                    time00_3 = [time00_3 datenum(str_dateStart)+1];
+                    time12_3 = [time12_3 datenum(str_dateStart)+1.5];
                 end
             elseif itr == 3
                 disp(['Complete data cannot be generated for this date. This month will not be included in downstream calculations.'])
@@ -189,10 +189,10 @@ for itr = 1:3  % Loop through iterations
         else
             disp(['Successfully made file: ' str_date])
         end
-        
+
         % As mentioned above, the start of 2019 involves a grid change.
-        % Thus, 01/01/2019 00:00:00 and 12:00:00 have different dimensions 
-        % and aren't compatible (e.g. for finding average). So, manually 
+        % Thus, 01/01/2019 00:00:00 and 12:00:00 have different dimensions
+        % and aren't compatible (e.g. for finding average). So, manually
         % mark 01/01/2019 for deletion and add 01/02 to second iteration.
         if strcmp(str_date, '2019-01-01 00:00:00')
             str_dateStart = dateshift(datetime(str_date), 'start', 'day');
@@ -201,9 +201,9 @@ for itr = 1:3  % Loop through iterations
             daysToDelete = [daysToDelete string(datetime(datenum(str_dateStart), 'ConvertFrom', 'datenum', 'Format', 'yyyyMMdd'))]; % 'Label' this date for deletion
             disp('2019-01-01 is automatically excluded from the data. Will use 2019-01-02 instead.')
         end
-        
+
     end % End loop through time points
-    
+
 end % End loop through iterations
 
 diary off;
@@ -233,7 +233,7 @@ fprintf(fileid, ['hycom_sampleMonths.m output - Report for User'...
     '\n\nFor the following months, second-day data was also missing or incomplete. The third day was attempted.\n' char(datetime(time00_3, 'ConvertFrom', 'datenum', 'Format', 'yyyy-MM'))...
     '\n\nFor the following months, third-day data was also missing or incomplete. These months have been excluded from the data.\n' char(excludedMonths)]);
 fclose(fileid);
-    
+
 %% Rename files without numeric prefix
 filesList_new = ls(fullfile(opath));
 for k = 1:size(filesList_new,1)
@@ -247,6 +247,6 @@ if exist(final_outpath) && ~strcmp(local_outpath, final_outpath)
     filesList_new = ls(fullfile(opath));
     for k = 1:size(filesList_new,1)
         movefile(fullfile(opath, filesList_new(k,:)),...
-            fullfile(final_outpath, filesList_new(k,:)))
+                fullfile(final_outpath, filesList_new(k,:)))
     end
 end
