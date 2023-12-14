@@ -95,8 +95,8 @@ end
 % Beam angles - from Kait's 2016 paper
 % "Three thousand rays were projected from the sensor position along each 
 % radial at launch angles ranging from 0 to 90, where 90 is directly above the instrument"
-%fprintf(fid, '0  90 /\n');
-fprintf(fid, '-90  90 /\n');
+fprintf(fid, '0  90 /\n');
+%fprintf(fid, '-90  90 /\n');
 %fprintf(fid, '-90  10 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
