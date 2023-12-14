@@ -27,25 +27,25 @@ close all
 %% Parameters defined by user
 
 % Export directories
-regAbrev = 'MC'; % Abbreviation of region name
-GDrive = 'L';     % GDrive drive
-HYCOM_saveDir_Local = 'I:\BellHopOutputs\GOM'; % Local save directory on your machine for HYCOM data
+regAbrev = 'AB'; % Abbreviation of region name
+GDrive = 'G';     % GDrive drive
+HYCOM_saveDir_Local = 'H:\GoA_AB\PropaMod\HYCOM_temp'; % Local save directory on your machine for HYCOM data
 % HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
 % SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
-HYCOM_saveDir_Final = ['I:\BellHopOutputs\GOM']; % For Baja_GI
-SSP_saveDir =         ['I:\BellHopOutputs\GOM']; % For Baja_GI
+HYCOM_saveDir_Final = 'H:\GoA_AB\PropaMod\HYCOM_data'; % For Baja_GI
+SSP_saveDir =         'H:\GoA_AB\PropaMod\SSPs'; % For Baja_GI
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
-siteCoordsFile = 'I:\BellHopOutputs\GOM\SiteCoords_Template.xlsx';
+siteCoordsFile = 'H:\GoA_AB\PropaMod\SiteCoords_Template.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available
 % in this region]
-LatRange = [26 28];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-92 -90];   % in degrees E (-180 W to 180 E). In order of W->E.
+LatRange = [55.5 59.5];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-148.5 -144.5];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2014-07';  % First month of study period. Format as yyyy-MM.
-Month_End = '2014-08';    % Final month of study period. Format as yyyy-MM.
+Month_Start = '2018-12';  % First month of study period. Format as yyyy-MM.
+Month_End = '2022-07';    % Final month of study period. Format as yyyy-MM.
 
 plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 %% Load site coordinates

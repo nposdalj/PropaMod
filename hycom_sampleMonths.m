@@ -87,8 +87,8 @@ depthGR = 0:1:39;
 
 %% Time
 formatTime = 'yyyy-MM-dd HH:mm:ss'; % formatTime = 'yyyy-mm-dd HH:MM:SS';
-start_date = char(datetime([startMonth '-01'], 'ConvertFrom', 'yyyy-mm-dd', 'Format', formatTime));
-end_date = char(datetime([endMonth '-01'], 'ConvertFrom', 'yyyy-MM-dd', 'Format', formatTime));
+start_date = char(datetime([startMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
+end_date = char(datetime([endMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
 
 monthnum = between(datetime(start_date),datetime(end_date), 'months');
 monthnum = split(monthnum, 'months');
