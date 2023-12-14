@@ -228,8 +228,8 @@ end
 
 extremeMonths = nan(length(siteAbrev(1,:)),2);
 for i = 1:length(siteAbrev(:,1))
-    extremeMonths(i,1) = find(testmean == min(testmean(:,i))) - 12*(i-1); % Min months stored in first column
-    extremeMonths(i,2) = find(testmean == max(testmean(:,i))) - 12*(i-1); % Max months stored in second column
+    extremeMonths(i,1) = find(testmean(:,i) == min(testmean(:,i))) - 12*(i-1); % Min months stored in first column
+    extremeMonths(i,2) = find(testmean(:,i) == max(testmean(:,i))) - 12*(i-1); % Max months stored in second column
 end
 
 for i = 1:length(siteAbrev(:,1))
