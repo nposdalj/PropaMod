@@ -12,14 +12,16 @@ clearvars
 close all
 %% Params defined by User
 % AllSite = {'BS','GS','JAX','BC','NC','NFC','OC','WC','BP','HZ','HAT_A','HAT_B'};
-AllSite = {'GI'};
-Region = 'CCE';
+AllSite = {'AB'};
+Region = 'GoA';
 sp = 'Pm';
 GDrive = 'G';
-inputDirMAIN = [GDrive,':\My Drive\PropagationModeling\Radials\']; % Where your data is coming from
-exportDirMAIN = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\']; % Where the assembled workspace will be saved
+% inputDirMAIN = [GDrive,':\My Drive\PropagationModeling\Radials\']; % Where your data is coming from
+% exportDirMAIN = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\']; % Where the assembled workspace will be saved
 % inputDirMAIN = 'H:\Baja_GI\PropaMod\Radials\'; % Where your data is coming from (for Baja)
 % exportDirMAIN = 'H:\Baja_GI\PropaMod\DetSim_Workspace\'; % Where the assembled workspace will be saved (for Baja)
+inputDirMAIN = 'H:\GoA_AB\PropaMod\Radials\'; % Where your data is coming from (for GoA)
+exportDirMAIN = 'H:\GoA_AB\PropaMod\DetSim_Workspace\'; % Where the assembled workspace will be saved (for GoA)
 for v = 1:length(AllSite)
     site = AllSite{v};
     exportDir = [exportDirMAIN,site];
@@ -43,6 +45,12 @@ for v = 1:length(AllSite)
         elseif contains(concatFilesMAIN{w},'8.500000e+00kHz')
             freq = '8.5kHz';
             freqNAME = '8.500000e+00kHz';
+        elseif contains(concatFilesMAIN{w},'7.750000e+00kHz')
+            freq = '7.75kHz';
+            freqNAME = '7.750000e+00kHz';
+        elseif contains(concatFilesMAIN{w},'9.250000e+00kHz')
+            freq = '9.25kHz';
+            freqNAME = '9.250000e+00kHz';
         else
             freq = '10.5kHz';
             freqNAME = '1.050000e+01kHz';
