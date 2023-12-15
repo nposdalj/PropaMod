@@ -44,7 +44,7 @@ LonRange = [-148.5 -144.5];   % in degrees E (-180 W to 180 E). In order of W->E
 
 % Effort Period
 Month_Start = '2019-01';  % First month of study period. Format as yyyy-MM.
-Month_End = '2019-12'; % '2022-12';    % Final month of study period. Format as yyyy-MM.
+Month_End = '2022-12'; % Final month of study period. Format as yyyy-MM.
 
 plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 %% Load site coordinates

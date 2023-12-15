@@ -24,8 +24,8 @@ global radStep
 global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-% settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
-settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
+settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
+% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
@@ -33,7 +33,9 @@ readSettings
 
 runDate = char(datetime('now', 'Format', 'yyMMdd'));
 existingDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
-existingDirs(1:2) = []; % delete first two rows
+if ~strcmp(existingDirs, "")
+    existingDirs(1:2) = []; % delete first two rows
+end
 existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
 % Code refers to saveDir instead of bellhopSaveDir to check for folders
 % other users may have generated today.
