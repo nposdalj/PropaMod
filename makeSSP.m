@@ -40,7 +40,7 @@ siteCoordsFile = 'H:\CCE_CCE\PropaMod\SiteCoords_Template.xlsx';
 % Range of data to download [Be mindful of the deepest bathymetry available
 % in this region]
 LatRange = [31.5 35.5];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-123.5 -119.5];   % in degrees E (-180 W to 180 E). In order of W->E.
+LonRange = [-124.5 -120.5];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
 Month_Start = '2019-01';  % First month of study period. Format as yyyy-MM.
