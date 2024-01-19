@@ -8,6 +8,7 @@
 % In recording 7/15/22 - we go through what all the vars are at ~0:40:00
 % Code outline started by AD and script continued by NP 07182022
 % Edited to loop through all site folders NP 05172023
+% WASD 2024/01/19 - Incorporated edits made by JAH to pDetSim_constructWS.m
 clearvars
 close all
 %% Params defined by User
@@ -72,6 +73,8 @@ for v = 1:length(AllSite)
             fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(inputDir,concatFiles{idsk}))
             D = fullfile(inputDir,concatFiles{idsk});
             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
+            % matOut = ESME_TL_3D(D, 'Bellhop');            % Added by JAH
+            matOut = ESME_TL_3D(inputDir, 'Bellhop');       % Added by JAH
     
             %create transmisson loss model
             PLslice = squeeze(pressure(1, 1,:,:));

@@ -10,17 +10,19 @@
 clearvars
 close all
 %% Params defined by User
-Site = 'HZ';
-Region = 'WAT';
+Site = 'CCE';
+Region = 'CCE';
 sp = 'Pm';
-date = '230629m'; %date you created the transmission loss model
-freq = '10.5kHz'; %peak frequency
+date = '240109c'; %date you created the transmission loss model
+freq = '8.5kHz'; %peak frequency
 %freqDir = '010'; %peak frequency for saving purposes (009, 010, 011)
-freqDir = '1.050000e+01'; %peak frequency for saving purposes (009, 010, 011)
+freqDir = '8.500000e+00'; %peak frequency for saving purposes (009, 010, 011)
 
-GDrive = 'L';
-inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from
-exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
+GDrive = 'G';
+% inputDir = [GDrive,':\My Drive\PropagationModeling\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from
+% exportDir = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
+inputDir = ['H:\CCE_CCE\PropaMod\Radials\',Site,'\',date,'\',freq]; % Where your data is coming from
+exportDir = ['H:\CCE_CCE\PropaMod\DetSim_Workspace\',Site]; % Where the assembled workspace will be saved
 %% Load workspace from bellhopDetRange to extract nrr and rr
 load(fullfile(exportDir, [Site,'_',date,'_',freqDir,'kHz_bellhopDetRange.mat']))
 %% Loop through .shd files and extract depth and transmission loss
@@ -37,6 +39,8 @@ for idsk = 1 : length(concatFiles)
     fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(inputDir,concatFiles{idsk}))
     D = fullfile(inputDir,concatFiles{idsk});
     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
+    % matOut = ESME_TL_3D(D, 'Bellhop');
+    matOut = ESME_TL_3D(inputDir, 'Bellhop');
     
     %create transmisson loss model
     PLslice = squeeze(pressure(1, 1,:,:));
