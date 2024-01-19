@@ -40,7 +40,9 @@ switch botModel
     case {'A', 'Y'}
         fprintf(fid, '''A*'' 0.0\n');
         %A = model as Acousto-Elastic half space
-        fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.3f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);
+        % fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.3f  /\n', max(ssp), botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten); % Original line before JAH change below
+        fprintf(fid, ' %.2f  %.1f  %.1f %.2f %.3f  /\n', ...
+            botParms.SiteDepth, botParms.compSpeed, botParms.shearSpeed, botParms.density, botParms.compAtten);%JAH fixed bug
 % fprintf(fid, ' 5000.0  %.3f  0.0 1.5 0.5  /\n', max(ssp)*1.01);
 % Params: Depth, Compressional speed, Shear speed, Density, Compressional attenuation, Shear attenuation
 %1.5 likely density (according to VZ)
@@ -85,7 +87,8 @@ fprintf(fid, ['''', modelType, '''\n']);
 %No. of beams
 switch modelType
     case 'I'
-        fprintf(fid, '0\n');
+        % fprintf(fid, '0\n'); % Original line before JAH change below
+        fprintf(fid, '5000\n'); %JAH hard coded to 5000, otherwise is 32000
     case 'E'
         fprintf(fid, '2001\n')
     case 'C'
@@ -100,9 +103,11 @@ fprintf(fid, '-90  90 /\n');
 %fprintf(fid, '-90  10 /\n');
 
 % Step, ZBOX, RBOX (don't really know what this does)
-%ZBOX - maximum ray depth
-%RBOX - maximum ray range
-fprintf(fid, '50  5000 101.0');
+% set step to 0 to allow program to select % Line added by JAH
+%ZBOX - maximum ray depth (m)
+%RBOX - maximum ray range (km)
+% fprintf(fid, '50  5000 101.0'); % Commented out by JAH
 %fprintf(fid, '0.0 1511 40.4'); 
+fprintf(fid, '0.0 5000 40.4'); % Line added by JAH
 
 fclose(fid);
