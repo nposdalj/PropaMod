@@ -1,0 +1,3 @@
+directory note: PropaMod\bellhop
+- bellhop_jah.exe - Version of BELLHOP used by JAH. Copied from F:\ACT\bin\bellhop.exe.
+- bellhopcxx.exe - Version of BELLHOP originally used by WASD and NP. Copied from H:\NP_propagationmodeling_backup\AcousticsToolbox\windows-bin-20201102\bellhop.exe. (File may alternatively be titled bellhopFAST.exe).
