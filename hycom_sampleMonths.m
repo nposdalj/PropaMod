@@ -86,9 +86,11 @@ y008_lonGR = dsearchn(y008_lons.', LonRange(1)+360):dsearchn(y008_lons.', LonRan
 depthGR = 0:1:39;
 
 %% Time
-formatTime = 'yyyy-MM-dd HH:mm:ss'; % formatTime = 'yyyy-mm-dd HH:MM:SS';
-start_date = char(datetime([startMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
-end_date = char(datetime([endMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
+formatTime = 'yyyy-MM-dd HH:mm:ss';
+% start_date = char(datetime([startMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
+% end_date = char(datetime([endMonth '-01'], 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
+start_date = char(datetime(startMonth, 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
+end_date = char(datetime(endMonth, 'InputFormat', 'yyyy-MM-dd', 'Format', formatTime));
 
 monthnum = between(datetime(start_date),datetime(end_date), 'months');
 monthnum = split(monthnum, 'months');
@@ -209,14 +211,16 @@ end % End loop through iterations
 diary off;
 
 % Wrap up by deleting partial data from unused days
+%   Note from WASD: JAH commented this section out when he made edits, but
+%   I don't see any reason to cut it, so I'm leaving it in...
 filesList = ls(opath);
 filesToDelete = filesList(contains(string(ls(opath)), string(daysToDelete)),:);
 for d = 1:size(filesToDelete, 1)
     delete(fullfile(opath,strcat(filesToDelete(d,:))))
 end
 disp('Incomplete data deleted.')
-
-runtime = toc; %Get run time
+%
+% runtime = toc; %Get run time
 
 %% Generate report of run for user -- This doesn't appear to be functioning correctly
 
@@ -237,7 +241,8 @@ fclose(fileid);
 %% Rename files without numeric prefix
 filesList_new = ls(fullfile(opath));
 for k = 1:size(filesList_new,1)
-    if contains(filesList_new(k,:), '.mat')
+    % if contains(filesList_new(k,:), '.mat') % Original line before JAH edited as below
+    if contains(filesList_new(k,:), '0.mat')
         movefile(fullfile(opath, filesList_new(k,:)), fullfile(opath, filesList_new(k,6:end)))
     end
 end
