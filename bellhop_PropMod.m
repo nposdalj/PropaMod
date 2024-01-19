@@ -1,5 +1,6 @@
 % code to calculate detection range around HARP
-% AD and NP, hacked by JAH
+% WASD and NP
+% WASD 2024/01/19 - Added changes made by JAH and WASD
 % Built for MATLAB R2022b, or later.
 %
 % Data needed to run:
@@ -228,7 +229,7 @@ for rad = 1:length(radials)
         if strcmp(justenv,'n')
             disp(['Running Bellhop for ' filePrefix '...']) % Status update
             tBegin = tic;
-            bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
+            bellhop_wasd(fullfile(intermedDirFi, filePrefix), 'jah'); % run bellhop on env file. Use jah's version of bellhop.
             blhopTimes(rad) = toc(tBegin);
             copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
                 fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
