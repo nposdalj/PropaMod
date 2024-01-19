@@ -25,8 +25,10 @@ global radStep
 global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
+% settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
+settingsPath = 'H:\PropaMod\PropaMod_Settings_compareJAHoutput.xlsx'; % <- Aaron alternate
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
+% readSettingsJAH'
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
@@ -104,7 +106,7 @@ dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
 % Reciever Depth
-RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
+RD = 0:depthStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
 r = 0:rangeStep:total_range;        % range with steps
 
 % Source Depth is set it to be the depth at hlat and hlon, - 10 m.
@@ -116,7 +118,10 @@ r = 0:rangeStep:total_range;        % range with steps
 distDec = dist*0.08; %convert distance from km to degrees
 hlat_range = [hlat+distDec hlat-distDec];
 hlon_range = [hlon+distDec hlon-distDec];
-AllVariables = loadBTY(distDec,hlat_range,hlon_range,GEBCODir);
+% GEBCOFile = ['GEBCO_2022.nc']; % baqthymetry file in geotiff or netCDF format % NEW]
+GEBCOFile = 'SOCAL.nc'; % rough edit to bring in John's bty file (COMMENT OUT WHEN DONE)
+AllVariables = loadBTYJAH(distDec,hlat_range,hlon_range,GEBCODir,GEBCOFile);
+
 %% 6G. Retrieve sediment data (if needed) and pack bottom parameters
 if botModel == 'G' || botModel == 'Y' % For bottom models requiring grain size...
     sedPath = [fpath '\Sediment_Data']; % Path where sediment data are located
@@ -152,28 +157,39 @@ for rad = 1:length(radials)
 
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
+    % radialiChar = num2str(sprintf('%6.2f', radials(rad))); % Radial number formatted for file names
+    % radialiChar = strrep(radialiChar, ' ','');
+    % radialiChar = strrep(radialiChar, '.','');
     [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
-    %[~, bath] = makeBTY_old(midDir, ['R' radialiChar],latout(rad), lonout(rad), hydLoc(1, 1), hydLoc(1, 2),GEBCODir); % make bathymetry file in intermed dir Freq 1
-    % The line above causes memory to climb, but ultimately it seems to go back down.
-    % Within the frequency loop, this .bty file is copied to the intermed
-    % frequency subdirectories and to the save directories
-
-    %bathTest(rad, :) = bath; % this is only used to plot the bathymetry if needed
-
+    figure
+    plotbty(fullfile(midDir, ['R' radialiChar, '.bty']));
+    hold on;
+    if isnan(bath)
+        disp('Bad Bathy')
+        return
+    end
     % DECIDE SD FOR ALL RADIALS (Done during the first radial)
     if rad == 1 % If this is currently running the first radial...
         SiteDepth = bath(1); % set the first value in the bathymetry as the depth of the site.
-        SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
+        AEHS.SiteDepth = SiteDepth;
+        if SiteDepth < hdepth % change by JAH: only fix source depth if it is inadvertently underground. Otherwise don't adjust
+            % WASD NOTE: I still want to make this more easy to adjust.
+            % Esp for different suspensions off the sea floor, like 30m
+            SD = SiteDepth - 10; % Set Source Depth (SD) as 10 m above the sea floor.
+        else
+            SD = hdepth;
+        end
     end
 
-    RD = 0:rangeStep:max(bath); % Re-creates the variable RD to go until the max depth of this specific radial
+    RD = 0:depthStep:floor(max(bath)); % Re-creates the variable RD to go until the max depth of this specific radial -  JAH change to depthStep
     bathyTimes(rad) = toc(tBegin);
 
     botDepthSort(rad,:) = bath'; %save bottom depth sorted by radial for pDetSim
 
     % make sound speed profile the same depth as the bathymetry
-    zssp = 1:1:max(bath)+1;
-    ssp = SSParray(1:length(zssp), 2);
+%     zssp = 1:floor(max(bath))+100; % JAH hard code every m
+    zssp = SSParray(1:5:end,1);
+    ssp = SSParray(1:5:end,2);
     %% Begin peak frequency loop (6.2 continues into here)
 
     for freqi = 1:length(freq)
@@ -218,6 +234,8 @@ for rad = 1:length(radials)
                 fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
             copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
                 fullfile(saveDir_subFi, [filePrefix '.prt'])); % copy prt to final save dir
+%             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
+
             %             %% 6.5 Generate radial plots
             %             if generate_RadialPlots == 1
             %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
@@ -291,56 +309,95 @@ for freqi = 1:length(freq)
     copyfile(paramfile,fullfile(saveDir_subFi, txtFileName)) % Copy to saveDir_sub
     copyfile(paramfile,fullfile(plotDirFi, txtFileName)); % Copy to plotDir
     %% 8. Generate Polar Plots
-    if generate_PolarPlots == 1
-
-        disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makePolarPlots(1))...
-            'm and ' num2str(makePolarPlots(3)) 'm, with interval ' num2str(makePolarPlots(2)) 'm'])
-        pause(1)
-
-        for plotdepth = makePolarPlots(1):makePolarPlots(2):makePolarPlots(3)
-            for rad = 1:length(radials)
-
-                radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-                filePrefix = ['R' radialiChar '_' freqiChar 'kHz']; % Current file prefix
-
-                [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
-                PLslice = squeeze(pressure(1, 1,:,:));
-                PL = -20*log10(abs(PLslice));
-
-                [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-                [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
-                zq = interp2(x1,y1, PL,xq1, yq1);
-
-                %save radial depth
-                rd_inter = Pos.r.z;
-
-                PLiii(rad, :) = zq(plotdepth, :); % Save PL along depth iii meters, the depth that is currently being plotted
-
-                clear zq yq1 xq1 x1 y1
-                disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' radialiChar])
-            end
-
-            PLiii(isinf(PLiii)) = NaN;
-            PLiii(PLiii > RL_threshold) = NaN; %PLxxx > 125 == NaN; %AD - what is this line for
-            RLiii = SL - PLiii;
-            RLiii(RLiii < RL_threshold) = NaN;
-
-            R = 1:1:length(RLiii(1,:));
-            figure('visible', 'off') % figure(1000 + plotdepth)
-            [Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
-            set(calbar,'location','EastOutside')
-            caxis([RL_threshold RL_plotMax]);
-            yticks(0:60:300)
-            set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
-            set(gcf, 'Position', [100 100 800 600])
-            title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'],'Position',[0 -1.2])
-            saveas(Radiance,[plotDirFi,'\',Site,'_',num2str(plotdepth),'m_' num2str(freqiChar) 'kHz_RLPolarMap.png'])
-            disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'])
-
-        end
-    end
+    %     if generate_PolarPlots == 1
+    %
+    %         disp(['Now generating polar plots for Freq ' num2str(freq{freqi}) ' kHz, between depths ' num2str(makePolarPlots(1))...
+    %             'm and ' num2str(makePolarPlots(3)) 'm, with interval ' num2str(makePolarPlots(2)) 'm'])
+    %         pause(1)
+    %
+    %         for plotdepth = makePolarPlots(1):makePolarPlots(2):makePolarPlots(3)
+    %             for rad = 1:length(radials)
+    %
+    %                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
+    %                 filePrefix = ['R' radialiChar '_' freqiChar 'kHz']; % Current file prefix
+    %
+    %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
+    %                 PLslice = squeeze(pressure(1, 1,:,:));
+    %                 PL = -20*log10(abs(PLslice));
+    %
+    %                 [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
+    %                 [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
+    %                 zq = interp2(x1,y1, PL,xq1, yq1);
+    %
+    %                 %save radial depth
+    %                 rd_inter = Pos.r.z;
+    %
+    %                 PLiii(rad, :) = zq(plotdepth, :); % Save PL along depth iii meters, the depth that is currently being plotted
+    %
+    %                 clear zq yq1 xq1 x1 y1
+    %                 disp(['Working on Polar plot w/ Depth ' num2str(plotdepth) ': Radial ' radialiChar])
+    %             end
+    %
+    %             PLiii(isinf(PLiii)) = NaN;
+    %             PLiii(PLiii > RL_threshold) = NaN; %PLxxx > 125 == NaN; %AD - what is this line for
+    %             RLiii = SL - PLiii;
+    %             RLiii(RLiii < RL_threshold) = NaN;
+    %
+    %             R = 1:1:length(RLiii(1,:));
+    %             figure('visible', 'off') % figure(1000 + plotdepth)
+    %             [Radiance, calbar] = polarPcolor(R, [radials 360], [RLiii;NaN(1,length(RLiii(1,:)))], 'Colormap', jet, 'Nspokes', 7);
+    %             set(calbar,'location','EastOutside')
+    %             caxis([RL_threshold RL_plotMax]);
+    %             yticks(0:60:300)
+    %             set(get(calbar,'ylabel'),'String', '\fontsize{10} Received Level [dB]');
+    %             set(gcf, 'Position', [100 100 800 600])
+    %             title(['\fontsize{15}', Site, ' - ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'],'Position',[0 -1.2])
+    %             saveas(Radiance,[plotDirFi,'\',Site,'_',num2str(plotdepth),'m_' num2str(freqiChar) 'kHz_RLPolarMap.png'])
+    %             disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'])
+    %
+    %         end
+    %     end
     %% 9. Save variables for pDetSim
     freqSave = char(num2str(freq{freqi}/1000));
     rr = r'; % output to be saved for pDetSim
+    targetDirectory = [fpath,'\DetSim_Workspace\',Site];
+    if exist(targetDirectory,'dir') == 0
+        mkdir(targetDirectory);
+    end
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
 end
+
+%% Loop through .shd files and extract depth and transmission loss
+matOut = ESME_TL_3D(saveDir_subFi, 'Bellhop', 'bellhopcxx');
+savePath = [saveDir_subFi, '\', 'freq_TL.mat'];
+save(savePath,'-mat')
+%     detfn = ['.*','.shd']; %.shd file names
+%     fileList = cellstr(ls(fullfile(saveDir_subFi))); %all file names in folder
+%     fileMatchIdx = find(~cellfun(@isempty,regexp(fileList,detfn))>0); % Find the file name that matches the filePrefix
+%     concatFiles = fileList(fileMatchIdx); %find actual file names
+%
+%     rd_all = num2cell(zeros(1,length(concatFiles))); %create empty array for radial depth to be used later with pDetSim
+%     sortedTLVec = num2cell(zeros(1,length(concatFiles))); %create empty array for transmission loss to be used later with pDetSim
+%
+%     for idsk = 1 : length(concatFiles)
+%         % Load file
+%         fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(saveDir_subFi,concatFiles{idsk}))
+%         D = fullfile(saveDir_subFi,concatFiles{idsk});
+%         %     [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
+%         [ ~, ~, ~, ~, ~, ~, rd, ~, pressure, ~, ~ ] = ReadShadeBin(D, 'Bellhop');
+%
+%         %create transmisson loss model
+%         PL = -20*log10(abs(pressure));
+% %         PL(:,1) = PL(:,2);
+%         sortedTLVec(idsk) = {PL};
+%         %save radial depth
+%         rd_all(idsk) = {rd}; %depth array to be used in pDetSim
+%     end
+%     thisAngle = radials; %change radial variable to match pdetSim code
+%     sd = SD;
+%     %% Save and export workspace for pDetSim_v3Pm.m
+%     fnmatOut = fullfile(saveDir_subFi,[Site,'_',freqiChar,'kHz_3DTL.mat']);
+%     save(fnmatOut,'rr','nrr','rd_all','sortedTLVec','hdepth','thisAngle','botDepthSort','freqSave','sd','-v7.3')% Kait format
+
+
+% end

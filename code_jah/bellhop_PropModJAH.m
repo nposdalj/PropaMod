@@ -35,7 +35,9 @@ readSettings
 
 runDate = char(datetime('now', 'Format', 'yyMMdd'));
 existingDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
-existingDirs(1:2) = []; % delete first two rows
+if ~strcmp(existingDirs, "")
+    existingDirs(1:2) = []; % delete first two rows
+end
 existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
 % Code refers to saveDir instead of bellhopSaveDir to check for folders
 % other users may have generated today.
@@ -99,7 +101,7 @@ hydLoc = [hlat, hlon, hdepth];
 % Radial intervals and length
 radStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)
 radials = 0:radStep:(360-radStep);  % radials in #-degree interval (# is in radStep)
-dist = (total_range/1000);          % distance in m to farthest point in range
+dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
 % Reciever Depth
@@ -351,7 +353,6 @@ for freqi = 1:length(freq)
     %             disp(['Polar Radial Map saved: ', Site, ', ', num2str(plotdepth), ' m, ' num2str(freq{freqi}) ' kHz'])
     %
     %         end
-end
 %% 9. Save variables for pDetSim
     freqSave = char(num2str(freq{freqi}/1000));
     rr = r'; % output to be saved for pDetSim
@@ -360,9 +361,10 @@ end
         mkdir(targetDirectory);
     end
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',newFolderName,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
+end
 
 %% Loop through .shd files and extract depth and transmission loss
-matOut = ESME_TL_3D(saveDir_subFi, 'Bellhop');
+matOut = ESME_TL_3D(saveDir_subFi, 'Bellhop', 'bellhopcxx');
 savePath = [saveDir_subFi, '\', 'freq_TL.mat'];
 save(savePath,'-mat')
 %     detfn = ['.*','.shd']; %.shd file names
