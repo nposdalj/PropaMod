@@ -140,7 +140,7 @@ for k = 1:2:length(fileNames(:,1))
     set(gcf,'Position',[50 50 1500 700])
     end
     
-    for i=1:length(siteAbrev)
+    for i=1:size(siteAbrev, 1)
         numdepths = nan(1,length(depthlist));
         
         nearlats = knnsearch(D.Latitude,Lat(1),'K',4); %find closest 4 latitude values
@@ -172,7 +172,7 @@ for k = 1:2:length(fileNames(:,1))
         % numdepths = [numdepths(1:izero-1), newcval(2:end)];
 
         if plotInProcess == 1
-        subplot(1,length(siteAbrev),i, 'Parent',plottimept_sup)
+        subplot(1,size(siteAbrev, 1),i, 'Parent',plottimept_sup)
         plot(numdepths, -depthlist,'-.')
         ylim([-3200 0])
         title(char(siteAbrev(i,:)))
@@ -181,7 +181,7 @@ for k = 1:2:length(fileNames(:,1))
         else
             set(gca,'YTickLabel',[])
         end
-        if i == round(size(siteAbrev,1)/2)
+        if i == round(size(siteAbrev, 1)/2)
             xlabel('Sound Speed (m/s)')
         end
         end
@@ -200,8 +200,8 @@ for k = 1:2:length(fileNames(:,1))
     % Array version of ALL_SSP - used for actual data assembly below
     
     SSP_table = array2table(SSP_array);
-    table_varNames = cell(1,size(siteAbrev,1));
-    for n = 1:size(siteAbrev,1)
+    table_varNames = cell(1,size(siteAbrev, 1));
+    for n = 1:size(siteAbrev, 1)
         table_varNames(n) = {char(siteAbrev(n,:))};
     end
     SSP_table.Properties.VariableNames = table_varNames;
@@ -224,14 +224,14 @@ end
 
 %% Interpolate full-depth SSPs and export data for each site
 
-for b = 1:length(siteAbrev)         % Generate subfolders for each site if they don't exist yet
+for b = 1:size(siteAbrev, 1)         % Generate subfolders for each site if they don't exist yet
    fName = char(siteAbrev(b,:)); % Convert the row to a character vector
     if ~exist(fullfile(SSP_saveDir, fName), 'dir')
         mkdir(fullfile(SSP_saveDir, fName))
     end
 end
 
-for b = 1:length(siteAbrev)
+for b = 1:size(siteAbrev, 1)
     Site = siteAbrev(b,:);
     
     TotMean = nanmean(cat(3, MoMeans.M01, MoMeans.M02,MoMeans.M03,MoMeans.M04,MoMeans.M05,MoMeans.M06,...
@@ -264,18 +264,18 @@ end
 
 %% Calculate the min and max months and produce the SSPs to save accordingly
 
-testmean = nan(12,size(siteAbrev,1));
+testmean = nan(12,size(siteAbrev, 1));
 for month = 1:12
-    testmean(month,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', month))])([23 25 27:33],1:length(siteAbrev)));
+    testmean(month,:) = mean(MoMeans.(['M',num2str(sprintf('%02d', month))])([23 25 27:33],1:size(siteAbrev, 1)));
 end
 
-extremeMonths = nan(length(siteAbrev(1,:)),2);
-for i = 1:length(siteAbrev(:,1))
+extremeMonths = nan(size(siteAbrev, 1),2);
+for i = 1:size(siteAbrev, 1)
     extremeMonths(i,1) = find(testmean == min(testmean(:,i))) - 12*(i-1); % Min months stored in first column
     extremeMonths(i,2) = find(testmean == max(testmean(:,i))) - 12*(i-1); % Max months stored in second column
 end
 
-for i = 1:length(siteAbrev(:,1))
+for i = 1:size(siteAbrev, 1)
     Site = siteAbrev(i,:);
     
     minMo = extremeMonths(i,1);
