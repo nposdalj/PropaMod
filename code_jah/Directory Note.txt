@@ -1,0 +1,13 @@
+C:\Users\HARP\Documents\GitHub\PropagationModeling\code_jah
+G:\My Drive\PropagationModeling\JAH_WASD_PropaMod
+Directory Note
+
+Code copied from G:\My Drive\PropagationModeling\JAH_PropaMod
+on 2024-01-08, 13:56, subsequently edited.
+
+Copied to H:\NP_propagationmodeling_backup\JAH_WASD_PropaMod
+on 2024-01-11, subsequently edited.
+
+Code from H:\NP_propagationmodeling_backup\JAH_WASD_PropaMod\PropaMod-main
+copied to C:\Users\HARP\Documents\GitHub\PropagationModeling\code_jah
+on 2024-01-18, 16:05, subsequently edited.
