@@ -27,16 +27,14 @@ close all
 %% Parameters defined by user
 
 % Export directories
-regAbrev = 'CORC3'; % Abbreviation of region name
-GDrive = 'E';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\CCE_CCE\PropaMod\HYCOM_data'; % Local save directory on your machine for HYCOM data
-% HYCOM_saveDir_Final = [GDrive ':\My Drive\PropagationModeling\HYCOM_data\' regAbrev]; % Final GDrive save directory for HYCOM data
-% SSP_saveDir =         [GDrive ':\My Drive\PropagationModeling\SSPs\' regAbrev]; % Final GDrive save directory for SSPs
-HYCOM_saveDir_Final = 'H:\CCE_CCE\PropaMod\HYCOM_data'; % For Baja_GI
-SSP_saveDir =         'H:\CCE_CCE\PropaMod\SSPs'; % For Baja_GI
+regAbrev = 'SOCAL'; % Abbreviation of region name
+GDrive = 'G';     % GDrive drive
+HYCOM_saveDir_Local = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % Local save directory on your machine for HYCOM data
+HYCOM_saveDir_Final = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % For SOCAL_CORC3
+SSP_saveDir =         'H:\SOCAL_CO3\PropaMod\SSPs';       % For SOCAL_CORC3
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
-siteCoordsFile = 'H:\CCE_CCE\PropaMod\SiteCoords_Template.xlsx';
+siteCoordsFile = 'H:\SOCAL_CO3\PropaMod\SiteCoords_SOCAL.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available
 % in this region]
@@ -45,9 +43,9 @@ LonRange = [-120 -118];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
 Month_Start = '2021-01-01';  % First month of study period. Format as yyyy-MM.
-Month_End = '2021-01-01';    % Final month of study period. Format as yyyy-MM.
+Month_End = '2021-12-01';    % Final month of study period. Format as yyyy-MM.
 
-plotInProcess = 1; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
+plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 %% Load site coordinates
 siteCoords = readtable(siteCoordsFile);
 sizsC = size(siteCoords);
