@@ -1,5 +1,5 @@
 % code to calculate detection range around HARP
-% AD and NP
+% AD and NP, hacked by JAH
 % Built for MATLAB R2022b, or later.
 %
 % Data needed to run:
@@ -14,6 +14,7 @@
 
 clearvars % clear variables
 close all;clear all;clc; % clear all
+justenv = 'n'; % only env files - no bellhop
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
@@ -104,7 +105,7 @@ distDeg = km2deg(dist);             % radial length in degrees
 
 % Reciever Depth
 RD = 0:rangeStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
-r = 0:rangeStep:total_range;        % range with steps                         
+r = 0:rangeStep:total_range;        % range with steps
 
 % Source Depth is set it to be the depth at hlat and hlon, - 10 m.
 % This simulates a hydrophone sitting 10 m off of the bottom.
@@ -208,45 +209,47 @@ for rad = 1:length(radials)
         copyfile(fullfile(intermedDirFi,[filePrefix '.env']),...
             fullfile(saveDir_subFi, [filePrefix '.env'])); % copy env to final save dir
         %% 6.4 Run BELLHOP - Make shade and print files
-        disp(['Running Bellhop for ' filePrefix '...']) % Status update
-        tBegin = tic;
-        bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
-        blhopTimes(rad) = toc(tBegin);
-        copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
-            fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
-        copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
-            fullfile(saveDir_subFi, [filePrefix '.prt'])); % copy prt to final save dir
-        %% 6.5 Generate radial plots
-        if generate_RadialPlots == 1
-            [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
-            PLslice = squeeze(pressure(1, 1,:,:));
-            PL = -20*log10(abs(PLslice));
-
-            [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-            [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1))); % this bumps memory up a bit...
-            zq = interp2(x1,y1, PL,xq1, yq1);
-
-            disp('Creating radial plot and saving...')
-            % figure(2000+radials(rad))
-            figure('visible', 'off')
-            RL_radiii = SL - zq; % bumps memory up a bit
-            RL_radiii(RL_radiii < RL_threshold) = NaN;
-            ptVisibility = ones(size(RL_radiii));
-            ptVisibility(isnan(RL_radiii)) = 0;
-            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial
-            % Using imagesc instead but still hiding RLs that are too low:
-            % got help from https://www.mathworks.com/matlabcentral/answers/81938-set-nan-as-another-color-than-default-using-imagesc
-            % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
-            % axis ij
-            % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
-            colormap(jet)
-            plotbty([intermedDirFi, '\' filePrefix, '.bty']) % doesn't hurt memory at all
-            title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
-            colorbar
-            saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
-
-            clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
-            close all
+        if strcmp(justenv,'n')
+            disp(['Running Bellhop for ' filePrefix '...']) % Status update
+            tBegin = tic;
+            bellhop(fullfile(intermedDirFi, filePrefix)); % run bellhop on env file
+            blhopTimes(rad) = toc(tBegin);
+            copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
+                fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir
+            copyfile(fullfile(intermedDirFi,[filePrefix '.prt']),...
+                fullfile(saveDir_subFi, [filePrefix '.prt'])); % copy prt to final save dir
+            %             %% 6.5 Generate radial plots
+            %             if generate_RadialPlots == 1
+            %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
+            %                 PLslice = squeeze(pressure(1, 1,:,:));
+            %                 PL = -20*log10(abs(PLslice));
+            %
+            %                 [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
+            %                 [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1))); % this bumps memory up a bit...
+            %                 zq = interp2(x1,y1, PL,xq1, yq1);
+            %
+            %                 disp('Creating radial plot and saving...')
+            %                 % figure(2000+radials(rad))
+            %                 figure('visible', 'off')
+            %                 RL_radiii = SL - zq; % bumps memory up a bit
+            %                 RL_radiii(RL_radiii < RL_threshold) = NaN;
+            %                 ptVisibility = ones(size(RL_radiii));
+            %                 ptVisibility(isnan(RL_radiii)) = 0;
+            %                 radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial
+            %                 % Using imagesc instead but still hiding RLs that are too low:
+            %                 % got help from https://www.mathworks.com/matlabcentral/answers/81938-set-nan-as-another-color-than-default-using-imagesc
+            %                 % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
+            %                 % axis ij
+            %                 % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
+            %                 colormap(jet)
+            %                 plotbty([intermedDirFi, '\' filePrefix, '.bty']) % doesn't hurt memory at all
+            %                 title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
+            %                 colorbar
+            %                 saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+            %
+            %                 clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
+            %                 close all
+            %             end
         end
     end
     clear Range bath
