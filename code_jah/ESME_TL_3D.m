@@ -1,4 +1,5 @@
-function sortedTLVec = ESME_TL_3D(indir,TLmethod)
+function sortedTLVec = ESME_TL_3D(indir,TLmethod, BELLHOPver)
+% WASD 2024-01-18 - Added parameter BELLHOPver.
 
 % indir = directory holding .shd files and .bty files
 
@@ -34,15 +35,17 @@ for itr = 1:length(listing)
         % ^ freq, nsd, nrd above are brought in, but never used moving forward.
         % moreover, nrr is the ONLY variable not replaced in the next (new) section...
 
-        %% Before continuing, get true inputs with read_shd_bin and adapt variable names
-        % ONLY activate this section for WASD's files (not JAH's)
-        yes_wasd = 1;
-        if yes_wasd == 1
+        %% If using bellhopcxx, get true inputs with read_shd_bin and adapt variable names
+        if strcmp(BELLHOPver, 'bellhopcxx')
             [ ~, ~, ~, ~, ~, Pos, pressure ] = read_shd_bin(fileName);
             sd = Pos.s.z;
             rd = Pos.r.z;
             rr = Pos.r.r;
             tlt = squeeze(pressure);
+        elseif strcmp(BELLHOPver, 'JAH')
+            % If running JAH's version of BELLHOP, no need to make fixes
+        else % Only accept these two version names!
+            error('BELLHOP version name not recognized. Enter bellhopcxx or JAH.')
         end
 
         %%
