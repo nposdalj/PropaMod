@@ -159,9 +159,6 @@ for rad = 1:length(radials)
 
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    % radialiChar = num2str(sprintf('%6.2f', radials(rad))); % Radial number formatted for file names
-    % radialiChar = strrep(radialiChar, ' ','');
-    % radialiChar = strrep(radialiChar, '.','');
     [~, bath] = makeBTY(midDir, ['R_' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
     figure
     plotbty(fullfile(midDir, ['R_' radialiChar, '.bty']));
