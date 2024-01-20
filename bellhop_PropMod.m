@@ -16,6 +16,7 @@
 clearvars % clear variables
 close all;clear all;clc; % clear all
 justenv = 'n'; % only env files - no bellhop
+
 %% 1. Define global vars
 % These are being called in the loop but are not functions
 global rangeStep
