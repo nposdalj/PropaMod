@@ -161,9 +161,9 @@ for rad = 1:length(radials)
     % radialiChar = num2str(sprintf('%6.2f', radials(rad))); % Radial number formatted for file names
     % radialiChar = strrep(radialiChar, ' ','');
     % radialiChar = strrep(radialiChar, '.','');
-    [~, bath] = makeBTY(midDir, ['R' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
+    [~, bath] = makeBTY(midDir, ['R_' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
     figure
-    plotbty(fullfile(midDir, ['R' radialiChar, '.bty']));
+    plotbty(fullfile(midDir, ['R_' radialiChar, '.bty']));
     hold on;
     if isnan(bath)
         disp('Bad Bathy')
@@ -203,9 +203,9 @@ for rad = 1:length(radials)
         end
 
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-        filePrefix = ['R' radialiChar '_' freqiChar 'kHz'];
+        filePrefix = ['R_' radialiChar '_' freqiChar 'kHz'];
 
-        copyfile(fullfile(midDir,['R' radialiChar '.bty']),...
+        copyfile(fullfile(midDir,['R_' radialiChar '.bty']),...
             fullfile(intermedDirFi, [filePrefix '.bty'])); % copy bty from intermed dir to intermed subdir
         copyfile(fullfile(intermedDirFi, [filePrefix '.bty']),...
             fullfile(saveDir_subFi, [filePrefix '.bty']));    % copy bty to final save dir
@@ -320,7 +320,7 @@ for freqi = 1:length(freq)
     %             for rad = 1:length(radials)
     %
     %                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    %                 filePrefix = ['R' radialiChar '_' freqiChar 'kHz']; % Current file prefix
+    %                 filePrefix = ['R_' radialiChar '_' freqiChar 'kHz']; % Current file prefix
     %
     %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
     %                 PLslice = squeeze(pressure(1, 1,:,:));
