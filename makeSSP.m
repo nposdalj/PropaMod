@@ -28,6 +28,7 @@ close all
 
 % Export directories
 regAbrev = 'SOCAL'; % Abbreviation of region name
+siteAbrev = 'CO3'; % Abbreviation of site name
 GDrive = 'G';     % GDrive drive
 HYCOM_saveDir_Local = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % Local save directory on your machine for HYCOM data
 HYCOM_saveDir_Final = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % For SOCAL_CORC3
@@ -48,16 +49,8 @@ Month_End = '2021-12-01';    % Final month of study period. Format as yyyy-MM.
 plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.
 %% Load site coordinates
 siteCoords = readtable(siteCoordsFile);
-sizsC = size(siteCoords);
-for isite = 1 : sizsC(1)
-    if strcmp(siteCoords.Site(isite),regAbrev)
-        siteAbrev = siteCoords.Site(isite);
-        Lat = siteCoords.Lat(isite); 
-        Lon = siteCoords.Lon(isite);
-    end
-end
-% siteAbrev = cell2mat(siteCoords.Site);
-% Lat = siteCoords.Lat; Lon = siteCoords.Lon;    
+siteAbrev = cell2mat(siteCoords.Site);
+Lat = siteCoords.Lat; Lon = siteCoords.Lon;    
 
 %% Download HYCOM data as mat files
 sprintf('\n/ / / / / / / / / / STEP 1: HYCOM DOWNLOAD / / / / / / / / / /')
