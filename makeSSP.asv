@@ -3,7 +3,7 @@
 % Configured for use with HYCOM's files
 % Latitudes and longitudes are configured for Western Atlantic (WAT).
 %
-% WASD: HYCOM data provides data points for every 1/12 degree. I believe
+% AD: HYCOM data provides data points for every 1/12 degree. I believe
 % that is at most every ~9.25 km. This MIGHT allow us to see significant
 % differences in sound speed across a 20-km range, but given such a low
 % resolution, I think those differences will be somewhat imprecise.

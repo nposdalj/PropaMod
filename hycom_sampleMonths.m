@@ -241,8 +241,8 @@ fclose(fileid);
 %% Rename files without numeric prefix
 filesList_new = ls(fullfile(opath));
 for k = 1:size(filesList_new,1)
-    % if contains(filesList_new(k,:), '.mat') % Original line before JAH edited as below
-    if contains(filesList_new(k,:), '0.mat')
+    if contains(filesList_new(k,:), '.mat') % Original line before JAH edited as below
+    % if contains(filesList_new(k,:), '0.mat')
         movefile(fullfile(opath, filesList_new(k,:)), fullfile(opath, filesList_new(k,6:end)))
     end
 end
