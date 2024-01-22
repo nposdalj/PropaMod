@@ -2,6 +2,7 @@
 % WASD and NP
 % WASD 2024/01/19 - Added changes made by JAH and WASD
 % Built for MATLAB R2022b, or later.
+% NOTE: May now require R2023b or later.
 %
 % Data needed to run:
 % - Sound speed profiles
