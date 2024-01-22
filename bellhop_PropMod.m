@@ -367,7 +367,7 @@ for freqi = 1:length(freq)
 end
 
 %% Loop through .shd files and extract depth and transmission loss
-matOut = ESME_TL_3D(saveDir_subFi, 'Bellhop', 'bellhopcxx');
+matOut = ESME_TL_3D(saveDir_subFi, 'Bellhop', 'JAH');
 savePath = [saveDir_subFi, '\', 'freq_TL.mat'];
 save(savePath,'-mat')
 %     detfn = ['.*','.shd']; %.shd file names
