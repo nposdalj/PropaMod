@@ -48,13 +48,14 @@ freq = {str2double(settings.Value_EDIT_{18})};  % Frequencies of sources, in Hz.
 SSPtype = settings.Value_EDIT_{19}; % 'Mean' = Overall mean; 'Mmax' = Month w/ max SS; 'Mmin' = Month w/ min SS.
 
 % D. SPECIFY MODELS
+bellhopVersion = settings.Value_EDIT_{20};
 % D.a makeBTY model - interpolation type
-BTYmodel = settings.Value_EDIT_{20}; % L: Linear interpolation of the surface
+BTYmodel = settings.Value_EDIT_{21}; % L: Linear interpolation of the surface
                 % C: Curvlinear interpolation
 
 %D.b makeENV model - method of interpolation used by Bellhop to calculate
 %sound speed and its derivatives along the way
-SSPint = settings.Value_EDIT_{21}; % S: cubic spline interpolation
+SSPint = settings.Value_EDIT_{22}; % S: cubic spline interpolation
                 % C: C-linear interpolation
                 % N: N2-linear interpolation
                 % A: Analytic interpolation (requires adaptation of the
@@ -63,54 +64,54 @@ SSPint = settings.Value_EDIT_{21}; % S: cubic spline interpolation
                 % (requires the creation of a *.ssp file containing the
                 % filed
                 
-SurfaceType = settings.Value_EDIT_{22}; 
+SurfaceType = settings.Value_EDIT_{23}; 
 
-BottomAtten = settings.Value_EDIT_{23};
+BottomAtten = settings.Value_EDIT_{24};
 
-VolAtten = settings.Value_EDIT_{24};
+VolAtten = settings.Value_EDIT_{25};
 
 % D.c Sea Floor Model
-botModel = settings.Value_EDIT_{25}; % 'A' = Model bottom as Acousto Elastic Half-Space; manually enter parameters. SEE D.i.
+botModel = settings.Value_EDIT_{26}; % 'A' = Model bottom as Acousto Elastic Half-Space; manually enter parameters. SEE D.i.
 %               % 'G' = Model bottom using grain size. SEE D.ii.
 %               % 'Y' = Model bottom as Acousto Elastic Half-Space; Calculate
 %               %       parameters with grain size and Algorithm Y. SEE D.ii.
 
 % D.i. If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %      (required for makeEnv.m to run, if botModel = 'A'):
-AEHS.compSpeed = str2double(settings.Value_EDIT_{26}); % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
+AEHS.compSpeed = str2double(settings.Value_EDIT_{27}); % 1470.00;   % Compressional speed % No longer used - Sound speed at seafloor at site is now used instead
 % This is now determined within the radial loop, during the first radial, along with Source Depth (SD)
-AEHS.shearSpeed = str2double(settings.Value_EDIT_{27}); %129.90; %150;  % 146.70;   % Shear speed
-AEHS.density = str2double(settings.Value_EDIT_{28}); %1.7  %1.15;        % Density.
+AEHS.shearSpeed = str2double(settings.Value_EDIT_{28}); %129.90; %150;  % 146.70;   % Shear speed
+AEHS.density = str2double(settings.Value_EDIT_{29}); %1.7  %1.15;        % Density.
 %   This value (1.7 g/cm^3) was chosen based on the average density of
 %   marine sediments found by Tenzer and Gladkikh (2014).
-AEHS.compAtten = str2double(settings.Value_EDIT_{29});    % Compressional attenuation
-AEHS.shearAtten = str2double(settings.Value_EDIT_{30});   % Shear attenuation
+AEHS.compAtten = str2double(settings.Value_EDIT_{30});    % Compressional attenuation
+AEHS.shearAtten = str2double(settings.Value_EDIT_{31});   % Shear attenuation
 
 % D.ii If modeling bottom using Acousto Elastic Half-Space, modify the following properties
 %        (required for makeEnv.m to run if botModel = 'Y'
-SedDep = str2double(settings.Value_EDIT_{31}); %sediment depth you expect for shear velocity calculations (3m = surficial sediment)
+SedDep = str2double(settings.Value_EDIT_{32}); %sediment depth you expect for shear velocity calculations (3m = surficial sediment)
 
 % D.ii. If modeling bottom using grain size, select which dataset to use:
-sedDatType = settings.Value_EDIT_{32}; % 'B' = BST data; 'I' = IMLGS data.
-forceLR = str2double(settings.Value_EDIT_{33}); % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
+sedDatType = settings.Value_EDIT_{33}; % 'B' = BST data; 'I' = IMLGS data.
+forceLR = str2double(settings.Value_EDIT_{34}); % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
-total_range = str2double(settings.Value_EDIT_{34});    % Radial range around your site, in meters
-rangeStep = str2double(settings.Value_EDIT_{35});         % Range resolution
-depthStep = str2double(settings.Value_EDIT_{36});         % Depth resolution
-numRadials = str2double(settings.Value_EDIT_{37});        % Specify number of radials - They will be evenly spaced.
+total_range = str2double(settings.Value_EDIT_{35});    % Radial range around your site, in meters
+rangeStep = str2double(settings.Value_EDIT_{36});         % Range resolution
+depthStep = str2double(settings.Value_EDIT_{37});         % Depth resolution
+numRadials = str2double(settings.Value_EDIT_{38});        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
 nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
-generate_RadialPlots = str2double(settings.Value_EDIT_{38}); % Generate radial plots? 1 = Yes, 0 = No
-generate_PolarPlots = str2double(settings.Value_EDIT_{39}); % Generate polar plots? 1 = Yes, 0 = No
+generate_RadialPlots = str2double(settings.Value_EDIT_{39}); % Generate radial plots? 1 = Yes, 0 = No
+generate_PolarPlots = str2double(settings.Value_EDIT_{40}); % Generate polar plots? 1 = Yes, 0 = No
 
-RL_threshold = str2double(settings.Value_EDIT_{40}); % Threshold below which you want to ignore data; will be plotted as blank (white space)
-RL_plotMax = str2double(settings.Value_EDIT_{41}); % Colorbar maximum for plots; indicates that this is the max expected RL
+RL_threshold = str2double(settings.Value_EDIT_{41}); % Threshold below which you want to ignore data; will be plotted as blank (white space)
+RL_plotMax = str2double(settings.Value_EDIT_{42}); % Colorbar maximum for plots; indicates that this is the max expected RL
 
 % Polar Plots
-makePolarPlots = [str2double(settings.Value_EDIT_{42}), ...
-    str2double(settings.Value_EDIT_{43}), ...
-    str2double(settings.Value_EDIT_{44})]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
+makePolarPlots = [str2double(settings.Value_EDIT_{43}), ...
+    str2double(settings.Value_EDIT_{44}), ...
+    str2double(settings.Value_EDIT_{45})]; % [min depth, step size, max depth] - we should try deeper than 800...maybe 1200m?
 % Radial plots are automatically generated for every radial

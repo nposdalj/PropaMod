@@ -218,7 +218,7 @@ for rad = 1:length(radials)
         if strcmp(justenv,'n')
             disp(['Running Bellhop for ' filePrefix '...']) % Status update
             tBegin = tic;
-            bellhop_wasd(fullfile(intermedDirFi, filePrefix), 'jah'); % run bellhop on env file. Use jah's version of bellhop.
+            bellhop_wasd(fullfile(intermedDirFi, filePrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
             blhopTimes(rad) = toc(tBegin);
             copyfile(fullfile(intermedDirFi,[filePrefix '.shd']),...
                 fullfile(saveDir_subFi, [filePrefix '.shd'])); % copy shd to final save dir

@@ -40,14 +40,18 @@ fprintf(fid, ['\nDepth\t' num2str(hdepth)]);
 fprintf(fid, ['\Z-config Method\t' hzconfig]); % Method to configure hydrophone z-position
 fprintf(fid, ['\Set Depth or Elevation\t' num2str(hz)]);
 
-% Section 3: Bottom Specs
-fprint(fid, '\n\nBOTTOM SPECS'); % header
+% Section 3: Model Specs
+fprint(fid, '\n\nMODEL SPECS'); % header
+fprint(fid, ['\nBELLHOP Version\t' bellhopVersion]);
+fprint(fid, '\nBATHYMETRY MODEL'); % Subsection: Bathymetry Model
 fprint(fid, ['\nBathymetry file\t' fullfile(GEBCODir, GEBCOFile)]);
 fprintf(fid, ['\nBathymetry Model\t' BTYmodel]);
+fprint(fid, '\nENVIRONMENT MODEL'); % Subsection: Environment Model
 fprintf(fid, ['\nSS Interpolation Method\t' SSPint]);
 fprintf(fid, ['\nType of Surface\t' SurfaceType]);
 fprintf(fid, ['\nAttenuation in Bottom\t' BottomAtten]);
 fprintf(fid, ['\nThorpe Volume Attenuation\t' VolAtten]);
+fprint(fid, '\nSEA FLOOR MODEL'); % Subsection: Sea Floor Model
 fprintf(fid, ['\nSea Floor Model\t' botModel]);
 switch botModel
     case 'A'
