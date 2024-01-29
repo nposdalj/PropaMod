@@ -121,8 +121,6 @@ r = 0:rangeStep:total_range;        % range with steps
 distDec = dist*0.08; %convert distance from km to degrees
 hlat_range = [hlat+distDec hlat-distDec];
 hlon_range = [hlon+distDec hlon-distDec];
-% GEBCOFile = ['GEBCO_2022.nc']; % baqthymetry file in geotiff or netCDF format % NEW]
-GEBCOFile = 'SOCAL.nc'; % rough edit to bring in John's bty file (COMMENT OUT WHEN DONE)
 AllVariables = loadBTYJAH(distDec,hlat_range,hlon_range,GEBCODir,GEBCOFile);
 
 %% 6G. Retrieve sediment data (if needed) and pack bottom parameters
