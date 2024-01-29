@@ -1,22 +1,24 @@
 % code to calculate detection range around HARP
 % WASD and NP
 % WASD 2024/01/19 - Added changes made by JAH and WASD
+
 % Built for MATLAB R2022b, or later.
 % NOTE: May now require R2023b or later.
-%
-% Data needed to run:
-% - Sound speed profiles
-
 % This script will:
-% Construct sound propagation radials around your site with your specified parameters
-% Save a .txt file w/ your selected parameters in Export directory and plot directory
-% Save .bty, .env, .shd, and .prt files to intermediate directory
-% Move these outputs to the Export directory
-% Generate radial and polar plots and save to Export directory
+% - Construct sound propagation radials around your site with your specified parameters
+% - Save a .txt file w/ your selected parameters in Export directory and plot directory
+% - Save .bty, .env, .shd, and .prt files to intermediate directory
+% - Move these outputs to the Export directory
+% - Generate radial and polar plots and save to Export directory
+% Please create a sound speed profile before executing this program.
+clearvars; close all;clc;
 
-clearvars % clear variables
-close all;clear all;clc; % clear all
 justenv = 'n'; % only env files - no bellhop
+
+%% (FOR USER) Enter path to settings file
+% Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
+settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- Aaron
+% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
 
 %% 1. Define global vars
 % These are being called in the loop but are not functions
@@ -26,11 +28,7 @@ global loni
 global rad
 global radStep
 global depthStep
-%% 2. Enter path to settings file and load settings
-% Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-% settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
-settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- Aaron alternate
-% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
+%% 2. Load settings
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
@@ -42,8 +40,7 @@ if ~strcmp(existingDirs, "")
     existingDirs(1:2) = []; % delete first two rows
 end
 existingDirs = existingDirs(contains(existingDirs, runDate), :); % Only consider folder names with today's date
-% Code refers to saveDir instead of bellhopSaveDir to check for folders
-% other users may have generated today.
+% Code refers to saveDir to check for folders of the same name created by other users
 
 dailyFolderNum = double('a');
 if ~isempty(existingDirs)
