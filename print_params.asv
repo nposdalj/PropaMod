@@ -6,6 +6,8 @@
 % print_params.m is set up as a subroutine to the program
 % bellhop_PropMod.m, and will not work independent of that program.
 
+hdepth = SD; % ADDED BY AD
+
 % Create file and prep for editing
 txtFileName = [newFolderName '_' freqiChar 'kHz_Input_Parameters.txt'];
 paramfile = fullfile(intermedDirFi, txtFileName);
@@ -38,7 +40,6 @@ fprintf(fid, ['\nLatitude\t' num2str(hlat)]);
 fprintf(fid, ['\nLongitude\t' num2str(hlon)]);
 fprintf(fid, ['\nDepth\t' num2str(hdepth)]);
 fprintf(fid, ['\Z-config Method\t' hzconfig]); % Method to configure hydrophone z-position
-fprintf(fid, ['\Set Depth or Elevation\t' num2str(hz)]);
 
 % Section 3: Bottom Specs
 fprint(fid, '\n\nBOTTOM SPECS'); % header
@@ -71,7 +72,7 @@ fprintf(fid, ['\nRad Step\t' num2str(radStep)]);
 fprintf(fid, ['\nDepth Step\t' num2str(depthStep) ' m']);
 
 % Section 5: Plotting Specs
-fprintf(fid, '\n\nPLOTTING SPECS');
+fprintf(fid, '\n\nPLOT GENERATION');
 fprintf(fid, ['\nGenerate Polar Plots\t' num2str(generate_PolarPlots)]);
 fprintf(fid, ['\nGenerate Radial Plots\t' num2str(generate_RadialPlots)]);
 fprintf(fid, ['\nRL Threshold\t' num2str(RL_threshold)]);
