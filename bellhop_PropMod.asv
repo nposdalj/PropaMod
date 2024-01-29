@@ -175,8 +175,7 @@ for rad = 1:length(radials)
         SiteDepth = bath(1); % Set first value in bathymetry as depth of site
         AEHS.SiteDepth = SiteDepth;
         if strcmp(hzconfig, 'ElevFromBot')
-            hdepth = SiteDepth - hz;
-            SD = hdepth;
+            
         end
     end
 
