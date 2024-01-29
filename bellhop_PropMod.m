@@ -29,9 +29,8 @@ global depthStep
 %% 2. Enter path to settings file and load settings
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
 % settingsPath = 'H:\PropaMod\PropaMod_Settings.xlsx'; % <- Aaron
-settingsPath = 'H:\PropaMod\PropaMod_Settings_compareJAHoutput.xlsx'; % <- Aaron alternate
+settingsPath = 'H:\PropaMod\PropaMod_Settings_ConfigV2.xlsx'; % <- Aaron alternate
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
-% readSettingsJAH'
 readSettings
 %% 3. Make new folders for this run's files
 % This step prevents file overwriting, if you are running bellhopDetRange.m
