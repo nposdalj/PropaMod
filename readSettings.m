@@ -96,12 +96,12 @@ sedDatType = settings.Value_EDIT_{33}; % 'B' = BST data; 'I' = IMLGS data.
 forceLR = str2double(settings.Value_EDIT_{34}); % If using BST data, set 0 to use high-res data where possible; 1, use low-res always
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
-total_range = str2double(settings.Value_EDIT_{35});    % Radial range around your site, in meters
+Range = str2double(settings.Value_EDIT_{35});    % Radial range around your site, in meters
 rStep = str2double(settings.Value_EDIT_{36});         % Range resolution
 zStep = str2double(settings.Value_EDIT_{37});         % Depth resolution
 numRadials = str2double(settings.Value_EDIT_{38});        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
-nrr = total_range/rStep; %total # of range step output to be saved for pDetSim
+nrr = Range/rStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
 generate_RadialPlots = str2double(settings.Value_EDIT_{39}); % Generate radial plots? 1 = Yes, 0 = No

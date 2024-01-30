@@ -13,25 +13,21 @@
 % Please create a sound speed profile before executing this program.
 clearvars; close all;clc;
 
-justenv = 'n'; % only env files - no bellhop
-
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- Aaron
-% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
+settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- WASD
+% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
 
 %% 2. Load settings
 readSettings
-%% 3. Make new folders for this run's files
-% This step prevents file overwriting, if you are running bellhopDetRange.m
-% multiple times in parallel on the same computer (or across devices).
 
+%% 3. Make new folders for this run's files
+% Define run ID (format: YYMMDDx where x is letter of alphabet)
 Date = char(datetime('now', 'Format', 'yyMMdd')); % Today's date
 runDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
 runDirs(strcmp(runDirs, ".      ") | strcmp(runDirs, "..     ")) = []; % Delete rows that actually aren't folders
 runDirs = runDirs(contains(runDirs, Date), :); % Only folders from today
 runDirs = char(runDirs); % Convert to char array
-
 dirTagInUse = double(runDirs(:, end)); % Directory tags already in use
 dirTagsAll = double('a'):double('{'); % All directory tag options (a-z)
 dirTag = min(setdiff(dirTagsAll, dirTagInUse)); % Get first available directory tag in alphabet
@@ -44,15 +40,15 @@ runID = [Date char(dirTag)]; disp(num2str(runID));
 midDir = [localDir, '\', Site, '\', runID]; mkdir(midDir);    % Intermediate save directory [local]
 endDir = [saveDir '\', runID]; mkdir(endDir);   % Final save directory [GDrive]
 plotDir = [fpath, '\Plots\' Site '\' runID]; mkdir(plotDir);    % Plot save directory [GDrive]
-% Create frequency-specific intermediate, final, and plot sub-directories
-midDirF = cell(length(freq), 1);    % Pre-allocate for intermediate sub-directory names
-endDirF = cell(length(freq), 1);    % Pre-allocate for final sub-directory names
-plotDirF = cell(length(freq), 1);   % Pre-allocate for plot sub-directory names
+% Pre-allocate names, then create frequency-specific intermediate, final, and plot sub-directories
+midDirF = cell(length(freq), 1); endDirF = cell(length(freq), 1); plotDirF = cell(length(freq), 1);
 for freqi = 1:length(freq)
-    midDirF{freqi} = [midDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(midDirF{freqi}); % Intermediate sub-directory for i'th freq
-    endDirF{freqi} = [endDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(endDirF{freqi}); % Final sub-directory for i'th freq
-    plotDirF{freqi} = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF{freqi}); % Plot sub-directory for i'th freq
+    fnameFreq = [num2str(freq{1}/1000) 'kHz']; % i'th freq formatted for sub-directory names
+    midDirF{freqi} = fullfile(midDir, fnameFreq); mkdir(midDirF{freqi}); % Intermediate sub-directory for i'th freq
+    endDirF{freqi} = fullfile(endDir, fnameFreq); mkdir(endDirF{freqi}); % Final sub-directory for i'th freq
+    plotDirF{freqi} = fullfile(plotDir, fnameFreq); mkdir(plotDirF{freqi}); % Plot sub-directory for i'th freq
 end
+
 %% 4. Sound Speed Profiles
 SSPdir = ls(fullfile(fpath,'SSPs',Region,Site));          % Get list of files in SSP folder
 SSPdirIdx = find(contains(string(SSPdir),SSPtype) & ~contains(string(SSPdir), "$"));
@@ -65,26 +61,24 @@ if strcmp(SSPtype, 'Mmax') || strcmp(SSPtype, 'Mmin') % Get month being examined
 elseif strcmp(SSPtype, 'Mean')
     SSPmoReporting = 'Not applicable'; % If using mean SSP, then report "Not applicable"
 end
-%% 5. Hydrophone location and depth
+
+%% 5. Hydrophone location and depth & Load GEBCO data
 % Center of source cell
 hydLoc = [hlat, hlon, NaN]; % Leave depth empty for now
 if strcmp(hzconfig, 'DepthFromSurf') % If vertical pos configuration is depth from surface, set hdepth = hz
     hdepth = hz;
     hydLoc(3) = hdepth; % Add to hydLoc
 end
-
 % Radial intervals and length
 thetaStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)
 radials = 0:thetaStep:(360-thetaStep);  % radials in #-degree interval (# is in radStep)
-dist = (total_range/1000);          % distance in km to farthest point in range
+dist = (Range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
-
 % Reciever Depth
-RD = 0:zStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
-r = 0:rStep:total_range;        % range with steps
-
-%5a. Load GEBCO data once
-distDec = dist*0.08; %convert distance from km to degrees
+RD = 0:zStep:1000;  % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
+r = 0:rStep:Range;  % range with steps
+% Load GEBCO data
+distDec = dist*0.08; % convert distance from km to degrees
 hlat_range = [hlat+distDec hlat-distDec];
 hlon_range = [hlon+distDec hlon-distDec];
 AllVariables = loadBTYJAH(distDec,hlat_range,hlon_range,GEBCODir,GEBCOFile);
@@ -96,21 +90,18 @@ if botModel == 'G' || botModel == 'Y' % For bottom models requiring grain size..
         imlgs2hfeva_WAT(sedPath) % Run imlgs2hfeva_WAT on the IMLGS data first to translate it to HFEVA types
         % I wonder if this part should be removed... it only ever needs to be run once
     end
-    radGrainSize = getGrainSize(sedDatType, sedPath, hydLoc, distDeg, total_range, radials, plotDir, rStep, forceLR);
+    radGrainSize = getGrainSize(sedDatType, sedPath, hydLoc, distDeg, Range, radials, plotDir, rStep, forceLR);
 end
 %% 6. Build Radials
-% Note: this loop will re-write the existing files in the folder if you do not
-% create a subfolder using Section 3
+% NOTE: Existing files in folder will be overwritten if you do not create subfolder using Section 3
 disp('General setup complete. Beginning radial construction...')
 
 % Preallocated variables
-bathyTimes = nan(rad, 1); % durations of bathymetry file section
-blhopTimes = nan(rad, 1); % durations of bellhop section
-botDepthSort = nan(length(radials), length(0:rStep:total_range)); % bottom depth sorted by radials for pDetSim
+botDepthSort = nan(length(radials), length(0:rStep:Range)); % bottom depth sorted by radials for pDetSim
 latout = nan(1, length(radials));
 lonout = nan(1, length(radials));
-lati = nan(length(radials), length(0:rStep:total_range));
-loni = nan(length(radials), length(0:rStep:total_range));
+lati = nan(length(radials), length(0:rStep:Range));
+loni = nan(length(radials), length(0:rStep:Range));
 
 for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
@@ -120,15 +111,14 @@ for rad = 1:length(radials)
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
 
     % RANGE STEP - interpolate line from center to point at edge of circle
-    lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rStep:total_range));
-    loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rStep:total_range));
+    lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rStep:Range));
+    loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rStep:Range));
 
     %% 6.2 Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
 
-    tBegin = tic;
-    radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [~, bath] = makeBTY(midDir, ['R_' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
+    radiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
+    [~, bath] = makeBTY(midDir, ['R_' radiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
     % figure; plotbty(fullfile(midDir, ['R_' radialiChar, '.bty'])); hold on;
     if isnan(bath)
         error('Bad Bathymetry')
@@ -145,8 +135,6 @@ for rad = 1:length(radials)
     end
 
     RD = 0:zStep:floor(max(bath)); % Re-creates the variable RD to go until the max depth of this specific radial -  JAH change to zStep
-    bathyTimes(rad) = toc(tBegin);
-
     botDepthSort(rad,:) = bath'; %save bottom depth sorted by radial for pDetSim
 
     % make sound speed profile the same depth as the bathymetry
@@ -156,14 +144,10 @@ for rad = 1:length(radials)
 
     %% Begin peak frequency loop (6.2 continues into here)
     for freqi = 1:length(freq)
-        midDirFi = midDirF{freqi}; % Select directories for current sub-iteration
-        endDirFi = endDirF{freqi};
-        plotDirFi = plotDirF{freqi};
-
+        midDirFi = midDirF{freqi}; endDirFi = endDirF{freqi}; plotDirFi = plotDirF{freqi}; % sub-directories for iteration
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-        fPrefix = ['R_' radialiChar '_' freqiChar 'kHz'];
-
-        copyfile(fullfile(midDir,['R_' radialiChar '.bty']), fullfile(midDirFi, [fPrefix '.bty'])); % copy bty to sub-directory
+        fPrefix = ['R_' radiChar '_' freqiChar 'kHz'];
+        copyfile(fullfile(midDir,['R_' radiChar '.bty']), fullfile(midDirFi, [fPrefix '.bty'])); % copy bty to sub-directory
         copyfile(fullfile(midDirFi, [fPrefix '.bty']), fullfile(endDirFi, [fPrefix '.bty']));    % copy bty to final directory
         %% 6.3 Make environment file (to be used in BELLHOP)
         disp(['Making environment file for ' fPrefix '...'])
@@ -173,21 +157,18 @@ for rad = 1:length(radials)
         elseif botModel == 'G' % G - Use grain size
             botParms = radGrainSize(rad);
         elseif botModel == 'Y' % Y - Generate AEHS parameters from grain size based on Algorithm Y
-            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.density] = hamilton_aehs(radGrainSize(rad),SedDep);
             % Calculate compressional speed, shear speed, sediment density, compressional attenuation, and shear attenuation
+            [AEHS.compSpeed, AEHS.compAtten, AEHS.shearSpeed, AEHS.density] = hamilton_aehs(radGrainSize(rad),SedDep);
             botParms = AEHS;
         end
         % Make environment file
-        makeEnv(midDirFi, fPrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms); % make environment file
+        makeEnv(midDirFi, fPrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms);
         copyfile(fullfile(midDirFi,[fPrefix '.env']), fullfile(endDirFi, [fPrefix '.env'])); % copy env to final directory
         %% 6.4 Run BELLHOP - Make shade and print files
-        if strcmp(justenv,'n')
-            disp(['Running Bellhop for ' fPrefix '...']) % Status update
-            tBegin = tic;
-            bellhop_wasd(fullfile(midDirFi, fPrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
-            blhopTimes(rad) = toc(tBegin);
-            copyfile(fullfile(midDirFi,[fPrefix '.shd']), fullfile(endDirFi, [fPrefix '.shd'])); % copy shd to final dir
-            copyfile(fullfile(midDirFi,[fPrefix '.prt']), fullfile(endDirFi, [fPrefix '.prt'])); % copy prt to final dir
+        disp(['Running Bellhop for ' fPrefix '...']) % Status update
+        bellhop_wasd(fullfile(midDirFi, fPrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
+        copyfile(fullfile(midDirFi,[fPrefix '.shd']), fullfile(endDirFi, [fPrefix '.shd'])); % copy shd to final dir
+        copyfile(fullfile(midDirFi,[fPrefix '.prt']), fullfile(endDirFi, [fPrefix '.prt'])); % copy prt to final dir
 %             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
 
             %             %% 6.5 Generate radial plots
@@ -222,17 +203,13 @@ for rad = 1:length(radials)
             %                 clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
             %                 close all
             %             end
-        end
     end
     clear Range bath
 end % End loop through radials
 disp('Completed constructing radials.')
 %% Steps 7-9 - Loop through frequencies
 for freqi = 1:length(freq)
-    midDirFi = midDirF{freqi}; % Select directories for current sub-iteration
-    endDirFi = endDirF{freqi};
-    plotDirFi = plotDirF{freqi};
-
+    midDirFi = midDirF{freqi}; endDirFi = endDirF{freqi}; plotDirFi = plotDirF{freqi}; % sub-directories for iteration
     freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
     %% 7. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
     hdepth = SD; % ADDED BY AD
