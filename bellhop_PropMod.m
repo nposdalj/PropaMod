@@ -119,13 +119,10 @@ for rad = 1:length(radials)
 
     radiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(midDir, ['R_' radiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
-    % figure; plotbty(fullfile(midDir, ['R_' radialiChar, '.bty'])); hold on;
     if isnan(bath)
         error('Bad Bathymetry')
     end
-
-    % During first radial: If hydrophone vertical pos is set as elevation from sea floor, calculate it now based on bathymetry
-    if rad == 1 % If on Radial 1
+    if rad == 1 % During first radial, if hydrophone z pos set as elev from sea floor, calculate it based on bathymetry
         SiteDepth = bath(1); % Set first value in bathymetry as depth of site
         AEHS.SiteDepth = SiteDepth;
         if strcmp(hzconfig, 'ElevFromBot')
