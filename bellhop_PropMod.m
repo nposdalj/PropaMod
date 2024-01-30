@@ -15,19 +15,11 @@ clearvars; close all;clc;
 
 justenv = 'n'; % only env files - no bellhop
 
-%% (FOR USER) Enter path to settings file
+%% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
 settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- Aaron
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- Natalie
 
-%% 1. Define global vars
-% These are being called in the loop but are not functions
-global rangeStep
-global lati
-global loni
-global rad
-global radStep
-global depthStep
 %% 2. Load settings
 readSettings
 %% 3. Make new folders for this run's files
