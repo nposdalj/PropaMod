@@ -26,40 +26,32 @@ readSettings
 % This step prevents file overwriting, if you are running bellhopDetRange.m
 % multiple times in parallel on the same computer (or across devices).
 
-Date = char(datetime('now', 'Format', 'yyMMdd'));
-existingDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
-if ~strcmp(existingDirs, "")
-    existingDirs(1:2) = []; % delete first two rows
-end
-existingDirs = existingDirs(contains(existingDirs, Date), :); % Only consider folder names with today's date
-% Code refers to saveDir to check for folders of the same name created by other users
+Date = char(datetime('now', 'Format', 'yyMMdd')); % Today's date
+runDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
+runDirs(strcmp(runDirs, ".      ") | strcmp(runDirs, "..     ")) = []; % Delete rows that actually aren't folders
+runDirs = runDirs(contains(runDirs, Date), :); % Only folders from today
+runDirs = char(runDirs); % Convert to char array
 
-dirTag = double('a');
-if ~isempty(existingDirs)
-    for k = 1:height(existingDirs)
-        if contains(existingDirs(k),char(dirTag)) == 1
-            dirTag = dirTag + 1;
-            % Starting from "a", go through characters until first one that isn't in a folder name from today is reached
-        end
-    end
-end
-if dirTag ~= double('{')    % If there is still room for more run folders for today, make new directories.
-    runID = [Date char(dirTag)];
-    % Create general intermediate, final, and plot directories
-    midDir = [bellhopSaveDir, '\', Site, '\', runID]; mkdir(midDir);    % Intermediate save directory [local]
-    endDir = [saveDir '\', runID]; mkdir(endDir);   % Final save directory [GDrive]
-    plotDir = [fpath, '\Plots\' Site '\' runID]; mkdir(plotDir);    % Plot save directory [GDrive]
-    % Create frequency-specific intermediate, final, and plot sub-directories
-    midDirF = cell(length(freq), 1);    % Pre-allocate for intermediate sub-directory names
-    endDirF = cell(length(freq), 1);    % Pre-allocate for final sub-directory names
-    plotDirF = cell(length(freq), 1);   % Pre-allocate for plot sub-directory names
-    for freqi = 1:length(freq)
-        midDirF{freqi} = [midDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(midDirF{freqi}); % Intermediate sub-directory for i'th freq
-        endDirF{freqi} = [endDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(endDirF{freqi}); % Final sub-directory for i'th freq
-        plotDirF{freqi} = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF{freqi}); % Plot sub-directory for i'th freq
-    end
-else % If reached end of alphabet 
+dirTagInUse = double(runDirs(:, end)); % Directory tags already in use
+dirTagsAll = double('a'):double('{'); % All directory tag options (a-z)
+dirTag = min(setdiff(dirTagsAll, dirTagInUse)); % Get first available directory tag in alphabet
+if isempty(dirTag) % Throw error if no directory tags available
     error('Max daily limit of 26 runs has been reached. To make a new one, delete a run from today from the GDrive save directory.')
+end
+runID = [Date char(dirTag)]; disp(num2str(runID));
+
+% Create general intermediate, final, and plot directories
+midDir = [localDir, '\', Site, '\', runID]; mkdir(midDir);    % Intermediate save directory [local]
+endDir = [saveDir '\', runID]; mkdir(endDir);   % Final save directory [GDrive]
+plotDir = [fpath, '\Plots\' Site '\' runID]; mkdir(plotDir);    % Plot save directory [GDrive]
+% Create frequency-specific intermediate, final, and plot sub-directories
+midDirF = cell(length(freq), 1);    % Pre-allocate for intermediate sub-directory names
+endDirF = cell(length(freq), 1);    % Pre-allocate for final sub-directory names
+plotDirF = cell(length(freq), 1);   % Pre-allocate for plot sub-directory names
+for freqi = 1:length(freq)
+    midDirF{freqi} = [midDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(midDirF{freqi}); % Intermediate sub-directory for i'th freq
+    endDirF{freqi} = [endDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(endDirF{freqi}); % Final sub-directory for i'th freq
+    plotDirF{freqi} = [plotDir '\' num2str(freq{1}/1000) 'kHz']; mkdir(plotDirF{freqi}); % Plot sub-directory for i'th freq
 end
 %% 4. Sound Speed Profiles
 SSPdir = ls(fullfile(fpath,'SSPs',Region,Site));          % Get list of files in SSP folder
@@ -82,14 +74,14 @@ if strcmp(hzconfig, 'DepthFromSurf') % If vertical pos configuration is depth fr
 end
 
 % Radial intervals and length
-radStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)
-radials = 0:radStep:(360-radStep);  % radials in #-degree interval (# is in radStep)
+thetaStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)
+radials = 0:thetaStep:(360-thetaStep);  % radials in #-degree interval (# is in radStep)
 dist = (total_range/1000);          % distance in km to farthest point in range
 distDeg = km2deg(dist);             % radial length in degrees
 
 % Reciever Depth
-RD = 0:depthStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
-r = 0:rangeStep:total_range;        % range with steps
+RD = 0:zStep:1000;              % Receiver depth (it's set to a 1000 here, but in the 'Build Radial' loop, RD goes to the maximum depth of the bathymetry
+r = 0:rStep:total_range;        % range with steps
 
 %5a. Load GEBCO data once
 distDec = dist*0.08; %convert distance from km to degrees
@@ -104,28 +96,32 @@ if botModel == 'G' || botModel == 'Y' % For bottom models requiring grain size..
         imlgs2hfeva_WAT(sedPath) % Run imlgs2hfeva_WAT on the IMLGS data first to translate it to HFEVA types
         % I wonder if this part should be removed... it only ever needs to be run once
     end
-    radGrainSize = getGrainSize(sedDatType, sedPath, hydLoc, distDeg, total_range, radials, plotDir, rangeStep, forceLR);
+    radGrainSize = getGrainSize(sedDatType, sedPath, hydLoc, distDeg, total_range, radials, plotDir, rStep, forceLR);
 end
 %% 6. Build Radials
 % Note: this loop will re-write the existing files in the folder if you do not
-% create a subfolder using the above section of the code (Section 3)
-
-botDepthSort = []; %create empty array for bottom depth sorted by radials for pDetSim
+% create a subfolder using Section 3
 disp('General setup complete. Beginning radial construction...')
 
-bathyTimes = nan(rad, 1); % List of durations of bathymetry file section
-blhopTimes = nan(rad, 1); % List of durations of bellhop section
+% Preallocated variables
+bathyTimes = nan(rad, 1); % durations of bathymetry file section
+blhopTimes = nan(rad, 1); % durations of bellhop section
+botDepthSort = nan(length(radials), length(0:rStep:total_range)); % bottom depth sorted by radials for pDetSim
+latout = nan(1, length(radials));
+lonout = nan(1, length(radials));
+lati = nan(length(radials), length(0:rStep:total_range));
+loni = nan(length(radials), length(0:rStep:total_range));
+
 for rad = 1:length(radials)
     disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
 
     %% 6.1 Create radial line
-    % gives lat lon point total range (km) away in the direction of radials from source center
+    % gives lat-lon point total range (km) away in the direction of radials from source center
     [latout(rad), lonout(rad)] = reckon(hydLoc(1, 1), hydLoc(1, 2), distDeg, radials(rad),'degrees');
 
-    % RANGE STEP, interpolating a line from the center point to the point
-    % at edge of circle
-    lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rangeStep:total_range));
-    loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rangeStep:total_range));
+    % RANGE STEP - interpolate line from center to point at edge of circle
+    lati(rad, :) = linspace(hydLoc(1, 1), latout(rad), length(0:rStep:total_range));
+    loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rStep:total_range));
 
     %% 6.2 Make bathymetry file (to be used in BELLHOP)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
@@ -133,13 +129,11 @@ for rad = 1:length(radials)
     tBegin = tic;
     radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     [~, bath] = makeBTY(midDir, ['R_' radialiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
-    figure
-    plotbty(fullfile(midDir, ['R_' radialiChar, '.bty']));
-    hold on;
+    % figure; plotbty(fullfile(midDir, ['R_' radialiChar, '.bty'])); hold on;
     if isnan(bath)
-        disp('Bad Bathy')
-        return
+        error('Bad Bathymetry')
     end
+
     % During first radial: If hydrophone vertical pos is set as elevation from sea floor, calculate it now based on bathymetry
     if rad == 1 % If on Radial 1
         SiteDepth = bath(1); % Set first value in bathymetry as depth of site
@@ -150,7 +144,7 @@ for rad = 1:length(radials)
         end
     end
 
-    RD = 0:depthStep:floor(max(bath)); % Re-creates the variable RD to go until the max depth of this specific radial -  JAH change to depthStep
+    RD = 0:zStep:floor(max(bath)); % Re-creates the variable RD to go until the max depth of this specific radial -  JAH change to zStep
     bathyTimes(rad) = toc(tBegin);
 
     botDepthSort(rad,:) = bath'; %save bottom depth sorted by radial for pDetSim
@@ -159,22 +153,20 @@ for rad = 1:length(radials)
 %     zssp = 1:floor(max(bath))+100; % JAH hard code every m
     zssp = SSP(1:5:end,1);
     ssp = SSP(1:5:end,2);
-    %% Begin peak frequency loop (6.2 continues into here)
 
+    %% Begin peak frequency loop (6.2 continues into here)
     for freqi = 1:length(freq)
         midDirFi = midDirF{freqi}; % Select directories for current sub-iteration
         endDirFi = endDirF{freqi};
         plotDirFi = plotDirF{freqi};
 
         freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
-        filePrefix = ['R_' radialiChar '_' freqiChar 'kHz'];
+        fPrefix = ['R_' radialiChar '_' freqiChar 'kHz'];
 
-        copyfile(fullfile(midDir,['R_' radialiChar '.bty']),...
-            fullfile(midDirFi, [filePrefix '.bty'])); % copy bty from intermed dir to intermed subdir
-        copyfile(fullfile(midDirFi, [filePrefix '.bty']),...
-            fullfile(endDirFi, [filePrefix '.bty']));    % copy bty to final save dir
+        copyfile(fullfile(midDir,['R_' radialiChar '.bty']), fullfile(midDirFi, [fPrefix '.bty'])); % copy bty to sub-directory
+        copyfile(fullfile(midDirFi, [fPrefix '.bty']), fullfile(endDirFi, [fPrefix '.bty']));    % copy bty to final directory
         %% 6.3 Make environment file (to be used in BELLHOP)
-        disp(['Making environment file for ' filePrefix '...'])
+        disp(['Making environment file for ' fPrefix '...'])
         % Prepare and pack bottom parameters (AEHS params or grain sizes) for makeEnv input
         if botModel == 'A'     % A - Use manually-entered AEHS parameters
             botParms = AEHS;
@@ -186,29 +178,26 @@ for rad = 1:length(radials)
             botParms = AEHS;
         end
         % Make environment file
-        makeEnv(midDirFi, filePrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms); % make environment file
-        copyfile(fullfile(midDirFi,[filePrefix '.env']),...
-            fullfile(endDirFi, [filePrefix '.env'])); % copy env to final save dir
+        makeEnv(midDirFi, fPrefix, freq{freqi}, zssp, ssp, SD, RD, length(r), r, SSPint, SurfaceType, BottomAtten, VolAtten, botModel, botParms); % make environment file
+        copyfile(fullfile(midDirFi,[fPrefix '.env']), fullfile(endDirFi, [fPrefix '.env'])); % copy env to final directory
         %% 6.4 Run BELLHOP - Make shade and print files
         if strcmp(justenv,'n')
-            disp(['Running Bellhop for ' filePrefix '...']) % Status update
+            disp(['Running Bellhop for ' fPrefix '...']) % Status update
             tBegin = tic;
-            bellhop_wasd(fullfile(midDirFi, filePrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
+            bellhop_wasd(fullfile(midDirFi, fPrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
             blhopTimes(rad) = toc(tBegin);
-            copyfile(fullfile(midDirFi,[filePrefix '.shd']),...
-                fullfile(endDirFi, [filePrefix '.shd'])); % copy shd to final save dir
-            copyfile(fullfile(midDirFi,[filePrefix '.prt']),...
-                fullfile(endDirFi, [filePrefix '.prt'])); % copy prt to final save dir
-%             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
+            copyfile(fullfile(midDirFi,[fPrefix '.shd']), fullfile(endDirFi, [fPrefix '.shd'])); % copy shd to final dir
+            copyfile(fullfile(midDirFi,[fPrefix '.prt']), fullfile(endDirFi, [fPrefix '.prt'])); % copy prt to final dir
+%             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
 
             %             %% 6.5 Generate radial plots
             %             if generate_RadialPlots == 1
-            %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([intermedDirFi, ['\' filePrefix '.shd']]);
+            %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
             %                 PLslice = squeeze(pressure(1, 1,:,:));
             %                 PL = -20*log10(abs(PLslice));
             %
-            %                 [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-            %                 [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1))); % this bumps memory up a bit...
+            %                 [x1,y1] = meshgrid(1:rStep:(rStep*size(PL,2)),1:zStep:(zStep*size(PL,1)));
+            %                 [xq1,yq1] = meshgrid(1:(rStep*size(PL,2)),1:(zStep*size(PL,1))); % this bumps memory up a bit...
             %                 zq = interp2(x1,y1, PL,xq1, yq1);
             %
             %                 disp('Creating radial plot and saving...')
@@ -228,7 +217,7 @@ for rad = 1:length(radials)
             %                 plotbty([intermedDirFi, '\' filePrefix, '.bty']) % doesn't hurt memory at all
             %                 title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
             %                 colorbar
-            %                 saveas(radplotiii,[plotDirFi,'\',Site,'_',filePrefix,'_RLRadialMap.png'])
+            %                 saveas(radplotiii,[plotDirFi,'\',Site,'_',fPrefix,'_RLRadialMap.png'])
             %
             %                 clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
             %                 close all
@@ -262,12 +251,12 @@ for freqi = 1:length(freq)
     %                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
     %                 filePrefix = ['R_' radialiChar '_' freqiChar 'kHz']; % Current file prefix
     %
-    %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([intermedDirFi, '\', [filePrefix '.shd']]);
+    %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([midDirFi, '\', [fPrefix '.shd']]);
     %                 PLslice = squeeze(pressure(1, 1,:,:));
     %                 PL = -20*log10(abs(PLslice));
     %
-    %                 [x1,y1] = meshgrid(1:rangeStep:(rangeStep*size(PL,2)),1:depthStep:(depthStep*size(PL,1)));
-    %                 [xq1,yq1] = meshgrid(1:(rangeStep*size(PL,2)),1:(depthStep*size(PL,1)));
+    %                 [x1,y1] = meshgrid(1:rStep:(rStep*size(PL,2)),1:zStep:(zStep*size(PL,1)));
+    %                 [xq1,yq1] = meshgrid(1:(rStep*size(PL,2)),1:(zStep*size(PL,1)));
     %                 zq = interp2(x1,y1, PL,xq1, yq1);
     %
     %                 %save radial depth
@@ -339,6 +328,5 @@ save(savePath,'-mat')
 %     %% Save and export workspace for pDetSim_v3Pm.m
 %     fnmatOut = fullfile(saveDir_subFi,[Site,'_',freqiChar,'kHz_3DTL.mat']);
 %     save(fnmatOut,'rr','nrr','rd_all','sortedTLVec','hdepth','thisAngle','botDepthSort','freqSave','sd','-v7.3')% Kait format
-
 
 % end

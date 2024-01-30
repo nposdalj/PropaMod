@@ -15,9 +15,9 @@ userNote = settings.Value_EDIT_{3}; % Include a note for yourself/others. This w
 Site = settings.Value_EDIT_{4};
 Region = settings.Value_EDIT_{5};
 BathyRegion = settings.Value_EDIT_{6}; % If your site is outside of the Western Atlantic, change this to GlobalCoverage
-%bellhopSaveDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
-bellhopSaveDir = settings.Value_EDIT_{7}; %Natalie's Computer % Intermediate save directory on your local disk
-%bellhopSaveDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
+%localDir = 'C:\Users\HARP\Documents\PropMod_Intermed'; %Aaron's Computer % Intermediate save directory on your local disk
+localDir = settings.Value_EDIT_{7}; %Natalie's Computer % Intermediate save directory on your local disk
+%localDir = 'H:\Baja_GI\PropaMod\PropMod_Intermed' % For Aaron Baja_GI
 
 Gdrive = settings.Value_EDIT_{8};
 fpath = settings.Value_EDIT_{9}; % Input directory for WAT
@@ -97,11 +97,11 @@ forceLR = str2double(settings.Value_EDIT_{34}); % If using BST data, set 0 to us
 
 % E. CONFIGURE MODEL OUTPUT: RANGE AND RESOLUTION
 total_range = str2double(settings.Value_EDIT_{35});    % Radial range around your site, in meters
-rangeStep = str2double(settings.Value_EDIT_{36});         % Range resolution
-depthStep = str2double(settings.Value_EDIT_{37});         % Depth resolution
+rStep = str2double(settings.Value_EDIT_{36});         % Range resolution
+zStep = str2double(settings.Value_EDIT_{37});         % Depth resolution
 numRadials = str2double(settings.Value_EDIT_{38});        % Specify number of radials - They will be evenly spaced.
 %   Keep in mind, 360/numRadials = Your angular resolution.
-nrr = total_range/rangeStep; %total # of range step output to be saved for pDetSim
+nrr = total_range/rStep; %total # of range step output to be saved for pDetSim
 
 % F. CONFIGURE PLOT OUTPUT
 generate_RadialPlots = str2double(settings.Value_EDIT_{39}); % Generate radial plots? 1 = Yes, 0 = No
