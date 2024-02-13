@@ -108,7 +108,7 @@ lati = nan(length(radials), length(0:rStep:Range));
 loni = nan(length(radials), length(0:rStep:Range));
 
 for rad = 1:length(radials)
-    disp(['Constructing Radial ' num2str(sprintf('%03d', radials(rad))), ':'])
+    disp(['Constructing Radial ' num2str(sprintf('%03d', round(radials(rad)))), ':'])
 
     %% 6.1 Create radial line
     % gives lat-lon point total range (km) away in the direction of radials from source center
@@ -119,9 +119,9 @@ for rad = 1:length(radials)
     loni(rad, :) = linspace(hydLoc(1, 2), lonout(rad), length(0:rStep:Range));
 
     %% 6.2 Make bathymetry file (to be used in BELLHOP)
-    disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
+    disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', round(radials(rad)))) '...'])
 
-    radiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
+    radiChar = num2str(sprintf('%03d', round(radials(rad)))); % Radial number formatted for file names
     [~, bath] = makeBTY(midDir, ['R_' radiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel, lati, loni, rad); % make bathymetry file in intermed dir Freq 1
     if isnan(bath)
         error('Bad Bathymetry')
@@ -146,7 +146,7 @@ for rad = 1:length(radials)
     %% Begin peak frequency loop (6.2 continues into here)
     for freqi = 1:length(freq)
         midDirFi = midDirF{freqi}; endDirFi = endDirF{freqi}; plotDirFi = plotDirF{freqi}; % sub-directories for iteration
-        freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
+        freqiChar = num2str(sprintf('%0.5g', freq{freqi}/1000)); % Frequency formatted for file names
         fPrefix = ['R_' radiChar '_' freqiChar 'kHz'];
         copyfile(fullfile(midDir,['R_' radiChar '.bty']), fullfile(midDirFi, [fPrefix '.bty'])); % copy bty to sub-directory
         copyfile(fullfile(midDirFi, [fPrefix '.bty']), fullfile(endDirFi, [fPrefix '.bty']));    % copy bty to final directory
@@ -211,7 +211,7 @@ disp('Completed constructing radials.')
 %% Steps 7-9 - Loop through frequencies
 for freqi = 1:length(freq)
     midDirFi = midDirF{freqi}; endDirFi = endDirF{freqi}; plotDirFi = plotDirF{freqi}; % sub-directories for iteration
-    freqiChar = num2str(sprintf('%03d', freq{freqi}/1000)); % Frequency formatted for file names
+    freqiChar = num2str(sprintf('%0.5g', freq{freqi}/1000)); % Frequency formatted for file names
     %% 7. Save User-input params to a text file; move this after SSP and include SSP that was inputted into that run (file name and the actual SSP)
     hdepth = SD; % ADDED BY AD
     print_params
@@ -226,7 +226,7 @@ for freqi = 1:length(freq)
     %         for plotdepth = makePolarPlots(1):makePolarPlots(2):makePolarPlots(3)
     %             for rad = 1:length(radials)
     %
-    %                 radialiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
+    %                 radialiChar = num2str(sprintf('%03d', round(radials(rad)))); % Radial number formatted for file names
     %                 filePrefix = ['R_' radialiChar '_' freqiChar 'kHz']; % Current file prefix
     %
     %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd([midDirFi, '\', [fPrefix '.shd']]);
