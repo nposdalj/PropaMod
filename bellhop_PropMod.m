@@ -15,7 +15,7 @@ clearvars; close all;clc;
 
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings_Baja.xlsx'; % <- WASD
+settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaUA.xlsx'; % <- WASD
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
 
 %% 2. Load settings
@@ -72,6 +72,7 @@ hydLoc = [hlat, hlon, NaN]; % Leave depth empty for now
 if strcmp(hzconfig, 'DepthFromSurf') % If vertical pos configuration is depth from surface, set hdepth = hz
     hdepth = hz;
     hydLoc(3) = hdepth; % Add to hydLoc
+    SD = hdepth; % Set SD as this
 end
 % Radial intervals and length
 thetaStep = 360/numRadials;           % Angular resolution (i.e. angle between radials)

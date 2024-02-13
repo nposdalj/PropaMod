@@ -37,8 +37,8 @@ fprintf(fid, ['\nSD\t' num2str(SD)]);
 fprintf(fid, ['\nLatitude\t' num2str(hlat)]);
 fprintf(fid, ['\nLongitude\t' num2str(hlon)]);
 fprintf(fid, ['\nDepth\t' num2str(hdepth)]);
-fprintf(fid, ['\Z-config Method\t' hzconfig]); % Method to configure hydrophone z-position
-fprintf(fid, ['\Set Depth or Elevation\t' num2str(hz)]);
+fprintf(fid, ['\nZ-config Method\t' hzconfig]); % Method to configure hydrophone z-position
+fprintf(fid, ['\nSet Depth or Elevation\t' num2str(hz)]);
 
 % Section 3: Model Specs
 fprintf(fid, '\n\nMODEL SPECS'); % header
