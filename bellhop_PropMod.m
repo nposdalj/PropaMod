@@ -15,7 +15,7 @@ clearvars; close all;clc;
 
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaGI.xlsx'; % <- WASD
+settingsPath = 'H:\PropaMod\PropaMod_Settings_Baja.xlsx'; % <- WASD
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
 
 %% 2. Load settings
@@ -28,7 +28,11 @@ runDirs = string(ls(saveDir)); % Check what folder names already exist in the fi
 runDirs(strcmp(runDirs, ".      ") | strcmp(runDirs, "..     ")) = []; % Delete rows that actually aren't folders
 runDirs = runDirs(contains(runDirs, Date), :); % Only folders from today
 runDirs = char(runDirs); % Convert to char array
-dirTagInUse = double(runDirs(:, end)); % Directory tags already in use
+if ~isempty(runDirs)
+    dirTagInUse = double(runDirs(:, end)); % Directory tags already in use
+else
+    dirTagInUse = 0; % If no directory tags being used yet, just set this as 0
+end
 dirTagsAll = double('a'):double('{'); % All directory tag options (a-z)
 dirTag = min(setdiff(dirTagsAll, dirTagInUse)); % Get first available directory tag in alphabet
 if isempty(dirTag) % Throw error if no directory tags available
@@ -118,7 +122,7 @@ for rad = 1:length(radials)
     disp(['Making bathymetry file for Radial ' num2str(sprintf('%03d', radials(rad))) '...'])
 
     radiChar = num2str(sprintf('%03d', radials(rad))); % Radial number formatted for file names
-    [~, bath] = makeBTY(midDir, ['R_' radiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel); % make bathymetry file in intermed dir Freq 1
+    [~, bath] = makeBTY(midDir, ['R_' radiChar],hydLoc(1, 1), hydLoc(1, 2),AllVariables,BTYmodel, lati, loni, rad); % make bathymetry file in intermed dir Freq 1
     if isnan(bath)
         error('Bad Bathymetry')
     end
@@ -201,7 +205,7 @@ for rad = 1:length(radials)
             %                 close all
             %             end
     end
-    clear Range bath
+    clear bath
 end % End loop through radials
 disp('Completed constructing radials.')
 %% Steps 7-9 - Loop through frequencies

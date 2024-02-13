@@ -26,22 +26,22 @@ clearvars
 close all
 %% Parameters defined by user
 % Export directories
-regAbrev = 'SOCAL'; % Abbreviation of region name
-GDrive = 'G';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % Local save directory on your machine for HYCOM data
-HYCOM_saveDir_Final = 'H:\SOCAL_CO3\PropaMod\HYCOM_data'; % For SOCAL_CORC3
-SSP_saveDir =         'H:\SOCAL_CO3\PropaMod\SSPs';       % For SOCAL_CORC3
+regAbrev = 'Baja'; % Abbreviation of region name
+GDrive = 'H';     % GDrive drive
+HYCOM_saveDir_Local = 'H:\Baja_GI\PropaMod\HYCOM_data\Baja'; % Local save directory on your machine for HYCOM data
+HYCOM_saveDir_Final = 'H:\Baja_GI\PropaMod\HYCOM_data\Baja'; % Final save directory for HYCOM data
+SSP_saveDir =         'H:\Baja_GI\PropaMod\SSPs';       % For SOCAL_CORC3
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
-siteCoordsFile = 'H:\SOCAL_CO3\PropaMod\SiteCoords_SOCAL.xlsx';
+siteCoordsFile = 'H:\Baja_GI\PropaMod\SiteCoords_Baja.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available in this region]
-LatRange = [31. 33.];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-120 -118];   % in degrees E (-180 W to 180 E). In order of W->E.
+LatRange = [27 31];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-120 -116];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2021-01-01';  % First month of study period. Format as yyyy-MM.
-Month_End = '2021-12-01';    % Final month of study period. Format as yyyy-MM.
+Month_Start = '2018-10-01';  % First month of study period. Format as yyyy-MM.
+Month_End = '2022-09-01';    % Final month of study period. Format as yyyy-MM.
 
 % Plotting
 plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.

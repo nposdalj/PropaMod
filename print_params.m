@@ -7,8 +7,8 @@
 % bellhop_PropMod.m, and will not work independent of that program.
 
 % Create file and prep for editing
-txtFileName = [newFolderName '_' freqiChar 'kHz_Input_Parameters.txt'];
-paramfile = fullfile(intermedDirFi, txtFileName);
+txtFileName = [runID '_' freqiChar 'kHz_Input_Parameters.txt'];
+paramfile = fullfile(midDirFi, txtFileName);
 % Make file or erase current contents of file
 fid = fopen(paramfile, 'w');
 fclose(fid);
@@ -16,9 +16,9 @@ fclose(fid);
 fid = fopen(paramfile, 'at');
 
 % Header
-fprintf(fid, ['User Input Parameters for Run ' newFolderName ', Freq ' freqiChar ' kHz']);
+fprintf(fid, ['User Input Parameters for Run ' runID ', Freq ' freqiChar ' kHz']);
 fprintf(fid, ['\n\nAuthor\t' author]);
-fprintf(fid, ['\nTimestamp\t' string(datetime('now'), 'yyyymmdd HHMMSS')]);
+fprintf(fid, ['\nTimestamp\t' char(string(datetime('now', 'Format', 'yyyyMMdd HHmmss')))]);
 fprintf(fid, ['\nNotes\t' userNote]);
 fprintf(fid, ['\n\nRegion\t' Region]);
 fprintf(fid, ['\nSite\t' Site]);
@@ -41,17 +41,17 @@ fprintf(fid, ['\Z-config Method\t' hzconfig]); % Method to configure hydrophone 
 fprintf(fid, ['\Set Depth or Elevation\t' num2str(hz)]);
 
 % Section 3: Model Specs
-fprint(fid, '\n\nMODEL SPECS'); % header
-fprint(fid, ['\nBELLHOP Version\t' bellhopVersion]);
-fprint(fid, '\nBATHYMETRY MODEL'); % Subsection: Bathymetry Model
-fprint(fid, ['\nBathymetry file\t' fullfile(GEBCODir, GEBCOFile)]);
+fprintf(fid, '\n\nMODEL SPECS'); % header
+fprintf(fid, ['\nBELLHOP Version\t' bellhopVersion]);
+fprintf(fid, '\nBATHYMETRY MODEL'); % Subsection: Bathymetry Model
+fprintf(fid, ['\nBathymetry file\t' fullfile(GEBCODir, GEBCOFile)]);
 fprintf(fid, ['\nBathymetry Model\t' BTYmodel]);
-fprint(fid, '\nENVIRONMENT MODEL'); % Subsection: Environment Model
+fprintf(fid, '\nENVIRONMENT MODEL'); % Subsection: Environment Model
 fprintf(fid, ['\nSS Interpolation Method\t' SSPint]);
 fprintf(fid, ['\nType of Surface\t' SurfaceType]);
 fprintf(fid, ['\nAttenuation in Bottom\t' BottomAtten]);
 fprintf(fid, ['\nThorpe Volume Attenuation\t' VolAtten]);
-fprint(fid, '\nSEA FLOOR MODEL'); % Subsection: Sea Floor Model
+fprintf(fid, '\nSEA FLOOR MODEL'); % Subsection: Sea Floor Model
 fprintf(fid, ['\nSea Floor Model\t' botModel]);
 switch botModel
     case 'A'
@@ -60,19 +60,19 @@ switch botModel
         fprintf(fid, ['\nDensity\t' num2str(AEHS.density)]);
         fprintf(fid, ['\nCompressional Attenuation\t' num2str(AEHS.compAtten)]);
     case {'G', 'Y'}
-        fprintf(filied, '\nSediment Dataset\tB, BST');
+        fprintf(fid, '\nSediment Dataset\tB, BST');
         if strcmp(sedDatType, 'B')
-            fprintf(filied, ['\nForce Low Resolution\t' num2str(forceLR)]);
+            fprintf(fid, ['\nForce Low Resolution\t' num2str(forceLR)]);
         end
 end
 
 % Section 4: Model range and resolution
 fprintf(fid, '\n\nRANGE & RESOLUTION');
-fprintf(fid, ['\nRange\t' num2str(total_range) ' m']);
-fprintf(fid, ['\nRange Step\t' num2str(rangeStep) ' m']);
+fprintf(fid, ['\nRange\t' num2str(Range) ' m']);
+fprintf(fid, ['\nRange Step\t' num2str(rStep) ' m']);
 fprintf(fid, ['\nNumber of Radials\t' num2str(numRadials)]);
-fprintf(fid, ['\nRad Step\t' num2str(radStep)]);
-fprintf(fid, ['\nDepth Step\t' num2str(depthStep) ' m']);
+fprintf(fid, ['\nRad Step\t' num2str(thetaStep)]);
+fprintf(fid, ['\nDepth Step\t' num2str(zStep) ' m']);
 
 % Section 5: Plotting Specs
 fprintf(fid, '\n\nPLOTTING SPECS');
@@ -84,11 +84,11 @@ fprintf(fid, ['\nDepth Levels\t' num2str(makePolarPlots)]);
 
 % Section 6: SSP
 fprintf(fid, '\n\n\nSSP\nDepth\tSound Speed'); % header
-SSP_Reporting = (table2array(SSP)).';
+SSP_Reporting = (SSP).';
 fprintf(fid, '\n%4.0f\t%4.11f', SSP_Reporting);
 
 % End
 fclose(fid);
 
-copyfile(paramfile,fullfile(saveDir_subFi, txtFileName)) % Copy to saveDir_sub
+copyfile(paramfile,fullfile(endDirFi, txtFileName)) % Copy to saveDir_sub
 copyfile(paramfile,fullfile(plotDirFi, txtFileName)); % Copy to plotDir

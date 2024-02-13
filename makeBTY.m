@@ -1,19 +1,19 @@
-function [Range, bath] = makeBTY(fpath, fname, hlat, hlon, AllVariables, modelType)
+function [Range, bath] = makeBTY(fpath, fname, hlat, hlon, AllVariables, modelType, lati, loni, rad)
 % VZ: Modified from Eric Snyder's makeBTY.m code
 % NOTE: I'm using the hydrophone as the source and ship as receiver for now
-global lati
-global loni
-global rad
+% global lati
+% global loni
+% global rad
 
 % Find which cell contains lat, lon, and elevation/depth
 % The following works for JAH's files
-lonLoc = (find(strcmp(AllVariables,'x'))+1)/2; % Find which cell contains lon
-latLoc = (find(strcmp(AllVariables,'y'))+1)/2; % Find which cell contains lat
-elevationLoc = (find(strcmp(AllVariables,'z'))+1)/2; % Find which cell contains elevation
+% lonLoc = (find(strcmp(AllVariables,'x'))+1)/2; % Find which cell contains lon
+% latLoc = (find(strcmp(AllVariables,'y'))+1)/2; % Find which cell contains lat
+% elevationLoc = (find(strcmp(AllVariables,'z'))+1)/2; % Find which cell contains elevation
 % And the following for WASD/NP's files
-% lonLoc = (find(strcmp(AllVariables,'lon'))+1)/2; % Find which cell contains lon
-% latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
-% elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
+lonLoc = (find(strcmp(AllVariables,'lon'))+1)/2; % Find which cell contains lon
+latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
+elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
 
 % Extract lat, lon, and elevation for radial
 latRange = [hlat+1 hlat-1]; %+/- 1 degree for lat

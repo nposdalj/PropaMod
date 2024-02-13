@@ -35,13 +35,13 @@ elseif strcmp(exten,'.nc')
 
     % Find which cell contains lat, lon, and elevation/depth
     % Need this version for certain .nc files...
-    lonLoc = (find(strcmp(AllVariables,'x'))+1)/2; % Find which cell contains lon
-    latLoc = (find(strcmp(AllVariables,'y'))+1)/2; % Find which cell contains lat
-    elevationLoc = (find(strcmp(AllVariables,'z'))+1)/2; % Find which cell contains elevation
+    % lonLoc = (find(strcmp(AllVariables,'x'))+1)/2; % Find which cell contains lon
+    % latLoc = (find(strcmp(AllVariables,'y'))+1)/2; % Find which cell contains lat
+    % elevationLoc = (find(strcmp(AllVariables,'z'))+1)/2; % Find which cell contains elevation
     % ... and this version for others.
-    % lonLoc = (find(strcmp(AllVariables,'lon'))+1)/2; % Find which cell contains lon
-    % latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
-    % elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
+    lonLoc = (find(strcmp(AllVariables,'lon'))+1)/2; % Find which cell contains lon
+    latLoc = (find(strcmp(AllVariables,'lat'))+1)/2; % Find which cell contains lat
+    elevationLoc = (find(strcmp(AllVariables,'elevation'))+1)/2; % Find which cell contains elevation
 
     % Extract lat, lon, and elevation for entire site
     latValsIDX = find(AllVariables{2,latLoc}<hlat_range(1) & AllVariables{2,latLoc}>hlat_range(2));
