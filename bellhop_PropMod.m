@@ -15,7 +15,7 @@ clearvars; close all;clc;
 
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaUA.xlsx'; % <- WASD
+settingsPath = 'H:\PropaMod\PropaMod_Settings_BajaFe.xlsx'; % <- WASD
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
 
 %% 2. Load settings
@@ -171,40 +171,40 @@ for rad = 1:length(radials)
         bellhop_wasd(fullfile(midDirFi, fPrefix), bellhopVersion); % run bellhop on env file. Version: 'jah' or 'cxx'
         copyfile(fullfile(midDirFi,[fPrefix '.shd']), fullfile(endDirFi, [fPrefix '.shd'])); % copy shd to final dir
         copyfile(fullfile(midDirFi,[fPrefix '.prt']), fullfile(endDirFi, [fPrefix '.prt'])); % copy prt to final dir
-%             [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
+            [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
 
-            %             %% 6.5 Generate radial plots
-            %             if generate_RadialPlots == 1
-            %                 [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
-            %                 PLslice = squeeze(pressure(1, 1,:,:));
-            %                 PL = -20*log10(abs(PLslice));
-            %
-            %                 [x1,y1] = meshgrid(1:rStep:(rStep*size(PL,2)),1:zStep:(zStep*size(PL,1)));
-            %                 [xq1,yq1] = meshgrid(1:(rStep*size(PL,2)),1:(zStep*size(PL,1))); % this bumps memory up a bit...
-            %                 zq = interp2(x1,y1, PL,xq1, yq1);
-            %
-            %                 disp('Creating radial plot and saving...')
-            %                 % figure(2000+radials(rad))
-            %                 figure('visible', 'off')
-            %                 RL_radiii = SL - zq; % bumps memory up a bit
-            %                 RL_radiii(RL_radiii < RL_threshold) = NaN;
-            %                 ptVisibility = ones(size(RL_radiii));
-            %                 ptVisibility(isnan(RL_radiii)) = 0;
-            %                 radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial
-            %                 % Using imagesc instead but still hiding RLs that are too low:
-            %                 % got help from https://www.mathworks.com/matlabcentral/answers/81938-set-nan-as-another-color-than-default-using-imagesc
-            %                 % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
-            %                 % axis ij
-            %                 % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
-            %                 colormap(jet)
-            %                 plotbty([intermedDirFi, '\' filePrefix, '.bty']) % doesn't hurt memory at all
-            %                 title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
-            %                 colorbar
-            %                 saveas(radplotiii,[plotDirFi,'\',Site,'_',fPrefix,'_RLRadialMap.png'])
-            %
-            %                 clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
-            %                 close all
-            %             end
+                        %% 6.5 Generate radial plots
+                        if generate_RadialPlots == 1
+                            [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure ] = read_shd([midDirFi, ['\' fPrefix '.shd']]);
+                            PLslice = squeeze(pressure(1, 1,:,:));
+                            PL = -20*log10(abs(PLslice));
+
+                            [x1,y1] = meshgrid(1:rStep:(rStep*size(PL,2)),1:zStep:(zStep*size(PL,1)));
+                            [xq1,yq1] = meshgrid(1:(rStep*size(PL,2)),1:(zStep*size(PL,1))); % this bumps memory up a bit...
+                            zq = interp2(x1,y1, PL,xq1, yq1);
+
+                            disp('Creating radial plot and saving...')
+                            % figure(2000+radials(rad))
+                            figure('visible', 'off')
+                            RL_radiii = SL - zq; % bumps memory up a bit
+                            RL_radiii(RL_radiii < RL_threshold) = NaN;
+                            ptVisibility = ones(size(RL_radiii));
+                            ptVisibility(isnan(RL_radiii)) = 0;
+                            radplotiii = imagesc(RL_radiii(:,:), 'AlphaData', ptVisibility); % RL_radiii is recieved level for the given radial
+                            % Using imagesc instead but still hiding RLs that are too low:
+                            % got help from https://www.mathworks.com/matlabcentral/answers/81938-set-nan-as-another-color-than-default-using-imagesc
+                            % radplotiii = pcolor(RL_radiii(:,:)); % RL_radiii is recieved level for the given radial % Uhhhh this line basically causes memory to max out
+                            % axis ij
+                            % set(radplotiii, 'EdgeColor','none') % eases memory a decent amount
+                            colormap(jet)
+                            plotbty([intermedDirFi, '\' filePrefix, '.bty']) % doesn't hurt memory at all
+                            title([Site,' Radial', radialiChar, ', Freq ' freqiChar ' kHz'])
+                            colorbar
+                            saveas(radplotiii,[plotDirFi,'\',Site,'_',fPrefix,'_RLRadialMap.png'])
+
+                            clear RL_radiii radplotiii x1 y1 xq1 yq1 zq pressure PL PLslice ptVisibility
+                            close all
+                        end
     end
     clear bath
 end % End loop through radials
