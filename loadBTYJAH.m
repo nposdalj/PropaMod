@@ -51,13 +51,11 @@ elseif strcmp(exten,'.nc')
 
     depthVals = AllVariables{2,elevationLoc}(lonValsIDX,latValsIDX); %index depth based on +/- lat and lon away from reciever
 
-    AllVariables{2,1} = lonVals;
-    AllVariables{2,2} = latVals;
+    AllVariables{2,lonLoc} = lonVals;
+    AllVariables{2,latLoc} = latVals;
     % AllVariables{2,4} = depthVals; % Original line; JAH changed as below.
     % AllVariables{2,3} = abs(depthVals); %JAH changed from 4 t0 3
-    AllVariables{2,4} = abs(depthVals); % WASD changed to 4 again
-    % WASD: I suspect might be 3 for some files, 4 for others. For the
-    % bathy file I currently use, it's 4... Look into this later.
+    AllVariables{2,4} = abs(depthVals); % WASD changed to elevationLoc
 end
 
 
