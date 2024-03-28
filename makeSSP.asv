@@ -28,20 +28,20 @@ close all
 % Export directories
 regAbrev = 'CCE'; % Abbreviation of region name
 GDrive = 'H';     % GDrive drive
-HYCOM_saveDir_Local = 'H:\Baja_GI\PropaMod\HYCOM_data\Baja'; % Local save directory on your machine for HYCOM data
-HYCOM_saveDir_Final = 'H:\Baja_GI\PropaMod\HYCOM_data\Baja'; % Final save directory for HYCOM data
-SSP_saveDir =         'H:\CCE_CCE\PropaMod\SSPs';       % For SOCAL_CORC3
+HYCOM_saveDir_Local = 'H:\CCE_PS\PropaMod\HYCOM_data\PS'; % Local save directory on your machine for HYCOM data
+HYCOM_saveDir_Final = 'H:\CCE_PS\PropaMod\HYCOM_data\PS'; % Final save directory for HYCOM data
+SSP_saveDir =         'H:\CCE_PS\PropaMod\SSPs';       % For SOCAL_CORC3
 
 % Site Data: Path to Excel file with your sites' latitudes and longitudes. Use the Excel template in the repository.
 siteCoordsFile = 'H:\CCE_CCE\PropaMod\SiteCoords_CCE.xlsx';
 
 % Range of data to download [Be mindful of the deepest bathymetry available in this region]
-LatRange = [27 31];     % in degrees N (-80 S to 90 N). In order of S->N.
-LonRange = [-120 -116];   % in degrees E (-180 W to 180 E). In order of W->E.
+LatRange = [31.5 35.5];     % in degrees N (-80 S to 90 N). In order of S->N.
+LonRange = [-124.5 -120.5];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2018-10-01';  % First month of study period. Format as yyyy-MM.
-Month_End = '2022-09-01';    % Final month of study period. Format as yyyy-MM.
+Month_Start = '2016-05-01';  % First month of study period. Format as yyyy-MM.
+Month_End = '2018-04-01';    % Final month of study period. Format as yyyy-MM.
 
 % Plotting
 plotInProcess = 0; % Monitor plotted SSPs as they are generated? 1=Y, 0=N. Program will run slower if this is on.

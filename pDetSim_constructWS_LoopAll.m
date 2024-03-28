@@ -1,7 +1,7 @@
 % pDetSim_constructWS.m
 % Role in workflow:
-    % bellhopDetRange.m -> pDetSim_constructWS.m -> pDetSim_v3Pm.m
-    % Build radials        Adapt output             Model det probability
+% bellhopDetRange.m -> pDetSim_constructWS.m -> pDetSim_v3Pm.m
+% Build radials        Adapt output             Model det probability
 % Uses output from bellhopDetRange.m to generate a workspace friendly for
 % pDetSim_v3Pm.m, as it is configured at present.
 
@@ -13,26 +13,29 @@ clearvars
 close all
 %% Params defined by User
 % AllSite = {'BS','GS','JAX','BC','NC','NFC','OC','WC','BP','HZ','HAT_A','HAT_B'};
-AllSite = {'AB'};
-Region = 'GoA';
+AllSite = {'CCE'};
+Region = 'CCE';
 sp = 'Pm';
 GDrive = 'G';
 % inputDirMAIN = [GDrive,':\My Drive\PropagationModeling\Radials\']; % Where your data is coming from
 % exportDirMAIN = [GDrive,':\My Drive\PropagationModeling\DetSim_Workspace\']; % Where the assembled workspace will be saved
 % inputDirMAIN = 'H:\Baja_GI\PropaMod\Radials\'; % Where your data is coming from (for Baja)
 % exportDirMAIN = 'H:\Baja_GI\PropaMod\DetSim_Workspace\'; % Where the assembled workspace will be saved (for Baja)
-inputDirMAIN = 'H:\GoA_AB\PropaMod\Radials\'; % Where your data is coming from (for GoA)
-exportDirMAIN = 'H:\GoA_AB\PropaMod\DetSim_Workspace\'; % Where the assembled workspace will be saved (for GoA)
+inputDirMAIN = 'H:\CCE_CCE\PropaMod\Radials\'; % Where your data is coming from (for CCE)
+exportDirMAIN = 'H:\CCE_CCE\PropaMod\DetSim_Workspace\'; % Where the assembled workspace will be saved (for CCE)
+
+BELLHOPver = 'JAH'; % bellhopcxx or JAH
+
 for v = 1:length(AllSite)
     site = AllSite{v};
     exportDir = [exportDirMAIN,site];
-    
+
     %Find all workspace that end with .bellhopDetRange (for all three classes)
     firstFN = [site,'.*','bellhopDetRange.mat'];
     fileList = cellstr(ls(exportDir)); % Get a list of all the files in the start directory
     fileMatchIdx = find(~cellfun(@isempty,regexp(fileList,firstFN))>0);
     concatFilesMAIN = fileList(fileMatchIdx);
-    
+
     for w = 1:length(concatFilesMAIN)
         % Load all workspace from bellhopDetRange to extract nrr and rr
         load(fullfile(exportDir, concatFilesMAIN{w}))
@@ -52,9 +55,24 @@ for v = 1:length(AllSite)
         elseif contains(concatFilesMAIN{w},'9.250000e+00kHz')
             freq = '9.25kHz';
             freqNAME = '9.250000e+00kHz';
-        else
+        elseif contains(concatFilesMAIN{w},'1.050000e+01kHz')
             freq = '10.5kHz';
             freqNAME = '1.050000e+01kHz';
+        elseif contains(concatFilesMAIN{w},'8.5kHz')
+            freq = '8.5kHz';
+            freqNAME = '8.5kHz';
+        elseif contains(concatFilesMAIN{w},'10kHz')
+            freq = '10kHz';
+            freqNAME = '10kHz';
+        elseif contains(concatFilesMAIN{w},'19.4kHz')
+            freq = '19.4kHz';
+            freqNAME = '19.4kHz';
+        elseif contains(concatFilesMAIN{w},'9.5kHz')
+            freq = '9.5kHz';
+            freqNAME = '9.5kHz';
+        elseif contains(concatFilesMAIN{w},'8.25kHz')
+            freq = '8.25kHz';
+            freqNAME = '8.25kHz';
         end
         %% Loop through .shd files and extract depth and transmission loss
         %find folder name to specify .shd file
@@ -68,23 +86,36 @@ for v = 1:length(AllSite)
         rd_all = num2cell(zeros(1,length(concatFiles))); %create empty array for radial depth to be used later with pDetSim
         sortedTLVec = num2cell(zeros(1,length(concatFiles))); %create empty array for transmission loss to be used later with pDetSim
 
-        for idsk = 1 : length(concatFiles)
-            % Load file
-            fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(inputDir,concatFiles{idsk}))
-            D = fullfile(inputDir,concatFiles{idsk});
-            [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
-            % matOut = ESME_TL_3D(D, 'Bellhop');            % Added by JAH
-            matOut = ESME_TL_3D(inputDir, 'Bellhop');       % Added by JAH
-    
-            %create transmisson loss model
-            PLslice = squeeze(pressure(1, 1,:,:));
-            PL = -20*log10(abs(PLslice));
-            PL(:,1) = PL(:,2);
-            sortedTLVec(idsk) = {PL}; 
-   
-            %save radial depth
-            rd_inter = Pos.r.z;
-            rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
+        if strcmp(BELLHOPver, 'bellhopcxx')
+            for idsk = 1 : length(concatFiles)
+                % Load file
+                fprintf('Loading %d/%d file %s\n',idsk,length(concatFiles),fullfile(inputDir,concatFiles{idsk}))
+                D = fullfile(inputDir,concatFiles{idsk});
+                [PlotTitle, PlotType, freqVec, freq0, atten, Pos, pressure] = read_shd(D);
+                % matOut = ESME_TL_3D(D, 'Bellhop');            % Added by JAH
+                matOut = ESME_TL_3D(inputDir, 'Bellhop', 'JAH');       % Added by JAH
+
+                %create transmisson loss model
+                PLslice = squeeze(pressure(1, 1,:,:));
+                PL = -20*log10(abs(PLslice));
+                PL(:,1) = PL(:,2);
+                sortedTLVec(idsk) = {PL};
+
+                %save radial depth
+                rd_inter = Pos.r.z;
+                rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
+            end
+        elseif strcmp(BELLHOPver, 'JAH')
+            % Load transmission loss using ESME_TL_3D, then convert to transmission loss model format
+            matOut = ESME_TL_3D(inputDir, 'Bellhop', 'JAH');
+            for idsk = 1:length(concatFiles)
+                sortedTLVec(idsk) = {matOut{idsk}};
+                
+                %save radial depth
+                rd_inter = Pos.r.z;
+                rd_all(idsk) = {rd_inter}; %depth array to be used in pDetSim
+            end
+
         end
         thisAngle = radials; %change radial variable to match pdetSim code
         %% Save and export workspace for pDetSim_v3Pm.m

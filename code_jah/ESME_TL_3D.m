@@ -91,23 +91,29 @@ rd_all = rd_all(IX);
 % Save plots and data
 cd(indir)
 matOut = strcat(saveName, '_3DTL.mat');
-save(matOut, 'thisAngle', 'rr', 'nrr', 'botDepthSort', 'sd', 'sortedTLVec', 'IX','rd_all')
 
-%
-% plot vertical profile
-profNum  =1;
-thisProf = sortedTLVec{profNum};
-thisBot = botDepth_interp(profNum,:);
-botCutoff = [];
-for itr = 1:length(thisBot)
-    [~,botCutoff(itr,1)] = min(abs(thisBot(itr) - rd));
-end
-for itr2 = 1:size(thisProf,2)
-    thisCut = floor(botCutoff(itr2)*(size(thisProf,1)/length(rd))); %JAH correct
-    thisProf(thisCut:end,itr2) = Inf;
-end
-figure(11);clf
-% [cmap, lims, ticks, bfncol, ctable] = cptcmap('GMT_wysiwygcont.cpt', gca, 'mapping', 'scaled', 'ncol', 256);
-% colormap(flipud(cmap));
-imagesc(rr,rd,real(thisProf))
-colorbar
+hdepth = sd; % Also set this because it needs to be saved too in the pDetSim workspace!
+
+save(matOut, 'thisAngle', 'rr', 'nrr', 'botDepthSort', 'sd', 'sortedTLVec', 'IX','rd_all', 'hdepth')
+
+% WASD - commented out the following. I don't think it adds anything we
+% need (although at one point it did result in an error for me, so I'd
+% rather just get rid of it)
+% %
+% % plot vertical profile
+% profNum  =1;
+% thisProf = sortedTLVec{profNum};
+% thisBot = botDepth_interp(profNum,:);
+% botCutoff = [];
+% for itr = 1:length(thisBot)
+%     [~,botCutoff(itr,1)] = min(abs(thisBot(itr) - rd));
+% end
+% for itr2 = 1:size(thisProf,2)
+%     thisCut = floor(botCutoff(itr2)*(size(thisProf,1)/length(rd))); %JAH correct
+%     thisProf(thisCut:end,itr2) = Inf;
+% end
+% figure(11);clf
+% % [cmap, lims, ticks, bfncol, ctable] = cptcmap('GMT_wysiwygcont.cpt', gca, 'mapping', 'scaled', 'ncol', 256);
+% % colormap(flipud(cmap));
+% imagesc(rr,rd,real(thisProf))
+% colorbar
