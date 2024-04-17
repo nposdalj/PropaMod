@@ -55,7 +55,7 @@ elseif strcmp(exten,'.nc')
     AllVariables{2,latLoc} = latVals;
     % AllVariables{2,4} = depthVals; % Original line; JAH changed as below.
     % AllVariables{2,3} = abs(depthVals); %JAH changed from 4 t0 3
-    AllVariables{2,4} = abs(depthVals); % WASD changed to elevationLoc
+    AllVariables{2,4} = -depthVals; % WASD changed to elevationLoc
 end
 
 
