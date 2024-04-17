@@ -15,7 +15,7 @@ clearvars; close all;clc;
 
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
-settingsPath = 'H:\PropaMod\PropaMod_Settings_CCEMa.xlsx'; % <- WASD
+settingsPath = 'H:\PropaMod\PropaMod_Settings_Baja.xlsx'; % <- WASD
 % settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
 
 %% 2. Load settings
