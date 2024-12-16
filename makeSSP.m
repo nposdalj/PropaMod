@@ -40,7 +40,7 @@ LatRange = [34.30 38.30];     % in degrees N (-80 S to 90 N). In order of S->N.
 LonRange = [-124.40 -120.40];   % in degrees E (-180 W to 180 E). In order of W->E.
 
 % Effort Period
-Month_Start = '2016-07-01';  % First month of study period. Format as yyyy-MM.
+Month_Start = '2019-04-01';  % First month of study period. Format as yyyy-MM.
 Month_End = '2022-06-01';    % Final month of study period. Format as yyyy-MM.
 
 % Plotting
