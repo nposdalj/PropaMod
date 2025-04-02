@@ -42,9 +42,8 @@ hlon = str2double(settings.Value_EDIT_{14}); % hydrophone long
 hzconfig = settings.Value_EDIT_{15}; % Hydrophone vertical position configuration
 hz = str2double(settings.Value_EDIT_{16});   % hydrophone vertical position % <- inputted into DetSim_Workspace
 SL = str2double(settings.Value_EDIT_{17});       % Source Level - 230 for Social Groups, 235 for Mid-Size and Males
-% freq = {str2double(settings.Value_EDIT_{18})};  % Frequencies of sources, in Hz. Enter up to 3 values.
+freq = {str2double(settings.Value_EDIT_{18})};  % Frequencies of sources, in Hz. Enter up to 3 values.
 freqInt = {str2num(settings.Value_EDIT_{18})};
-freq = num2cell(freqInt{1}'); % Frequencies of sources, in Hz. Enter up to 3 values.
 
 % freq = cellfun(@(x) str2double(x), settings.Value_EDIT_{18}, 'UniformOutput', false);
 

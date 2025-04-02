@@ -16,8 +16,8 @@ clearvars; close all;clc;
 %% 1. USER: Enter path to settings file
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
 % settingsPath = 'H:\PropaMod\MI\PropaMod_Settings_MI.xlsx'; % <- WASD & EHP
-settingsPath = 'H:\PropaMod\PropaMod_Settings_exptl.xlsx'; % <- WASD
-% settingsPath = 'I:\BellHopOutputs\PropaMod_Settings.xlsx'; % <- NP
+% settingsPath = 'H:\PropaMod\PropaMod_Settings_exptl.xlsx'; % <- WASD
+settingsPath = 'C:\Users\nposd\Documents\GitHub\PropaMod\PropaMod_Settings_ConfigV2_NP.xlsx'; % <- NP
 
 %% 2. Load settings
 readSettings
@@ -28,6 +28,7 @@ Date = char(datetime('now', 'Format', 'yyMMdd')); % Today's date
 runDirs = string(ls(saveDir)); % Check what folder names already exist in the final save directory
 runDirs(strcmp(runDirs, ".      ") | strcmp(runDirs, "..     ")) = []; % Delete rows that actually aren't folders
 runDirs = runDirs(contains(runDirs, Date), :); % Only folders from today
+runDirs = strtrim(runDirs);
 runDirs = char(runDirs); % Convert to char array
 if ~isempty(runDirs)
     dirTagInUse = double(runDirs(:, end)); % Directory tags already in use
@@ -48,7 +49,7 @@ plotDir = [fpath, '\Plots\' Site '\' runID]; mkdir(plotDir);    % Plot save dire
 % Pre-allocate names, then create frequency-specific intermediate, final, and plot sub-directories
 midDirF = cell(length(freq), 1); endDirF = cell(length(freq), 1); plotDirF = cell(length(freq), 1);
 for freqi = 1:length(freq)
-    fnameFreq = [num2str(freq{1}/1000) 'kHz']; % i'th freq formatted for sub-directory names
+    fnameFreq = [num2str(freq{freqi}/1000) 'kHz']; % i'th freq formatted for sub-directory names
     midDirF{freqi} = fullfile(midDir, fnameFreq); mkdir(midDirF{freqi}); % Intermediate sub-directory for i'th freq
     endDirF{freqi} = fullfile(endDir, fnameFreq); mkdir(endDirF{freqi}); % Final sub-directory for i'th freq
     plotDirF{freqi} = fullfile(plotDir, fnameFreq); mkdir(plotDirF{freqi}); % Plot sub-directory for i'th freq
