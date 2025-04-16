@@ -277,12 +277,13 @@ for freqi = 1:length(freq)
         mkdir(targetDirectory);
     end
     save([fpath,'\DetSim_Workspace\',Site,'\',Site,'_',runID,'_' freqiChar 'kHz_bellhopDetRange.mat'],'rr','nrr','freqSave','hdepth','radials','botDepthSort');
+    %% 10. Loop through .shd files and extract depth and transmission loss
+    matOut = ESME_TL_3D(endDirFi, 'Bellhop', 'JAH');
+    savePath = [endDirFi, '\', 'freq_TL.mat'];
+    save(savePath,'-mat')
 end
 
-%% Loop through .shd files and extract depth and transmission loss
-matOut = ESME_TL_3D(endDirFi, 'Bellhop', 'JAH');
-savePath = [endDirFi, '\', 'freq_TL.mat'];
-save(savePath,'-mat')
+
 %     detfn = ['.*','.shd']; %.shd file names
 %     fileList = cellstr(ls(fullfile(saveDir_subFi))); %all file names in folder
 %     fileMatchIdx = find(~cellfun(@isempty,regexp(fileList,detfn))>0); % Find the file name that matches the filePrefix
