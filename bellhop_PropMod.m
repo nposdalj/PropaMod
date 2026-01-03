@@ -17,7 +17,8 @@ clearvars; close all;clc;
 % Enter your settings in the PropaMod_Settings sheet. Then, enter the file path below.
 % settingsPath = 'H:\PropaMod\MI\PropaMod_Settings_MI.xlsx'; % <- WASD & EHP
 % settingsPath = 'H:\PropaMod\PropaMod_Settings_exptl.xlsx'; % <- WASD
-settingsPath = 'C:\Users\nposd\Documents\GitHub\PropaMod\PropaMod_Settings_ConfigV2_NP.xlsx'; % <- NP
+% settingsPath = 'C:\Users\nposd\Documents\GitHub\PropaMod\PropaMod_Settings_ConfigV2_NP.xlsx'; % <- NP
+settingsPath = 'E:\PropaMod\PropaMod_Settings_BajaZc.xlsx';
 
 %% 2. Load settings
 readSettings
