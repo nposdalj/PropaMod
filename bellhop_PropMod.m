@@ -18,8 +18,8 @@ clearvars; close all;clc;
 % settingsPath = 'H:\PropaMod\MI\PropaMod_Settings_MI.xlsx'; % <- WASD & EHP
 % settingsPath = 'H:\PropaMod\PropaMod_Settings_exptl.xlsx'; % <- WASD
 % settingsPath = 'C:\Users\nposd\Documents\GitHub\PropaMod\PropaMod_Settings_ConfigV2_NP.xlsx'; % <- NP
-settingsPath = 'E:\PropaMod\PropaMod_Settings_BajaZc.xlsx';
-
+% settingsPath = 'E:\PropaMod\PropaMod_Settings_BajaZc.xlsx';
+settingsPath = 'E:\PropaMod\PropaMod_Settings_BajaUA.xlsx';
 %% 2. Load settings
 readSettings
 
