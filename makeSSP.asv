@@ -270,4 +270,4 @@ for i = 1:size(siteAbrev, 1)
 end
 
 %% Save entire SSP data
-save(fullfile(SSP_saveDir, Site, strcat(Site, '_SSP_data', '.mat')), 'ALL_SSP', 'SSPT')
+save('', 'ALL_SSParray')
