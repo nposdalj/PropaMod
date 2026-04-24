@@ -19,7 +19,8 @@ clearvars; close all;clc;
 % settingsPath = 'H:\PropaMod\PropaMod_Settings_exptl.xlsx'; % <- WASD
 % settingsPath = 'C:\Users\nposd\Documents\GitHub\PropaMod\PropaMod_Settings_ConfigV2_NP.xlsx'; % <- NP
 % settingsPath = 'E:\PropaMod\PropaMod_Settings_BajaZc.xlsx';
-settingsPath = 'E:\PropaMod\PropaMod_Settings_Baja_experimental_seddepth3m.xlsx';
+% settingsPath = 'E:\PropaMod\PropaMod_Settings_Baja_experimental_seddepth3m.xlsx';
+settingsPath = 'E:\PropaMod\PropaMod_Settings_PN.xlsx';
 %% 2. Load settings
 readSettings
 
@@ -66,6 +67,8 @@ SSP = table2array(readtable(fullfile(fpath,'SSPs',Region,Site,SSPfile))); % read
 if strcmp(SSPtype, 'Mmax') || strcmp(SSPtype, 'Mmin') % Get month being examined to report in the output info file, if applicable
     SSPmoReporting = num2str(SSPfile(12:13));
 elseif strcmp(SSPtype, 'Mean')
+    SSPmoReporting = 'Not applicable'; % If using mean SSP, then report "Not applicable"
+elseif strcmp(SSPtype, 'Mean_Extended')
     SSPmoReporting = 'Not applicable'; % If using mean SSP, then report "Not applicable"
 end
 
